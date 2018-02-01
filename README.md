@@ -49,7 +49,8 @@ Node.js, Express, MongoDB
 
 ## Setup
 
-Coming soon
+npm install; npm run dev
+###### runs on port 8888
 
 ## Deployment
 
