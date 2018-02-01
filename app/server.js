@@ -12,8 +12,11 @@ mongoose.connect(mongoURI);
 mongoose.Promise = global.Promise;
 
 // display hello world
-app.get('/', (req, res) => res.send('Hello, world!'));
+app.get('/', (req, res) => {
+  res.send('Hello, world!');
+});
+
 
 // startup server
-const port = process.env.PORT || 8888;
+const port = process.env.PORT || 9000;
 app.listen(port);
