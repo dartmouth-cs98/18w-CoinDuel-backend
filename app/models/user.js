@@ -12,7 +12,7 @@ const UserSchema = new Schema({
   },
 });
 
-PollSchema.virtual('balanace').get(function balance() {
+UserSchema.virtual('balanace').get(function balance() {
   return this.balance;
 });
 
