@@ -21,7 +21,7 @@ coinPrices: {
     coin_id,
     price,
     date
-}
+},
 capCoinHistory: {
     user_id,
     balance,
