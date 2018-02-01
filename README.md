@@ -1,6 +1,6 @@
 # CoinDuel backend
 
-Backend API for CoinDuel app.
+Backend API repo for CoinDuel iOS app.
 
 * Data models:
 
@@ -26,17 +26,17 @@ capCoinHistory: {
     user_id,
     balance,
     date
-}
+},
 game: {
     game_id,
     start_date,
     finish_date
-}
+},
 gameLeaderboard: {
     game_id,
     user_id,
     percent_return
-}
+},
 gameUserChoices: {
     game_id,
     user_id,
@@ -45,7 +45,7 @@ gameUserChoices: {
 ```
 ## Architecture
 
-Node.js, Express, MongoDB
+The backend is comprised of Node.js and Express for the server, and MongoDB for the database.
 
 ## Setup
 
