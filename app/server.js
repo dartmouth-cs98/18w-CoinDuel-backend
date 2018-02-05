@@ -13,7 +13,7 @@ mongoose.Promise = global.Promise;
 
 // display hello world
 app.get('/', (req, res) => {
-  res.send('Hello, world!');
+  res.send('Hello, cryptocurrency world!');
 });
 
 
