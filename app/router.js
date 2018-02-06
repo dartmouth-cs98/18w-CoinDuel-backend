@@ -7,7 +7,6 @@ router.get('/', (req, res) => {
   res.json({ message: 'coinduel me' });
 });
 
-///your routes will go here
-router.post('/signin', UserController.signup);
+router.post('/signin', User.signup);
 
 export default router;

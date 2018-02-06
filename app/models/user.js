@@ -4,8 +4,9 @@ import mongoose, { Schema } from 'mongoose';
 
 const UserSchema = new Schema({
   email: { type: String, unique: true, lowercase: true },
+  username: String,
   password: String,
-  balance: { type: Number, default: 0 },
+  coinBalance: { type: Number, default: 0 },
 });
 
 UserSchema.set('toJSON', {
