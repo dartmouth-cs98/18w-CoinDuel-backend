@@ -3,18 +3,20 @@
 import mongoose, { Schema } from 'mongoose';
 
 const UserSchema = new Schema({
-  email: String,
-  password_hash: String,
+  email: { type: String, unique: true, lowercase: true },
+  password: String,
   balance: { type: Number, default: 0 },
-}, {
-  toJSON: {
-    virtuals: true,
-  },
 });
 
-UserSchema.virtual('balanace').get(function balance() {
+UserSchema.set('toJSON', {
+  virtuals: true,
+});
+
+UserSchema.virtual('balance').get(function balance() {
   return this.balance;
 });
+
+
 
 // create model class
 const UserModel = mongoose.model('User', UserSchema);
