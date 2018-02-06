@@ -2,6 +2,7 @@
 
 import express from 'express';
 import mongoose from 'mongoose';
+import apiRouter from './router.js';
 
 // instantiate app
 const app = express();
@@ -16,7 +17,13 @@ app.get('/', (req, res) => {
   res.send('Hello, cryptocurrency world!');
 });
 
+app.get('/', (req, res) => {
+  res.send('Hello, cryptocurrency world!');
+});
+
 
 // startup server
 const port = process.env.PORT || 9000;
 app.listen(port);
+
+app.use('/api', apiRouter);
