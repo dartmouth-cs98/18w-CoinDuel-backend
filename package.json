@@ -7,9 +7,9 @@
   "scripts": {
     "test": "echo no test script",
     "dev": "nodemon app/server.js --exec babel-node",
-    "start": "echo no start script",
-    "build": "echo no build script",
-    "prod": "echo no prod script"
+    "start": "babel-node app/server.js",
+    "build": "babel app -d build",
+    "prod": "npm run build; node build/server.js"
   },
   "license": "ISC",
   "dependencies": {
