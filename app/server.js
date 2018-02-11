@@ -9,8 +9,6 @@ import bodyParser from 'body-parser';
 // instantiate app
 const app = express();
 
-app.use('/api', apiRouter);
-
 // enable json message body for posting data to API
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: '8mb' }));
@@ -21,7 +19,7 @@ app.get('/', (req, res) => {
   res.send('Hello, cryptocasdfasdfurrency world!');
 });
 
-
+app.use('/api', apiRouter);
 
 // startup server
 const port = process.env.PORT || 9000;
