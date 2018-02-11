@@ -1,4 +1,4 @@
-
+// Rajiv Ramaiah , CoinDuel 2018
 
 import User from '../models/user.js';
 
@@ -25,4 +25,10 @@ export const signup = (req, res, next) => {
   }
 
   // add query to check if user exists
+};
+
+
+export const signin = (req, res, next) => {
+  console.log('sign in started');
+  res.send({ token: tokenForUser(req.user) });
 };

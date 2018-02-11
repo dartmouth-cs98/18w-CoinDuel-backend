@@ -14,7 +14,7 @@ UserSchema.set('toJSON', {
 });
 
 UserSchema.virtual('balance').get(function balance() {
-  return this.balance;
+  return this.coinBalance;
 });
 
 

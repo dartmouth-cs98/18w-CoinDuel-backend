@@ -18,7 +18,7 @@ app.use(bodyParser.json({ limit: '8mb' }));
 
 // display hello world
 app.get('/', (req, res) => {
-  res.send('Hello, cryptocurrency world!');
+  res.send('Hello, cryptocasdfasdfurrency world!');
 });
 
 
@@ -26,6 +26,10 @@ app.get('/', (req, res) => {
 // startup server
 const port = process.env.PORT || 9000;
 app.listen(port);
+
+
+console.log(`listening on: ${port}`);
+
 
 // database setup
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/coinduel';
