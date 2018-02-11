@@ -13,13 +13,12 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: '8mb' }));
 
-
+app.use('/api', apiRouter);
 // display hello world
 app.get('/', (req, res) => {
-  res.send('Hello, cryptocasdfasdfurrency world!');
+  res.send('Hello, cryptocurrency world!');
 });
 
-app.use('/api', apiRouter);
 
 // startup server
 const port = process.env.PORT || 9000;
