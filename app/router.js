@@ -3,8 +3,9 @@ import * as User from './controllers/user_controller.js';
 
 const router = Router();
 
-router.get('/', (req, res) => {
-  res.json({ message: 'coinduel me' });
+router.get('/hello', (req, res) => {
+  // res.json({ message: 'coinduel me' });
+  res.send('Hello, coinduel');
 });
 
 router.post('/signin', User.signup);
