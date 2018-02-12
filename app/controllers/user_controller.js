@@ -17,7 +17,7 @@ export const signup = (req, res, next) => {
       res.send('success');
     })
     .catch(err => {
-      res.status(400).send(`${err}`);
+      res.send(`${err}`);
     });
 
   if (!email || !password || !username) {
@@ -26,6 +26,53 @@ export const signup = (req, res, next) => {
 
   // add query to check if user exists
 };
+
+export const findUser = (req, res) => {
+  const reqUser = req.user;
+
+  User.findById({ _id: reqUser._id })
+   .then(user => {
+     if (user.profilePicKey !== '') {
+       var paramsTwo = { Bucket: 'snap-app-bucket', Key: user.profilePicKey }; //eslint-disable-line
+       s3.getSignedUrl('getObject', paramsTwo, (err, Url) => {
+         console.log('\n\nThe new Signed URL is', Url);
+         User.findOneAndUpdate({ _id: reqUser._id }, {
+           profilePicURL: Url,
+         }).then(() => {
+           console.log('Updated Snaps URL');
+           User.findById({ _id: reqUser._id })
+             .then((userToReturn) => {
+               console.log('\n\nUSER TO RETURN', userToReturn);
+               res.send(userToReturn);
+             })
+           .catch(error => {
+             res.json({ error });
+           });
+         })
+         .catch(error => {
+           res.json({ error });
+         });
+       });
+     } else {
+       res.send(reqUser);
+     }
+   })
+ .catch(error => {
+   res.json({ error });
+ });
+};
+
+export const deleteUser = (req, res) => {
+  console.log('DELETE USER ID', req.user._id);
+  User.remove({ _id: req.user._id })
+   .then(() => {
+     res.json({ message: 'Usage successfully deleted!' });
+   })
+   .catch(error => {
+     res.json({ error });
+   });
+};
+
 
 
 export const signin = (req, res, next) => {

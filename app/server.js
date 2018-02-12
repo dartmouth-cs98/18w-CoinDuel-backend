@@ -2,23 +2,32 @@
 
 import express from 'express';
 import mongoose from 'mongoose';
-import apiRouter from './router.js';
+import apiRouter from './router';
 import bodyParser from 'body-parser';
 
 
 // instantiate app
 const app = express();
 
+
 // enable json message body for posting data to API
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: '8mb' }));
 
 app.use('/api', apiRouter);
+
 // display hello world
 app.get('/', (req, res) => {
   res.send('Hello, cryptocurrency world!');
 });
 
+app.get('/hello', (req, res) => {
+  res.json({ message: 'coinduel me' });
+});
+
+app.post('/', function (req, res) {
+  res.send('Got a POST request')
+})
 
 // startup server
 const port = process.env.PORT || 9000;
