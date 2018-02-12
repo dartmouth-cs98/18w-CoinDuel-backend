@@ -59,6 +59,25 @@ export const findUser = (req, res) => {
   });
 };
 
+// check if user exists
+export const getAllUsers = (req, res) => {
+  console.log("getting all users");
+  // add query to check if user exists
+  User.find()
+  .then((users) => {
+      if (users) {
+        res.send(users);
+      }
+      else {
+        return res.status(422).send('No users found!');
+      }
+    }
+  )
+  .catch(err => {
+    res.status(400).send(`${err}`);
+  });
+};
+
 export const deleteUser = (req, res) => {
   console.log('DELETE USER');
   User.remove({ "username": req.body.username })

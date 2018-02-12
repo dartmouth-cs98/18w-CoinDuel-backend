@@ -14,6 +14,7 @@ router.post('/', function (req, res) {
 })
 
 router.route('/user')
+  .get(User.getAllUsers)
   .post(User.findUser)
   .delete(User.deleteUser);
 
