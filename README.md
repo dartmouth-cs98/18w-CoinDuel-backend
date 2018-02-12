@@ -42,12 +42,13 @@ game: {
 gameLeaderboard: {
     game_id,
     user_id,
-    percent_return
+    percent_return,
+    time_of_observation
 },
 gameUserChoices: {
     game_id,
     user_id,
-    selections: {[selection_1, is_short,], ...,[selection_3, is_short]}
+    selections: {[selection_1, percent_mix,], ...,[selection_3, percent_mix]}
 }
 ```
 ## Architecture
