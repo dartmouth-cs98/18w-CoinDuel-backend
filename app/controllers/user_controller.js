@@ -7,64 +7,61 @@ export const signup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const username = req.body.username;
-
-  const newUser = new User();
-  newUser.email = email;
-  newUser.password = password;
-  newUser.username = username;
-  newUser.save()
-    .then((result) => {
-      res.send('success');
-    })
-    .catch(err => {
-      res.send(`${err}`);
-    });
+  console.log(req.body);
 
   if (!email || !password || !username) {
     return res.status(422).send('You must provide an email, a password, and a username to sign up!');
   }
 
   // add query to check if user exists
+  User.findOne({ "username": username })
+  .then((user) => {
+      if (user) {
+        return res.status(422).send('The password or email or username you entered has been taken!');
+      }
+      else {
+        const newUser = new User();
+        newUser.email = email;
+        newUser.password = password;
+        newUser.username = username;
+        newUser.save()
+          .then((result) => {
+            res.send('success');
+          })
+          .catch(err => {
+            res.send(`${err}`);
+          });
+      }
+    }
+  )
+  .catch(err => {
+    res.status(400).send(`${err}`);
+  });
 };
 
+// check if user exists
 export const findUser = (req, res) => {
-  const reqUser = req.user;
-
-  User.findById({ _id: reqUser._id })
-   .then(user => {
-     if (user.profilePicKey !== '') {
-       var paramsTwo = { Bucket: 'snap-app-bucket', Key: user.profilePicKey }; //eslint-disable-line
-       s3.getSignedUrl('getObject', paramsTwo, (err, Url) => {
-         console.log('\n\nThe new Signed URL is', Url);
-         User.findOneAndUpdate({ _id: reqUser._id }, {
-           profilePicURL: Url,
-         }).then(() => {
-           console.log('Updated Snaps URL');
-           User.findById({ _id: reqUser._id })
-             .then((userToReturn) => {
-               console.log('\n\nUSER TO RETURN', userToReturn);
-               res.send(userToReturn);
-             })
-           .catch(error => {
-             res.json({ error });
-           });
-         })
-         .catch(error => {
-           res.json({ error });
-         });
-       });
-     } else {
-       res.send(reqUser);
-     }
-   })
- .catch(error => {
-   res.json({ error });
- });
+  console.log("checking for user");
+  console.log(req.body);
+  // add query to check if user exists
+  User.findOne({ "username": req.body.username })
+  .then((user) => {
+      if (user) {
+        res.send(user);
+      }
+      else {
+        return res.status(422).send('No user found!');
+      }
+    }
+  )
+  .catch(err => {
+    res.status(400).send(`${err}`);
+  });
 };
 
 export const deleteUser = (req, res) => {
-  console.log('DELETE USER ID', req.user._id);
-  User.remove({ _id: req.user._id })
+  console.log('DELETE USER');
+  User.remove({ "username": req.body.username })
    .then(() => {
      res.json({ message: 'Usage successfully deleted!' });
    })

@@ -21,14 +21,6 @@ app.get('/', (req, res) => {
   res.send('Hello, cryptocurrency world!');
 });
 
-app.get('/hello', (req, res) => {
-  res.json({ message: 'coinduel me' });
-});
-
-app.post('/', function (req, res) {
-  res.send('Got a POST request')
-})
-
 // startup server
 const port = process.env.PORT || 9000;
 app.listen(port);
@@ -41,3 +33,4 @@ console.log(`listening on: ${port}`);
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/coinduel';
 mongoose.connect(mongoURI);
 mongoose.Promise = global.Promise;
+console.log(`listening on: ${mongoURI}`);

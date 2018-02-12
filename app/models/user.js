@@ -13,9 +13,9 @@ UserSchema.set('toJSON', {
   virtuals: true,
 });
 
-UserSchema.virtual('balance').get(function balance() {
-  return this.coinBalance;
-});
+// UserSchema.virtual('balance').get(function balance() {
+//   return this.coinBalance;
+// });
 
 
 

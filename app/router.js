@@ -8,14 +8,13 @@ router.get('/', (req, res) => {
 });
 
 
-router.get('/', User.findUser);
-
 router.post('/', function (req, res) {
   res.send('Got a POST request')
+  console.log(req.body);
 })
 
 router.route('/user')
-  .get(User.findUser)
+  .post(User.findUser)
   .delete(User.deleteUser);
 
 router.post('/signup', User.signup);

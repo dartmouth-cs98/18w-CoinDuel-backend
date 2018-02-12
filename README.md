@@ -2,6 +2,13 @@
 
 Backend API repo for CoinDuel iOS app.
 
+https://coinduel-cs98.herokuapp.com/api/user
+^ send post endpoint with username to find if one exists
+^ send delete request with usernamen to delete
+
+https://coinduel-cs98.herokuapp.com/api/signup
+^add user with a post request with email, password, and username
+
 * Data models:
 
 ```
