@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as User from './controllers/user_controller.js';
+import * as Price from './controllers/price_controller.js';
 
 const router = Router();
 
@@ -17,6 +18,9 @@ router.route('/user')
   .get(User.getAllUsers)
   .post(User.findUser)
   .delete(User.deleteUser);
+
+router.route('/price')
+  .get(Price.getPrice);
 
 router.post('/signup', User.signup);
 

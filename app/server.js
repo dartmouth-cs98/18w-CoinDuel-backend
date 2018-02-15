@@ -9,6 +9,9 @@ import bodyParser from 'body-parser';
 // instantiate app
 const app = express();
 
+// store crypto tickers
+const tickers = require('./resources/ticker.json');
+app.locals.tickers = tickers;
 
 // enable json message body for posting data to API
 app.use(bodyParser.urlencoded({ extended: true }));
