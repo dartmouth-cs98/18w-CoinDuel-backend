@@ -1,26 +1,24 @@
 import { Router } from 'express';
 import * as User from './controllers/user_controller.js';
 import * as Game from './controllers/game_controller.js';
+import * as Coin from './controllers/coin_controller.js';
 
 const router = Router();
 
-router.get('/', (req, res) => {
-  res.json({ message: 'coinduel me' });
-});
-
-
-router.post('/', function (req, res) {
-  res.send('Got a POST request')
-  console.log(req.body);
-})
-
+// user controller
 router.route('/user')
   .get(User.getAllUsers)
   .post(User.findUser)
   .delete(User.deleteUser);
 
+// coin controller
+router.route('/coin')
+  .get(Coin.getCoin);
+
+// signup user
 router.post('/signup', User.signup);
 
+// game controller
 router.get('/game', Game.getLatestGame);
 
 router.route('/game/:gameId/:userId')
