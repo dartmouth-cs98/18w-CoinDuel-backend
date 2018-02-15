@@ -58,7 +58,7 @@ The backend is comprised of Node.js and Express for the server, and MongoDB for 
 ## Setup
 
 npm install; npm run dev
-###### runs on port 8888
+###### runs on port 9000
 
 ## Deployment
 
