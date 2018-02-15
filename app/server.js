@@ -24,6 +24,8 @@ app.get('/', (req, res) => res.send('Hello, cryptocurrency world!'));
 const port = process.env.PORT || 9000;
 app.listen(port);
 
+console.log(`listening on: ${port}`);
+
 // database setup
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/coinduel';
 mongoose.connect(mongoURI);

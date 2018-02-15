@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as User from './controllers/user_controller.js';
+import * as Game from './controllers/game_controller.js';
 import * as Coin from './controllers/coin_controller.js';
 
 const router = Router();
@@ -16,5 +17,14 @@ router.route('/coin')
 
 // signup user
 router.post('/signup', User.signup);
+
+// game controller
+router.get('/game', Game.getLatestGame);
+
+router.route('/game/:gameId/:userId')
+  .get(Game.getEntry)
+  .post(Game.createAndUpdateEntry)
+  .put(Game.createAndUpdateEntry)
+  .delete(Game.deleteEntry)
 
 export default router;
