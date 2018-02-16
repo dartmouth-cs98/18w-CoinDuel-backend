@@ -3,14 +3,14 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import apiRouter from './router';
+import resources from './resources';
 import bodyParser from 'body-parser';
 
 // instantiate app
 const app = express();
 
-// store crypto tickers
-const tickers = require('./resources/ticker.json');
-app.locals.tickers = tickers;
+// load in resources
+app.locals.resources = resources;
 
 // enable json message body
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -23,8 +23,6 @@ app.get('/', (req, res) => res.send('Hello, cryptocurrency world!'));
 // startup server
 const port = process.env.PORT || 9000;
 app.listen(port);
-
-console.log(`listening on: ${port}`);
 
 // database setup
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/coinduel';

@@ -14,7 +14,7 @@ const getJSON = require('get-json');
  */
 export const getCoin = (req, res) => {
   const symbol = req.body.symbol;
-  const tickers = req.app.locals.tickers;   // global ticker dict
+  const tickers = req.app.locals.resources.tickers;   // global ticker dict
 
   // check if request has ticker
   if (!symbol) {
@@ -36,7 +36,7 @@ export const getCoin = (req, res) => {
       }
 
       // send back data as object
-      res.send(crypto[0]);
+      res.status(400).send(crypto[0]);
     });
   }
 };
