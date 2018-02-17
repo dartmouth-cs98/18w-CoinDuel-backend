@@ -57,7 +57,13 @@ The backend is comprised of Node.js and Express for the server, and MongoDB for 
 
 ## Setup
 
-npm install; npm run dev
+1) clone backend repo
+1.5) If necessary, get homebrew and download mongo using 'brew install mongodb'
+2) 'brew services start mongodb' OR 'mongod' (if not using brew)
+3) mongo < test_data.js 
+4) npm install
+5) npm run dev
+6) To test, try http://localhost:9000/api/game. This should return the most recent game from test_data.js.
 ###### runs on port 9000
 
 ## Deployment
