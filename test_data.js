@@ -19,6 +19,10 @@ db.games.insertMany([
 	{ _id: new ObjectId("5a8608233d378876bf62d818"), start_date: new Date(1519653600000), finish_date: new Date(1520028000000), "coins": { "ADA": 0.41, "XLM": 0.5, "NEO": 127.32, "EOS": 9.24, "MIOTA": 2.11 }},
 	{ _id: new ObjectId("5a8608233d378876bf62d819"), start_date: new Date(1520258400000), finish_date: new Date(1520632800000), "coins": { "DASH": 728.42, "ZCL": 189.24, "XVG": 0.08, "BNB": 10.86 }}])
 
+
+db.entries.insertMany([
+  { _id: new ObjectId("5a8ace5a53bb81002573c1f0"), userId:"5a8607d4971c50fbf29726a2", percent_return: 0, choices: { "DASH": 1.0, "XMR": 1.0, "ZCL": 2.0, "XVG": 0.0, "BNB": 6.0}},
+  { _id: new ObjectId("5a8ace5a53bb12302573c1f0"), userId:"5a8607d5971c50fbf29726a3", percent_return: 0, choices: { "ADA": 1.0, "XLM": 1.0, "NEO": 2.0, "EOS": 0.0, "MIOTA": 6.0}} ])
 /* Commands for testing game_controller functions:
 
 getLatestGame: curl -X GET http://localhost:9000/api/game/
