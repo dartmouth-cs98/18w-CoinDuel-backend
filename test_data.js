@@ -15,9 +15,9 @@ db.users.insertMany([
 	{ _id: new ObjectId("5a8607d6971c50fbf29726a5"), email: '4@gmail.com', username: 'p4', password: '4', coinBalance: 40 }])
 
 db.games.insertMany([
-	{ _id: new ObjectId("5a8608233d378876bf62d817"), start_date: new Date(1519048800000), finish_date: new Date(1519423200000), currency_list: ["BTC", "ETH", "XRP", "BCH", "LTC"]},
-	{ _id: new ObjectId("5a8608233d378876bf62d818"), start_date: new Date(1519653600000), finish_date: new Date(1520028000000), currency_list: ["ADA", "XLM", "NEO", "EOS", "MIOTA"]},
-	{ _id: new ObjectId("5a8608233d378876bf62d819"), start_date: new Date(1520258400000), finish_date: new Date(1520632800000), currency_list: ["DASH", "XMR", "ZCL", "XVG", "BNB"]}])
+	{ _id: new ObjectId("5a8608233d378876bf62d817"), start_date: new Date(1519048800000), finish_date: new Date(1519423200000), "coins": { "BTC": 11129, "ETH": 973.93, "XRP": 1.05, "BCH": 1527.79, "LTC": 218.82 }},
+	{ _id: new ObjectId("5a8608233d378876bf62d818"), start_date: new Date(1519653600000), finish_date: new Date(1520028000000), "coins": { "ADA": 0.41, "XLM": 0.5, "NEO": 127.32, "EOS": 9.24, "MIOTA": 2.11 }},
+	{ _id: new ObjectId("5a8608233d378876bf62d819"), start_date: new Date(1520258400000), finish_date: new Date(1520632800000), "coins": { "DASH": 728.42, "ZCL": 189.24, "XVG": 0.08, "BNB": 10.86 }}])
 
 /* Commands for testing game_controller functions:
 
