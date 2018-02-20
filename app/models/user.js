@@ -6,7 +6,7 @@ const UserSchema = new Schema({
   email: { type: String, unique: true, lowercase: true },
   username: String,
   password: String,
-  coinBalance: { type: Number, default: 0 },
+  coinBalance: { type: Number, default: 0 }
 });
 
 UserSchema.set('toJSON', {

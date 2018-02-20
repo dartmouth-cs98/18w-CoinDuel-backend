@@ -59,42 +59,48 @@ export const getCoinReturns = (req, res) => {
       res.status(422).send('No game found with id ' + gameId);
       return;
     }
-    var priceDict = result.coins;
 
-    // get current prices of
-    var currentPrices = {};
-    getJSON('https://api.coinmarketcap.com/v1/ticker/', (err, cryptos) => {
-      if (err) {
-        res.status(422).send('Unable to retrieve prices - please check http://api.coinmarketcap.com/. ERROR: ' + err);
-        return;
-      }
-
-      // find user's coins
-      cryptos.forEach(crypto => {
-        if (priceDict[crypto.symbol]) {
-
-        }
-      });
-
+    // save tickers and prices in obj
+    var initialPrices = {};
+    result.coins.forEach(coin => {
+      initialPrices[coin.name] = coin.value;
     });
 
-    // get users coin choices
-    GameEntry.findOne({ gameId: gameId, userId: userId }, (err, result) => {
-      if (err) {
-        res.status(422).send('No game entries found for user ' + userId + ' and game ' + gameId);
+    // get current prices of coins
+    var currentPrices = {};
+    getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=0', (subErr, cryptos) => {
+      if (subErr) {
+        res.status(422).send('Unable to retrieve prices - please check http://api.coinmarketcap.com/. ERROR: ' + subErr);
         return;
       }
-      var returns = {};
 
-      // calculate return for each coin
-      Object.keys(result.choices).forEach(coin => {
-        // cap coin amount in 'result.choices.coin'
-        // starting price in priceDict.*coin*
-        returns[coin] = {'capCoin':0, 'percent':0}
-        returns.coin.capCoin =
-        returns.coin.percent =
+      // store user's coin's current prices
+      cryptos.forEach(crypto => {
+        if (initialPrices[crypto.symbol]) currentPrices[crypto.symbol] = crypto.price_usd;
       });
-      res.status(200).send(returns);
+
+      // get users coin choices
+      GameEntry.findOne({ gameId: gameId, userId: userId }, (subSubErr, entry) => {
+        if (subSubErr) {
+          res.status(422).send('No game entries found for user ' + userId + ' and game ' + gameId);
+          return;
+        }
+
+        // calculate return for each coin
+        var fullResults = {'userId': userId, 'gameId': gameId, 'returns':{}};
+        entry.choices.forEach(choice => {
+          let ticker = choice.symbol;
+          let percentChange = (currentPrices[ticker] - initialPrices[ticker]) / currentPrices[ticker];
+          let capCoin = choice.allocation * percentChange + choice.allocation;
+          fullResults.returns[ticker] = {
+            'initialPrice': initialPrices[ticker],
+            'currentPrice': currentPrices[ticker],
+            'allocation': choice.allocation,
+            'capCoin': capCoin,
+            'percent': percentChange * 100 };
+        });
+        res.status(200).send(fullResults);
+      });
     });
   });
 };
