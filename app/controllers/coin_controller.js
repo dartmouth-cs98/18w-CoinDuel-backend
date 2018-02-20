@@ -62,9 +62,7 @@ export const getCoinReturns = (req, res) => {
 
     // save tickers and prices in obj
     var initialPrices = {};
-    result.coins.forEach(coin => {
-      initialPrices[coin.name] = coin.value;
-    });
+    result.coins.forEach(coin => initialPrices[coin.name] = coin.value);
 
     // get current prices of coins
     var currentPrices = {};
