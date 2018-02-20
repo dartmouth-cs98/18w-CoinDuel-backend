@@ -31,7 +31,7 @@ export const signup = (req, res, next) => {
         newUser.username = username;
         newUser.save()
           .then((result) => {
-            res.send('success');
+            res.send(newUser);
           })
           .catch(err => {
             res.send(`${err}`);
