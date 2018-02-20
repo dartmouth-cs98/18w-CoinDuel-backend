@@ -14,6 +14,8 @@ router.route('/user')
 // coin controller
 router.route('/coin')
   .get(Coin.getCoin);
+router.route('/return/:gameId/:userId')
+  .get(Coin.getCoinReturns);
 
 // signup user
 router.post('/signup', User.signup);
