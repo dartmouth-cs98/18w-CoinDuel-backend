@@ -11,7 +11,7 @@ GameSchema.set('toJSON', {
 });
 
 GameSchema.virtual('started').get(function () {
-  return Date.now > start_date ;
+  return Date.now > this.start_date ;
 });
 
 const GameModel = mongoose.model('Game', GameSchema);
