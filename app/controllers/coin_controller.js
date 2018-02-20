@@ -74,7 +74,7 @@ export const getCoinReturns = (req, res) => {
 
       // store user's coin's current prices
       cryptos.forEach(crypto => {
-        if (initialPrices[crypto.symbol]) currentPrices[crypto.symbol] = crypto.price_usd;
+        if (initialPrices[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
       });
 
       // get users coin choices
@@ -91,11 +91,11 @@ export const getCoinReturns = (req, res) => {
           let percentChange = (currentPrices[ticker] - initialPrices[ticker]) / currentPrices[ticker];
           let capCoin = choice.allocation * percentChange + choice.allocation;
           fullResults.returns[ticker] = {
-            'initialPrice': initialPrices[ticker],
-            'currentPrice': currentPrices[ticker],
-            'allocation': choice.allocation,
-            'capCoin': capCoin,
-            'percent': percentChange * 100 };
+            'initialPrice': initialPrices[ticker].toString(),
+            'currentPrice': currentPrices[ticker].toString(),
+            'allocation': choice.allocation.toString(),
+            'capCoin': capCoin.toString(),
+            'percent': (percentChange * 100).toString() };
         });
         res.status(200).send(fullResults);
       });
