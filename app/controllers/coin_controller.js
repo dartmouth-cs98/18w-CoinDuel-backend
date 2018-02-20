@@ -17,7 +17,7 @@ const getJSON = require('get-json');
  * @param req, ex. {symbol: 'ETH'}
  */
 export const getCoin = (req, res) => {
-  const symbol = req.body.symbol;
+  const symbol = req.params.symbol;
   const tickers = req.app.locals.resources.tickers;   // global ticker dict
 
   // check if request has ticker
