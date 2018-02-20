@@ -6,5 +6,13 @@ const GameSchema = new Schema({
     coins: [{"name":String, "value":Number}],
 });
 
+GameSchema.set('toJSON', {
+  virtuals: true,
+});
+
+GameSchema.virtual('started').get(function () {
+  return Date.now > start_date ;
+});
+
 const GameModel = mongoose.model('Game', GameSchema);
 export default GameModel;
