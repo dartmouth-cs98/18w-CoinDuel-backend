@@ -12,7 +12,7 @@ router.route('/user')
   .delete(User.deleteUser);
 
 // coin controller
-router.route('/coin')
+router.route('/coin/:symbol')
   .get(Coin.getCoin);
 router.route('/return/:gameId/:userId')
   .get(Coin.getCoinReturns);
