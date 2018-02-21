@@ -10,8 +10,8 @@ GameSchema.set('toJSON', {
   virtuals: true,
 });
 
-GameSchema.virtual('started').get(function () {
-  return Date.now > this.start_date ;
+GameSchema.virtual('is_active').get(function () {
+  return this.start_date < Date.now() < this.finish_date;
 });
 
 const GameModel = mongoose.model('Game', GameSchema);
