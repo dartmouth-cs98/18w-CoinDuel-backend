@@ -15,7 +15,7 @@ GameSchema.virtual('is_active').get(function () {
 });
 
 GameSchema.virtual('game_finished').get(function () {
-  return Date.now() < this.finish_date;
+  return Date.now() > this.finish_date;
 });
 
 const GameModel = mongoose.model('Game', GameSchema);
