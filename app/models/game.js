@@ -11,7 +11,7 @@ GameSchema.set('toJSON', {
 });
 
 GameSchema.virtual('is_active').get(function () {
-  return this.start_date < Date.now() < this.finish_date;
+  return this.start_date < Date.now() && Date.now() < this.finish_date;
 });
 
 GameSchema.virtual('game_finished').get(function () {
