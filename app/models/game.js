@@ -1,3 +1,11 @@
+/*
+ * game.js
+ *
+ * Schema for a weekly game
+ * Feb 12 2018
+ * Kooshul Jhaveri
+ */
+
 import mongoose, { Schema } from 'mongoose';
 
 const GameSchema = new Schema({

@@ -115,7 +115,7 @@ export const getCoinReturns = (req, res) => {
         return;
       }
 
-      // store user's coin's current prices
+      // store game's current coin prices
       cryptos.forEach(crypto => {
         if (initialPrices[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
       });

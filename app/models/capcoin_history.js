@@ -4,7 +4,7 @@ const CapcoinHistorySchema = new Schema({
     gameId: { type: Schema.Types.ObjectId, ref: 'Game' },
     userId: { type: Schema.Types.ObjectId, ref: 'User' },
     balance: { type: Number, default: 0 },
-    date: { type: Date }
+    date: { type: Date, default: Date.now }
 });
 
 CapcoinHistorySchema.set('toJSON', {
