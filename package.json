@@ -5,7 +5,9 @@
   "author": "Kooshul Jhaveri, Anish Chadalavada, Mitchell Revers, Rajiv Ramaiah, Henry Wilson, Josh Kerber",
   "main": "app/server.js",
   "scripts": {
-    "test": "echo no test script",
+    "test": "echo test script",
+    "startGame": "",
+    "endGame": "",
     "dev": "nodemon app/server.js --exec babel-node",
     "start": "babel-node app/server.js",
     "build": "babel app -d build",
