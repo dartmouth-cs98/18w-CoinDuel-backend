@@ -8,6 +8,7 @@
 
 import Game from '../models/game.js';
 import GameEntry from '../models/gameentry.js';
+import CapcoinHistory from '../models/capcoin_history.js';
 
 // for calls to CoinMarketCap
 const getJSON = require('get-json');
@@ -142,5 +143,26 @@ export const getCoinReturns = (req, res) => {
         res.status(200).send(fullResults);
       });
     });
+  });
+};
+
+/*
+ * Get the a user's capcoin history.
+ * @param req, ex. { userId: '5a8607d6971c50fbf29726a5' }
+ */
+export const getCapcoinHistory = (req, res) => {
+  const userId = req.params.userId;
+
+  // get all history for user
+  CapcoinHistory.find({ userId: userId }, (err, history) => {
+    if (err || !history) {
+      res.status(422).send('No capcoin history for user \'' + userId + '\'');
+      return;
+    }
+
+    // clean up data
+    var balances = [];
+    history.forEach(entry => balances.push({'date': entry['date'], 'balance': entry['balance']}));
+    res.status(200).send(balances);
   });
 };

@@ -18,6 +18,8 @@ router.route('/return/:gameId/:userId')
   .get(Coin.getCoinReturns);
 router.route('/game/prices/:gameId')
   .get(Coin.getCoinPrices);
+router.route('/capcoin/:userId')
+  .get(Coin.getCapcoinHistory);
 
 // signup user
 router.post('/signup', User.signup);
