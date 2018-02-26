@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as User from './controllers/user_controller.js';
 import * as Game from './controllers/game_controller.js';
 import * as Coin from './controllers/coin_controller.js';
+import * as Leaderboard from './controllers/leaderboard_controller.js';
 
 const router = Router();
 
@@ -34,5 +35,10 @@ router.route('/game/:gameId/:userId')
   .post(Game.createAndUpdateEntry)
   .put(Game.createAndUpdateEntry)
   .delete(Game.deleteEntry)
+
+// leaderboard controller
+router.route('/leaderboard/:gameId')
+.get(Leaderboard.getRankings)
+
 
 export default router;

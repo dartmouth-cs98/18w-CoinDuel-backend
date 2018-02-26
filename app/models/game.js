@@ -3,7 +3,7 @@ import mongoose, { Schema } from 'mongoose';
 const GameSchema = new Schema({
     start_date: { type: Date, default: Date.now },
     finish_date: { type: Date },
-    coins: [{"name":String, "value":Number}],
+    coins: [{ name: { type: String }, value: { type: Number }}],
 });
 
 GameSchema.set('toJSON', {

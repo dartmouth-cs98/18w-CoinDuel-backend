@@ -4,7 +4,9 @@
 use coinduel
 db.getCollectionNames().forEach(
   function(collection_name) {
-    db[collection_name].remove({})
+    if(collection_name != 'system.indexes') {
+      db[collection_name].remove({})
+    }
   }
 );
 
@@ -19,8 +21,9 @@ db.games.insertMany([
 
 
 db.entries.insertMany([
-  { _id: new ObjectId("5a8ace5a53bb81002573c1f0"), gameId: new ObjectId("5a8608233d378876bf62d819"), userId: new ObjectId("5a8607d4971c50fbf29726a2"), percent_return: 0, choices: [ {"symbol": "BTC", "allocation": 1.0}, {"symbol": "ETH", "allocation": 1.0}, {"symbol": "XRP", "allocation": 2.0}, {"symbol": "BCH", "allocation": 2.0}, {"symbol": "LTC", "allocation": 4.0} ] },
-  { _id: new ObjectId("5a8ace5a53bb12302573c1f0"), gameId: new ObjectId("5a8608233d378876bf62d818"), userId: new ObjectId("5a8607d5971c50fbf29726a3"), percent_return: 0, choices: [ {"symbol": "ADA", "allocation": 1.0}, {"symbol": "XLM", "allocation": 1.0}, {"symbol": "NEO", "allocation": 2.0}, {"symbol": "EOS", "allocation": 0.0}, {"symbol": "MIOTA", "allocation": 6.0} ] } ])
+  { _id: new ObjectId("5a8ace5a53bb81002573c1f0"), gameId: new ObjectId("5a8608233d378876bf62d819"), userId: new ObjectId("5a8607d6971c50fbf29726a4"), coin_balance: 8.4, choices: [ {"symbol": "BTC", "allocation": 1.0}, {"symbol": "ETH", "allocation": 1.0}, {"symbol": "XRP", "allocation": 2.0}, {"symbol": "BCH", "allocation": 2.0}, {"symbol": "LTC", "allocation": 4.0} ] },
+  { _id: new ObjectId("5a8ace5a53bb81002573c1f1"), gameId: new ObjectId("5a8608233d378876bf62d819"), userId: new ObjectId("5a8607d4971c50fbf29726a2"), coin_balance: 3.9, choices: [ {"symbol": "BTC", "allocation": 1.0}, {"symbol": "ETH", "allocation": 1.0}, {"symbol": "XRP", "allocation": 2.0}, {"symbol": "BCH", "allocation": 2.0}, {"symbol": "LTC", "allocation": 4.0} ] },
+  { _id: new ObjectId("5a8ace5a53bb12302573c1f2"), gameId: new ObjectId("5a8608233d378876bf62d819"), userId: new ObjectId("5a8607d5971c50fbf29726a3"), coin_balance: 5.3, choices: [ {"symbol": "ADA", "allocation": 1.0}, {"symbol": "XLM", "allocation": 1.0}, {"symbol": "NEO", "allocation": 2.0}, {"symbol": "EOS", "allocation": 0.0}, {"symbol": "MIOTA", "allocation": 6.0} ] } ])
 
 db.capcoin_history.insertMany([
 	{ _id: new ObjectId("5a8608233d378876bf62d822"), gameId: new ObjectId("5a8608233d378876bf62d818"), userId: new ObjectId("5a8607d4971c50fbf29726a2"), date: new Date(1519048800000), balance: 12 },

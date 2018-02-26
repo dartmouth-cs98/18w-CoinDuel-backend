@@ -54,7 +54,6 @@ export const getEntry = (req, res) => {
 };
 
 // updates entry specified by game and user ids (creates a new entry if one doesn't already exist)
-// @param req, ex. { "choices": [["BTC", 2], ["ETH", 3], ["XRP", 2], ["BCH", 2], ["LTC", 1]] }
 export const createAndUpdateEntry = (req, res) => {
 	GameEntry.findOneAndUpdate(
 		{ gameId: req.params.gameId, userId: req.params.userId },
