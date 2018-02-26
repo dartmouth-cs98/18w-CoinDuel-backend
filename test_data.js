@@ -4,7 +4,9 @@
 use coinduel
 db.getCollectionNames().forEach(
   function(collection_name) {
-    db[collection_name].remove({})
+    if(collection_name != 'system.indexes') {
+      db[collection_name].remove({})
+    }
   }
 );
 
