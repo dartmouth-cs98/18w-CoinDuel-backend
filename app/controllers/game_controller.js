@@ -5,7 +5,12 @@ import GameEntry from '../models/gameentry.js';
 // returns most recent game
 // // @param req, ex. { }
 export const getLatestGame = (req, res) => {
-	Game.find({})
+	var date = Date.now()
+
+	Game.find({
+		start_date: {$lt: date},
+		finish_date: {$gt: date}
+	})
 	.sort('-start_date')
 	.limit(1)
 	.then((result) => {
