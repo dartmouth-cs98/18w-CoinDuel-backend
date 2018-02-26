@@ -97,7 +97,7 @@ export const getCoinReturns = (req, res) => {
 
   // get initial coin prices for game
   Game.findById(gameId, (err, result) => {
-    if (err) {
+    if (err || !result) {
       res.status(422).send('No game found with id ' + gameId);
       return;
     }
@@ -109,7 +109,7 @@ export const getCoinReturns = (req, res) => {
     // get current prices of coins
     var currentPrices = {};
     getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=0', (subErr, cryptos) => {
-      if (subErr) {
+      if (subErr || !cryptos) {
         res.status(422).send('Unable to retrieve prices - please check http://api.coinmarketcap.com/. ERROR: ' + subErr);
         return;
       }
@@ -121,7 +121,7 @@ export const getCoinReturns = (req, res) => {
 
       // get users coin choices
       GameEntry.findOne({ gameId: gameId, userId: userId }, (subSubErr, entry) => {
-        if (subSubErr) {
+        if (subSubErr || !entry) {
           res.status(422).send('No game entries found for user ' + userId + ' and game ' + gameId);
           return;
         }
