@@ -38,7 +38,7 @@ router.route('/game/:gameId/:userId')
 
 // leaderboard controller
 router.route('/leaderboard/:gameId')
-.get(Leaderboard.getRankings)
+  .get(Leaderboard.getRankings)
 
 
 export default router;

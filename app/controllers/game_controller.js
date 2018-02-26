@@ -1,3 +1,11 @@
+/*
+ * game_controller.js
+ *
+ * API endpoints to deal with CRUD operations for games and game entries
+ * Feb 12 2018
+ * Kooshul Jhaveri
+ */
+
 import User from '../models/user.js';
 import Game from '../models/game.js';
 import GameEntry from '../models/gameentry.js';

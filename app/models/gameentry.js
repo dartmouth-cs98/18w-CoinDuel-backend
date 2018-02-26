@@ -1,3 +1,11 @@
+/*
+ * gameentry.js
+ *
+ * Schema for a user's entry into a particular game
+ * Feb 12 2018
+ * Kooshul Jhaveri
+ */
+
 import mongoose, { Schema } from 'mongoose';
 
 const GameEntrySchema = new Schema({
@@ -5,7 +13,7 @@ const GameEntrySchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'User' },
     choices: [{ symbol: { type: String }, allocation: { type: Number, min: 0, max: 10 }}],
     coin_balance: { type: Number, default: 0 },
-    last_updated: { type: Date }
+    last_updated: { type: Date, default: Date.now }
 });
 
 const GameEntryModel = mongoose.model('GameEntry', GameEntrySchema, 'entries');
