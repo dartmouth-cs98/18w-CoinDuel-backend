@@ -16,6 +16,8 @@ router.route('/coin/:symbol')
   .get(Coin.getCoin);
 router.route('/return/:gameId/:userId')
   .get(Coin.getCoinReturns);
+router.route('/game/prices/:gameId')
+  .get(Coin.getCoinPrices);
 
 // signup user
 router.post('/signup', User.signup);

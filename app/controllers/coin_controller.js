@@ -46,6 +46,48 @@ export const getCoin = (req, res) => {
 };
 
 /*
+ * Get the current prices for coins in a specific game.
+ * @param req, ex. { gameId: '5a8608233d378876bf62d819'}
+ */
+export const getCoinPrices = (req, res) => {
+  const gameId = req.params.gameId;
+
+  // get initial coin prices for game
+  Game.findById(gameId, (err, result) => {
+    if (err) {
+      res.status(422).send('No game found with id ' + gameId);
+      return;
+    }
+
+    // save tickers and prices in obj
+    var initialPrices = {};
+    result.coins.forEach(coin => initialPrices[coin.name] = coin.value);
+
+    // get current prices of coins
+    var currentPrices = {};
+    getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=0', (subErr, cryptos) => {
+      if (subErr) {
+        res.status(422).send('Unable to retrieve prices - please check http://api.coinmarketcap.com/. ERROR: ' + subErr);
+        return;
+      }
+
+      // store user's coin's current prices
+      cryptos.forEach(crypto => {
+        if (initialPrices[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
+      });
+
+      // calculate return for each coin
+      var fullResults = {'gameId': gameId, 'prices':{}};
+      result.coins.forEach(coin => {
+        let ticker = coin.name;
+        fullResults.prices[ticker] = currentPrices[ticker].toString();
+      });
+      res.status(200).send(fullResults);
+    });
+  });
+};
+
+/*
  * Get the current return for a user's cryptocurrencies during a game.
  * @param req, ex. { gameId: '5a8608233d378876bf62d819', userId: '5a8607d6971c50fbf29726a5'}
  */
