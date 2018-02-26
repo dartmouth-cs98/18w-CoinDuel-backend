@@ -166,3 +166,25 @@ export const getCapcoinHistory = (req, res) => {
     res.status(200).send(balances);
   });
 };
+
+/*
+ * Get the a user's capcoin history during a specified game.
+ * @param req, ex. { gameId: '5a8608233d378876bf62d819', userId: '5a8607d6971c50fbf29726a5'}
+ */
+export const getCapcoinHistoryForGame = (req, res) => {
+  const userId = req.params.userId;
+  const gameId = req.params.gameId;
+
+  // get all history for user during game
+  CapcoinHistory.find({ userId: userId, gameId: gameId }, (err, history) => {
+    if (err || !history) {
+      res.status(422).send('No capcoin history for user \'' + userId + '\' during game \'' + gameId + '\'');
+      return;
+    }
+
+    // clean up data
+    var balances = [];
+    history.forEach(entry => balances.push({'date': entry['date'], 'balance': entry['balance']}));
+    res.status(200).send(balances);
+  });
+};
