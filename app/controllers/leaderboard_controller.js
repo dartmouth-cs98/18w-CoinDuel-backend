@@ -9,6 +9,7 @@
 import User from '../models/user.js';
 import Game from '../models/game.js';
 import GameEntry from '../models/gameentry.js';
+import CapcoinHistory from '../models/capcoin_history.js';
 
 const getJSON = require('get-json');
 
