@@ -57,7 +57,7 @@ export const getRankings = (req, res) => {
 		      			if (err4 || !result4) {
 		      				res.status(500).send('Error saving updated coin balance. ERROR: ' + err2);
 	    					return;
-		      			} 	
+		      			}
 		      		});
 		 		})
 
@@ -71,6 +71,63 @@ export const getRankings = (req, res) => {
 				.catch((error) => {
 					res.status(500).json({ error });
 				});
+			});
+		});
+	});
+}
+
+
+/*
+ * Sets leaderboard list during game.
+ * @param req, ex. { }
+ */
+export const setRankings = (req, res) => {
+	// get current game
+	var date = Date.now()
+	Game.find({ finish_date: {$gt: date} }, (error, result) => {
+		if (error || !result || result.length == 0) {
+			res.status(422).send('No game currently available.');
+			return;
+		}
+		var game = result[0];
+
+    // save tickers and prices in obj
+    var initialPrices = {};
+    game.coins.forEach(coin => initialPrices[coin.name] = coin.value);
+
+    // get current prices of coins
+    var currentPrices = {};
+    getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=0', (error, result) => {
+    	if (error || !result) {
+    		res.status(422).send('Unable to retrieve prices - please check http://api.coinmarketcap.com/. ERROR: ' + error);
+    		return;
+    	}
+
+    	// store game's current coin prices
+    	result.forEach(crypto => {
+    		if (initialPrices[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
+    	});
+
+    	// loop through each entry (user) of the game
+    	GameEntry.find({ game: game.gameId }, (error, result) => {
+      	result.forEach(entry => {
+
+      		// calculate entry's current capcoin balance
+      		let coinBalance = 0;
+      		entry.choices.forEach((choice) => {
+      			let percent_change = 1 - (initialPrices[choice.symbol] / currentPrices[choice.symbol]);
+      			coinBalance += (1 + percent_change) * choice.allocation;
+      		});
+
+      		// add entry to history collection
+      		CapcoinHistory.create({ gameId: game.gameId, userId: entry.userId, date: Date.now(), balance: coinBalance }, (error, result) => {
+      			if (error || !result) {
+      				res.status(500).send('Unable to add entry to collection for user \'' + entry.userId + '\' . ERROR: ' + error);
+  						return;
+      			}
+      		});
+	 			});
+				res.status(200).send('succesful');
 			});
 		});
 	});
