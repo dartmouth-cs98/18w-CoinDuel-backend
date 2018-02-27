@@ -6,7 +6,7 @@
   "main": "app/server.js",
   "scripts": {
     "test": "echo test script",
-    "updateGame": "while [ True ]; do curl -X POST https://coinduel-cs98.herokuapp.com/api/leaderboard/update; echo updated capcoin balances; sleep 10; done",
+    "updateGame": "while [ True ]; do curl -X POST https://coinduel-cs98.herokuapp.com/api/leaderboard/update; echo updated capcoin balances; sleep 900; done",
     "dev": "nodemon app/server.js --exec babel-node",
     "start": "babel-node app/server.js",
     "build": "babel app -d build",
