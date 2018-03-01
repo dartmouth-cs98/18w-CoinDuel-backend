@@ -42,4 +42,8 @@ router.route('/leaderboard/:gameId')
 router.route('/leaderboard/update')
   .post(Leaderboard.setRankings)
 
+router.route('/leaderboard/')
+  .get(Leaderboard.getAllTimeRankings)
+
+
 export default router;
