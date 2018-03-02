@@ -61,17 +61,10 @@ export const getRankings = (req, res) => {
 	    					return;
 		      			}
 		      		});
-
-		      		User.findByIdAndUpdate(entry.userId, { $inc: { coinBalance: coin_balance - initial_coin_balance }}, (err4, result4) => {
-		      			if (err4 || !result4) {
-		      				res.status(500).send('Error saving updated coin balance. ERROR: ' + err2);
-	    					return;
-		      			}
-		      		});
-
 		 		})
-
-		      	// generate ranked order of entries
+			})
+			.then(() => {
+				// generate ranked order of entries
 				GameEntry.find({ gameId }, { _id: 0, coin_balance: 1, userId: 1 })
 				.sort('-coin_balance')
 				.populate('userId', 'username')
@@ -86,10 +79,15 @@ export const getRankings = (req, res) => {
 	});
 }
 
+// returns sorted leaderboard list for all time game
+// @param req, ex. { }
 export const getAllTimeRankings = (req, res) => {
-	Game.find({ finish_date: {$gt: Date.now()} }).sort('finish_date').limit(1).then((result) => {
+	// retrieve active game id and update balances with live prices
+	Game.find({ finish_date: {$gt: Date.now()} })
+	.sort('finish_date')
+	.limit(1)
+	.then((result) => {
 		const gameId = result[0].id;
-
 		// get initial coin prices for game
 	  	Game.findById(gameId, (err, result) => {
 		    if (err || !result) {
@@ -115,6 +113,7 @@ export const getAllTimeRankings = (req, res) => {
 		      	});
 
 		      	// loop through each entry of the game
+		      	var balances = {};
 		      	GameEntry.find({ gameId }, (err3, result3) => {
 			      	result3.forEach((entry) => {
 
@@ -125,6 +124,7 @@ export const getAllTimeRankings = (req, res) => {
 			      			let percent_change = 1 - (initialPrices[choice.symbol] / currentPrices[choice.symbol]);
 			      			coin_balance += (1 + percent_change) * choice.allocation;
 			      		});
+			      		balances[entry.userId] = coin_balance;
 
 			      		// save updated coin_balance in entry document
 			      		entry.update({ $set: { coin_balance: coin_balance, last_updated: Date.now() }}, (err4, result4) => {
@@ -133,25 +133,30 @@ export const getAllTimeRankings = (req, res) => {
 		    					return;
 			      			}
 			      		});
-
-			      		User.findByIdAndUpdate(entry.userId, { $inc: { coinBalance: coin_balance - initial_coin_balance }}, (err4, result4) => {
-			      			if (err4 || !result4) {
-			      				res.status(500).send('Error saving updated coin balance. ERROR: ' + err2);
-		    					return;
-			      			}
-			      		});
 			 		});
 
-					// generate ranked order of entries
-					User.find({}, { username: 1, coinBalance: 1 })
-					.sort('-coinBalance')
-					.then((result4) => {
-						res.json(result4);
-					})
-					.catch((error) => {
-						res.status(500).json({ error });
-					});
+			      	// sum up the user's all time balance and the current game balance (if it exists)
+			      	var usernames = {}
+					User.find({ }, (err4, result4) => {
+		      			result4.forEach((entry) => {
+		      				if (balances[entry.id]) {
+		      					balances[entry.id] += entry.coinBalance;
+			      			} else {
+			      				balances[entry.id] = entry.coinBalance;
+			      			}
+			      			usernames[entry.id] = entry.username;
+		 				})
 
+		      			// create an array of Objects, sort by coin balance, and send the array as a JSON response
+			      		var user_data = []
+			      		for (var userId in usernames) {
+			      			user_data.push({ userId, username: usernames[userId], coin_balance: balances[userId] });
+			      		}
+			      		user_data.sort((a,b) => {
+			      			return (a.coin_balance < b.coin_balance) ? 1 : ((a.coin_balance > b.coin_balance) ? -1 : 0);
+			      		});
+			      		res.json(user_data);
+					});
 				});
 			});
 		});
@@ -166,50 +171,49 @@ export const getAllTimeRankings = (req, res) => {
  */
 export const setRankings = (req, res) => {
 	// get current game
-	var date = Date.now()
-	Game.find({ finish_date: {$gt: date} }, (error, result) => {
+	Game.find({ finish_date: {$gt: Date.now()} }, (error, result) => {
 		if (error || !result || result.length == 0) {
 			res.status(422).send('No game currently available.');
 			return;
 		}
 		var game = result[0];
 
-    // save tickers and prices in obj
-    var initialPrices = {};
-    game.coins.forEach(coin => initialPrices[coin.name] = coin.value);
+	    // save tickers and prices in obj
+	    var initialPrices = {};
+	    game.coins.forEach(coin => initialPrices[coin.name] = coin.value);
 
-    // get current prices of coins
-    var currentPrices = {};
-    getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=0', (error, result) => {
-    	if (error || !result) {
-    		res.status(422).send('Unable to retrieve prices - please check http://api.coinmarketcap.com/. ERROR: ' + error);
-    		return;
-    	}
+	    // get current prices of coins
+	    var currentPrices = {};
+	    getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=0', (error, result) => {
+	    	if (error || !result) {
+	    		res.status(422).send('Unable to retrieve prices - please check http://api.coinmarketcap.com/. ERROR: ' + error);
+	    		return;
+	    	}
 
-    	// store game's current coin prices
-    	result.forEach(crypto => {
-    		if (initialPrices[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
-    	});
+	    	// store game's current coin prices
+	    	result.forEach(crypto => {
+	    		if (initialPrices[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
+	    	});
 
-    	// loop through each entry (user) of the game
-    	GameEntry.find({ game: game.gameId }, (error, result) => {
-      	result.forEach(entry => {
+	    	// loop through each entry (user) of the game
+	    	GameEntry.find({ game: game.gameId }, (error, result) => {
+		      	result.forEach(entry => {
 
-      		// calculate entry's current capcoin balance
-      		let coinBalance = 0;
-      		entry.choices.forEach((choice) => {
-      			let percent_change = 1 - (initialPrices[choice.symbol] / currentPrices[choice.symbol]);
-      			coinBalance += (1 + percent_change) * choice.allocation;
-      		});
+		      		// calculate entry's current capcoin balance
+		      		let coinBalance = 0;
+		      		entry.choices.forEach((choice) => {
+		      			let percent_change = 1 - (initialPrices[choice.symbol] / currentPrices[choice.symbol]);
+		      			coinBalance += (1 + percent_change) * choice.allocation;
+		      		});
 
-      		// add entry to history collection
-      		CapcoinHistory.create({ gameId: game.gameId, userId: entry.userId, date: Date.now(), balance: coinBalance }, (error, result) => {
-      			if (error || !result) {
-      				res.status(500).send('Unable to add entry to collection for user \'' + entry.userId + '\' . ERROR: ' + error);
-  						return;
-      			}
-      		});
-	 			});
+		      		// add entry to history collection
+		      		CapcoinHistory.create({ gameId: game.gameId, userId: entry.userId, date: Date.now(), balance: coinBalance }, (error, result) => {
+		      			if (error || !result) {
+		      				res.status(500).send('Unable to add entry to collection for user \'' + entry.userId + '\' . ERROR: ' + error);
+		  					return;
+		      			}
+		      		});
+			 	});
 				res.status(200).send('succesful');
 			});
 		});
