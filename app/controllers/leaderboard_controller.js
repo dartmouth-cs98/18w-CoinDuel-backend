@@ -170,8 +170,11 @@ export const getAllTimeRankings = (req, res) => {
  * @param req, ex. { }
  */
 export const setRankings = (req, res) => {
+	// check for endGame flag
+	const endGame = "endGame" in req.body;
+
 	// get current game
-	Game.find({ finish_date: {$gt: Date.now()} }, (error, result) => {
+	Game.find({ finish_date: {$gt: Date.now()},  start_date: {$lt: Date.now()}}, (error, result) => {
 		if (error || !result || result.length == 0) {
 			res.status(422).send('No game currently available.');
 			return;
@@ -196,7 +199,8 @@ export const setRankings = (req, res) => {
 	    	});
 
 	    	// loop through each entry (user) of the game
-	    	GameEntry.find({ game: game.gameId }, (error, result) => {
+				let updateAll = true;
+	    	GameEntry.find({ gameId: game._id }, (error, result) => {
 		      	result.forEach(entry => {
 
 		      		// calculate entry's current capcoin balance
@@ -208,13 +212,21 @@ export const setRankings = (req, res) => {
 
 		      		// add entry to history collection
 		      		CapcoinHistory.create({ gameId: game.gameId, userId: entry.userId, date: Date.now(), balance: coinBalance }, (error, result) => {
-		      			if (error || !result) {
-		      				res.status(500).send('Unable to add entry to collection for user \'' + entry.userId + '\' . ERROR: ' + error);
-		  					return;
-		      			}
+								if (error) console.log('Unable to add entry to collection for user \'' + entry.userId + '\'. ERROR: ' + error);
 		      		});
+
+							// give user back capcoin if end of game
+							if (endGame) {
+								User.findOneAndUpdate({ _id: entry.userId }, { $inc: { coinBalance }}, (err, res) => {
+										if (err) {
+											console.log('unable to update capcoin balance for user \'' + entry.userId + '\'. ERROR: ' + err);
+											updateAll = false;
+										}
+								});
+							}
 			 	});
-				res.status(200).send('succesful');
+				if (!updateAll) res.status(500).send('unable to update all capcoin balances');
+				else res.status(200).send('succesful');
 			});
 		});
 	});
