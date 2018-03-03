@@ -107,6 +107,7 @@ export const createAndUpdateEntry = (req, res) => {
 				if (upError || !upResult) res.status(500).send('unable to update game entry');
 				else res.status(200).send(upResult);
 			});
+		return;
 	});
 };
 
