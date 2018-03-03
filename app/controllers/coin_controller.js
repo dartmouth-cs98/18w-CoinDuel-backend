@@ -61,8 +61,8 @@ export const getCoinPrices = (req, res) => {
     }
 
     // save tickers and prices in obj
-    var initialPrices = {};
-    result.coins.forEach(coin => initialPrices[coin.name] = coin.value);
+    var tickerFlags = {};
+    result.coins.forEach(coin => tickerFlags[coin.name] = true);
 
     // get current prices of coins
     var currentPrices = {};
@@ -74,7 +74,7 @@ export const getCoinPrices = (req, res) => {
 
       // store user's coin's current prices
       cryptos.forEach(crypto => {
-        if (initialPrices[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
+        if (tickerFlags[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
       });
 
       // calculate return for each coin
