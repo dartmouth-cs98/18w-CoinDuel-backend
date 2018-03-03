@@ -66,19 +66,47 @@ export const getEntry = (req, res) => {
 
 // updates entry specified by game and user ids (creates a new entry if one doesn't already exist)
 export const createAndUpdateEntry = (req, res) => {
-	GameEntry.findOneAndUpdate(
-		{ gameId: req.params.gameId, userId: req.params.userId },
-		{ $set: { gameId: req.params.gameId, userId: req.params.userId, choices: req.body.choices, last_updated: Date.now() }},
-		{ upsert: true, new: true, setDefaultsOnInsert: true })
-	.then((result) => {
-		if (result) {
-			res.json(result);
-		} else {
-			res.status(422).send('Unsuccessful create/update');
+	GameEntry.find({ gameId: req.params.gameId, userId: req.params.userId }, (error, result) => {
+
+		// create new entry
+		if (error || !result || result.length == 0) {
+			GameEntry.findOneAndUpdate(
+				{ gameId: req.params.gameId, userId: req.params.userId },
+				{ $set: { gameId: req.params.gameId, userId: req.params.userId, choices: req.body.choices, last_updated: Date.now() }},
+				{ upsert: true, new: true, setDefaultsOnInsert: true }, (newError, newResult) => {
+					if (newError || !newResult) {
+						res.status(500).send('unable to create game entry');
+						return;
+					}
+
+					// withdraw capcoin from user's account
+					var totalCapcoin = 0;
+					req.body.choices.forEach(choice => totalCapcoin += choice.allocation)
+					totalCapcoin *= -1;
+					User.findOneAndUpdate(
+						{ _id: req.params.userId },
+						{ $inc: { coinBalance: totalCapcoin }},
+						(newError, newResult) => {
+							if (newError || !newResult) {
+								res.status(500).send('unable to update user capcoin balance');
+								return;
+							}
+
+							// success
+							res.status(200).send(newResult);
+						});
+				});
+			return
 		}
-	})
-	.catch((error) => {
-		res.status(422).send('Unsuccessful create/update');
+
+		// update entry
+		GameEntry.findOneAndUpdate(
+			{ gameId: req.params.gameId, userId: req.params.userId },
+			{ $set: { gameId: req.params.gameId, userId: req.params.userId, choices: req.body.choices, last_updated: Date.now() } },
+			{ upsert: true, new: true, setDefaultsOnInsert: true }, (upError, upResult) => {
+				if (upError || !upResult) res.status(500).send('unable to update game entry');
+				else res.status(200).send(upResult);
+			});
 	});
 };
 
