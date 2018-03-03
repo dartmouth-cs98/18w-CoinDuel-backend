@@ -154,7 +154,7 @@ export const createNextGame = (req, res) => {
  * Start of each game - set initial prices for coins and take capcoin from user.
  * @param req, ex. { }
  */
-export const setInitialPrices = (req, res) => {
+export const initializeGame = (req, res) => {
 	// bail if today isn't monday
 	var today = new Date();
 	if (today.getDay() != 1) {
@@ -165,7 +165,7 @@ export const setInitialPrices = (req, res) => {
 	// set initial coin prices for game
   Game.find({ finish_date: {$gt: Date.now()},  start_date: {$lt: Date.now()}}, (error, result) => {
     if (error || !result) {
-      res.status(422).send('No game found');
+      res.status(422).send('No game currently available');
       return;
     }
 		var game = result[0];
