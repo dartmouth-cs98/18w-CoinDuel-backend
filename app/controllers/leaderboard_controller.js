@@ -172,7 +172,6 @@ export const getAllTimeRankings = (req, res) => {
 export const setRankings = (req, res) => {
 	// check for endGame flag
 	const endGame = "endGame" in req.body;
-	const startGame = "startGame" in req.body;
 
 	// get current game
 	Game.find({ finish_date: {$gt: Date.now()},  start_date: {$lt: Date.now()}}, (error, result) => {
@@ -218,17 +217,6 @@ export const setRankings = (req, res) => {
 
 							// give user back capcoin if end of game
 							if (endGame) {
-								User.findOneAndUpdate({ _id: entry.userId }, { $inc: { coinBalance }}, (err, res) => {
-										if (err) {
-											console.log('unable to update capcoin balance for user \'' + entry.userId + '\'. ERROR: ' + err);
-											updateAll = false;
-										}
-								});
-							}
-
-							// take user capcoin away if start of game
-							if (startGame) {
-								coinBalance *= -1;		// for reverse $inc
 								User.findOneAndUpdate({ _id: entry.userId }, { $inc: { coinBalance }}, (err, res) => {
 										if (err) {
 											console.log('unable to update capcoin balance for user \'' + entry.userId + '\'. ERROR: ' + err);
