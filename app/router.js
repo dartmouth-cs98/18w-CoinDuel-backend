@@ -29,7 +29,8 @@ router.post('/signup', User.signup);
 
 // game controller
 router.get('/game', Game.getLatestGame);
-router.post('/newGame', Game.createNextGame);
+router.post('/game/create', Game.createNextGame);
+router.post('/game/initialize', Game.setInitialPrices);
 router.route('/game/:gameId/:userId')
   .get(Game.getEntry)
   .post(Game.createAndUpdateEntry)

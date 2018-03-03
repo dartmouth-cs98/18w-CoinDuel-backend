@@ -10,6 +10,9 @@ import User from '../models/user.js';
 import Game from '../models/game.js';
 import GameEntry from '../models/gameentry.js';
 
+// for calls to CoinMarketCap
+const getJSON = require('get-json');
+
 // returns most recent game
 // // @param req, ex. { }
 export const getLatestGame = (req, res) => {
@@ -145,4 +148,61 @@ export const createNextGame = (req, res) => {
 
 	// we made it
 	res.status(200).send('successful');
+};
+
+/*
+ * Start of each game - set initial prices for coins and take capcoin from user.
+ * @param req, ex. { }
+ */
+export const setInitialPrices = (req, res) => {
+	// bail if today isn't monday
+	var today = new Date();
+	if (today.getDay() != 1) {
+		res.status(422).send('ERROR: initial prices can only be set at the start of games on Mondays')
+		return;
+	}
+
+	// set initial coin prices for game
+  Game.find({ finish_date: {$gt: Date.now()},  start_date: {$lt: Date.now()}}, (error, result) => {
+    if (error || !result) {
+      res.status(422).send('No game found');
+      return;
+    }
+		var game = result[0];
+
+    // save tickers in obj
+    var tickerFlags = {};
+    game.coins.forEach(coin => tickerFlags[coin.name] = true);
+
+    // get current prices of coins
+    var currentPrices = {};
+    getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=0', (subErr, cryptos) => {
+      if (subErr || !cryptos) {
+        res.status(422).send('Unable to retrieve prices - please check http://api.coinmarketcap.com/. ERROR: ' + subErr);
+        return;
+      }
+
+      // store game's current coin prices
+      cryptos.forEach(crypto => {
+        if (tickerFlags[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
+      });
+
+			// change prices in coins array
+			var coinChoices = [];
+			game.coins.forEach(coin => coinChoices.push({"name": coin.name, "value": currentPrices[coin.name]}));
+
+      // update coins array
+			var updateGame = true;
+      Game.findOneAndUpdate({ _id: game._id }, { $set: { coins: coinChoices }}, (err, res) => {
+					if (err) {
+						console.log('unable to set initial prices for game ' + game._id);
+						updateGame = false;
+					}
+			});
+			if (!updateGame) res.status(500).send('unable to set initial prices for game ' + game._id);
+
+			// we made it
+      else res.status(200).send('successful');
+    });
+  });
 };
