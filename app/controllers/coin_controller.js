@@ -105,7 +105,11 @@ export const getCoinReturns = (req, res) => {
 
     // save tickers and prices in obj
     var initialPrices = {};
-    result.coins.forEach(coin => initialPrices[coin.name] = coin.value);
+    var tickerFlags = {};
+    result.coins.forEach(coin => {
+      initialPrices[coin.name] = coin.value;
+      tickerFlags[coin.name] = true;
+    });
 
     // get current prices of coins
     var currentPrices = {};
@@ -117,7 +121,12 @@ export const getCoinReturns = (req, res) => {
 
       // store game's current coin prices
       cryptos.forEach(crypto => {
-        if (initialPrices[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
+        if (tickerFlags[crypto.symbol]) {
+          currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
+
+          // set initial price to current price if game hasn't started
+          initialPrices[crypto.symbol] = initialPrices[crypto.symbol] ? initialPrices[crypto.symbol] : parseFloat(crypto.price_usd);
+        }
       });
 
       // get users coin choices
