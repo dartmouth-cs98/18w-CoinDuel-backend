@@ -68,35 +68,53 @@ export const getEntry = (req, res) => {
 export const createAndUpdateEntry = (req, res) => {
 	GameEntry.find({ gameId: req.params.gameId, userId: req.params.userId }, (error, result) => {
 
-		// create new entry
+		// entry does not already exist
 		if (error || !result || result.length == 0) {
-			GameEntry.findOneAndUpdate(
-				{ gameId: req.params.gameId, userId: req.params.userId },
-				{ $set: { gameId: req.params.gameId, userId: req.params.userId, choices: req.body.choices, last_updated: Date.now() }},
-				{ upsert: true, new: true, setDefaultsOnInsert: true }, (newError, newResult) => {
+			var totalCapcoin = 0;
+			var userBalance = 0;
+
+			// check user's capcoin balance
+			User.findOne({ _id: req.params.userId }, (error, result) => {
+				if (error || !result) {
+					res.status(422).send('user does not exist');
+					return;
+				}
+
+				// ensure user won't go negative
+				userBalance = result.coinBalance;
+				req.body.choices.forEach(choice => totalCapcoin += choice.allocation);
+				if (totalCapcoin > userBalance) {
+					res.status(200).json({'error': 'insufficient funds'});
+					return;
+				}
+
+				// create new game entry
+				GameEntry.findOneAndUpdate(
+					{ gameId: req.params.gameId, userId: req.params.userId },
+					{ $set: { gameId: req.params.gameId, userId: req.params.userId, choices: req.body.choices, last_updated: Date.now() }},
+					{ upsert: true, new: true, setDefaultsOnInsert: true }, (newError, newResult) => {
 					if (newError || !newResult) {
 						res.status(500).send('unable to create game entry');
 						return;
 					}
 
 					// withdraw capcoin from user's account
-					var totalCapcoin = 0;
-					req.body.choices.forEach(choice => totalCapcoin += choice.allocation)
 					totalCapcoin *= -1;
 					User.findOneAndUpdate(
 						{ _id: req.params.userId },
 						{ $inc: { coinBalance: totalCapcoin }},
-						(newError, newResult) => {
-							if (newError || !newResult) {
-								res.status(500).send('unable to update user capcoin balance');
-								return;
-							}
+						(userError, userResult) => {
+						if (userError || !userResult) {
+							res.status(500).send('unable to update user capcoin balance');
+							return;
+						}
 
-							// success
-							res.status(200).send(newResult);
-						});
+						// we made it
+						res.status(200).send(newResult);
+					});
 				});
-			return
+			});
+			return;
 		}
 
 		// update entry
@@ -104,10 +122,9 @@ export const createAndUpdateEntry = (req, res) => {
 			{ gameId: req.params.gameId, userId: req.params.userId },
 			{ $set: { gameId: req.params.gameId, userId: req.params.userId, choices: req.body.choices, last_updated: Date.now() } },
 			{ upsert: true, new: true, setDefaultsOnInsert: true }, (upError, upResult) => {
-				if (upError || !upResult) res.status(500).send('unable to update game entry');
-				else res.status(200).send(upResult);
-			});
-		return;
+			if (upError || !upResult) res.status(500).send('unable to update game entry');
+			else res.status(200).send(upResult);
+		});
 	});
 };
 
@@ -133,11 +150,16 @@ export const deleteEntry = (req, res) => {
  */
 export const createNextGame = (req, res) => {
 	// bail if today isn't friday
-	var today = new Date();
-	if (today.getDay() != 5) {
-		res.status(422).send('ERROR: new games can only be created on Fridays')
-		return;
-	}
+
+	/****************************************
+	**	COMMENTING OUT FOR CS98 GALA DEMO  **
+	****************************************/
+
+	// var today = new Date();
+	// if (today.getDay() != 5) {
+	// 	res.status(422).send('ERROR: new games can only be created on Fridays')
+	// 	return;
+	// }
 
 		// get two monday's from now at 10:00PM UTC (5:00PM EST)
 	var startDate = new Date();
@@ -185,11 +207,16 @@ export const createNextGame = (req, res) => {
  */
 export const initializeGame = (req, res) => {
 	// bail if today isn't monday
-	var today = new Date();
-	if (today.getDay() != 1) {
-		res.status(422).send('ERROR: initial prices can only be set at the start of games on Mondays')
-		return;
-	}
+
+	/****************************************
+	**	COMMENTING OUT FOR CS98 GALA DEMO  **
+	****************************************/
+
+	// var today = new Date();
+	// if (today.getDay() != 1) {
+	// 	res.status(422).send('ERROR: initial prices can only be set at the start of games on Mondays')
+	// 	return;
+	// }
 
 	// set initial coin prices for game
   Game.find({ finish_date: {$gt: Date.now()},  start_date: {$lt: Date.now()}}, (error, result) => {

@@ -11,7 +11,7 @@ db.getCollectionNames().forEach(
 );
 
 db.users.insertMany([
-	{ _id: new ObjectId("5a8607d4971c50fbf29726a2"), email: '1@gmail.com', username: 'p1', password: '1', coinBalance: 0 },
+	{ _id: new ObjectId("5a8607d4971c50fbf29726a2"), email: '1@gmail.com', username: 'p1', password: '1', coinBalance: 10 },
 	{ _id: new ObjectId("5a8607d5971c50fbf29726a3"), email: '2@gmail.com', username: 'p2', password: '2', coinBalance: 10 },
 	{ _id: new ObjectId("5a8607d6971c50fbf29726a4"), email: '3@gmail.com', username: 'p3', password: '3', coinBalance: 30 },
 	{ _id: new ObjectId("5a8607d6971c50fbf29726a5"), email: '4@gmail.com', username: 'p4', password: '4', coinBalance: 40 }])
@@ -36,7 +36,7 @@ db.capcoin_history.insertMany([
 /* Commands for testing game_controller functions:
 
   getLatestGame: curl -X GET http://localhost:9000/api/game/
-  createAndUpdateEntry (create): curl -X POST http://localhost:9000/api/game/5a8607d4971c50fbf29726a2/5a8608233d378876bf62d817/ -d '{ "choices": [["BTC", 2], ["ETH", 3], ["XRP", 2], ["BCH", 2], ["LTC", 1]] }' -H "Content-Type: application/json"
+  createAndUpdateEntry (create): curl -X POST http://localhost:9000/api/game/5a8608233d378876bf62d817/5a8607d4971c50fbf29726a2/ -d '{ "choices": [{"symbol": "SFC", "allocation": 1.0}, {"symbol": "PRE", "allocation": 1.0}, {"symbol": "POLIS", "allocation": 2.0}, {"symbol": "WETH", "allocation": 2.0}, {"symbol": "GLS", "allocation": 4.0}] }' -H "Content-Type: application/json"
   createAndUpdateEntry (update): curl -X PUT http://localhost:9000/api/game/5a8607d4971c50fbf29726a2/5a8608233d378876bf62d817/ -d '{ "choices": [["BTC", 5], ["ETH", 0], ["XRP", 2], ["BCH", 2], ["LTC", 1]] }' -H "Content-Type: application/json"
   getEntry: curl -X GET http://localhost:9000/api/game/5a8607d4971c50fbf29726a2/5a8608233d378876bf62d817/
   deleteEntry: curl -X DELETE http://localhost:9000/api/game/5a8607d4971c50fbf29726a2/5a8608233d378876bf62d817/
