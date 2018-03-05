@@ -114,6 +114,7 @@ export const getAllTimeRankings = (req, res) => {
 
 		      	// loop through each entry of the game
 		      	var balances = {};
+						var updateError = 'none';
 		      	GameEntry.find({ gameId }, (err3, result3) => {
 			      	result3.forEach((entry) => {
 
@@ -129,11 +130,17 @@ export const getAllTimeRankings = (req, res) => {
 			      		// save updated coin_balance in entry document
 			      		entry.update({ $set: { coin_balance: coin_balance, last_updated: Date.now() }}, (err4, result4) => {
 			      			if (err4 || !result4) {
-			      				res.status(500).send('Error saving updated coin balance. ERROR: ' + err2);
-		    					return;
+			      				updateError = 'Error saving updated coin balance. ERROR: ' + err4;
+		    						return;
 			      			}
 			      		});
-			 		});
+			 				});
+
+							// send back errors if any
+							if (updateError != 'none') {
+								res.status(500).send(updateError);
+								return;
+							}
 
 			      	// sum up the user's all time balance and the current game balance (if it exists)
 			      	var usernames = {}
