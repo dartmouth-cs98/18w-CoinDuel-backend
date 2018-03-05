@@ -161,14 +161,14 @@ export const createNextGame = (req, res) => {
 	// 	return;
 	// }
 
-		// get two monday's from now at 10:00PM UTC (5:00PM EST)
+		// get two monday's from now at 10:00:00PM UTC (5:00:00PM EST)
 	var startDate = new Date();
 	startDate.setHours(17, 0, 0, 0);
 	startDate.setDate(startDate.getDate() + 10);
 
-	// get two friday's from now at 2:00PM UTC (9:00AM EST)
+	// get two friday's from now at 2:00:10PM UTC (9:00:10AM EST)
 	var endDate = new Date();
-	endDate.setHours(9, 0, 0, 0);
+	endDate.setHours(9, 0, 10, 0);
 	endDate.setDate(endDate.getDate() + 14);
 
 	// create choices
