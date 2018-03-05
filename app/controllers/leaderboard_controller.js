@@ -43,6 +43,7 @@ export const getRankings = (req, res) => {
 	      	});
 
 	      	// loop through each entry of the game
+					var updateError = 'none';
 	      	GameEntry.find({ gameId }, (err3, result3) => {
 		      	result3.forEach((entry) => {
 
@@ -57,24 +58,29 @@ export const getRankings = (req, res) => {
 		      		// save updated coin_balance in entry document
 		      		entry.update({ $set: { coin_balance: coin_balance, last_updated: Date.now() }}, (err4, result4) => {
 		      			if (err4 || !result4) {
-		      				res.status(500).send('Error saving updated coin balance. ERROR: ' + err2);
-	    					return;
+		      				updateError = 'Error saving updated coin balance. ERROR: ' + err4;
+	    						return;
 		      			}
-		      		});
-		 		})
-			})
-			.then(() => {
-				// generate ranked order of entries
-				GameEntry.find({ gameId }, { _id: 0, coin_balance: 1, userId: 1 })
-				.sort('-coin_balance')
-				.populate('userId', 'username')
-				.then((result4) => {
-					res.json(result4);
-				})
-				.catch((error) => {
-					res.status(500).json({ error });
-				});
-			});
+	      			});
+		 				});
+
+						// send back errors if any
+						if (updateError != 'none') {
+							res.status(500).send(updateError);
+							return;
+						}
+
+						// generate ranked order of entries
+						GameEntry.find({ gameId }, { _id: 0, coin_balance: 1, userId: 1 })
+						.sort('-coin_balance')
+						.populate('userId', 'username')
+						.then((result4) => {
+							res.json(result4);
+						})
+						.catch((error) => {
+							res.status(500).json({ error });
+						});
+					});
 		});
 	});
 }
