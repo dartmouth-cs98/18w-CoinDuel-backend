@@ -82,13 +82,7 @@ export const createAndUpdateEntry = (req, res) => {
 
 				// ensure user won't go negative
 				userBalance = result.coinBalance;
-				console.log(req.body);
-				req.body.choices.forEach(choice => {
-					console.log(choice);
-					console.log(choice.allocation);
-					totalCapcoin += choice.allocation;
-					console.log(totalCapcoin);
-				});
+				req.body.choices.forEach(choice => totalCapcoin += parseFloat(choice.allocation));
 				if (totalCapcoin > userBalance) {
 					res.status(200).json({'error': 'insufficient funds'});
 					return;
@@ -111,7 +105,6 @@ export const createAndUpdateEntry = (req, res) => {
 						{ $inc: { coinBalance: totalCapcoin }},
 						(userError, userResult) => {
 						if (userError || !userResult) {
-							console.log('error or result. error: ' + userError);
 							res.status(500).send('unable to update user capcoin balance');
 							return;
 						}
@@ -347,14 +340,14 @@ export const initializeGame = (req, res) => {
 			game.coins.forEach(coin => coinChoices.push({"name": coin.name, "startPrice": currentPrices[coin.name], "endPrice":null}));
 
       // update coins array
-			var updateGame = true;
+			var updateGameError = 'none';
       Game.findOneAndUpdate({ _id: game._id }, { $set: { coins: coinChoices }}, (err, res) => {
 					if (err) {
-						console.log('unable to set initial prices for game ' + game._id);
-						updateGame = false;
+						updateGameError = 'unable to set initial prices for game ' + game._id;
+						return;
 					}
 			});
-			if (!updateGame) res.status(500).send('unable to set initial prices for game ' + game._id);
+			if (updateGameError != 'none') res.status(500).send(updateGameError);
 
 			// we made it
       else res.status(200).send('successful');
