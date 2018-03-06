@@ -34,7 +34,6 @@ export const setRankings = (req, res) => {
 		var game = result[0];
 
 		// no games in progress and not end game
-		console.log(game);
 		if (!endGame && game.finish_date < date) {
 			res.status(422).send('no end game flag & no games currently in progress - nothing to update')
 			return;
