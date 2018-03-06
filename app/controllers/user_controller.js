@@ -29,6 +29,7 @@ export const signup = (req, res, next) => {
         newUser.email = email;
         newUser.password = password;
         newUser.username = username;
+        newUser.coinBalance = 30;
         newUser.save()
           .then((result) => {
             res.send(newUser);
