@@ -33,6 +33,13 @@ export const setRankings = (req, res) => {
 		}
 		var game = result[0];
 
+		// no games in progress and not end game
+		console.log(game);
+		if (!endGame && game.finish_date < date) {
+			res.status(422).send('no end game flag & no games currently in progress - nothing to update')
+			return;
+		}
+
     // save tickers and prices in obj
     var initialPrices = {};
     game.coins.forEach(coin => initialPrices[coin.name] = coin.startPrice);
@@ -57,21 +64,18 @@ export const setRankings = (req, res) => {
 
       		// calculate and update user's capcoin balance if game in progress OR end of game
 					var coinBalance = 0;
-					if (endGame || (game.start_date < date && game.finish_date > date)) {
-						console.log(endGame);
-	      		entry.choices.forEach((choice) => {
-	      			let percent_change = 1 - (initialPrices[choice.symbol] / currentPrices[choice.symbol]);
-	      			coinBalance += (1 + percent_change) * choice.allocation;
-	      		});
+      		entry.choices.forEach((choice) => {
+      			let percent_change = 1 - (initialPrices[choice.symbol] / currentPrices[choice.symbol]);
+      			coinBalance += (1 + percent_change) * choice.allocation;
+      		});
 
-						// update entry with new balance
-						entry.update({ $set: { coin_balance: coinBalance }}, (updateErr, updateRes) => {
-							if (updateErr) {
-								updateError = 'Unable to update capcoin balance for user \'' + entry.userId + '\'. ERROR: ' + updateErr;
-								return;
-							}
-						});
-					}
+					// update entry with new balance
+					entry.update({ $set: { coin_balance: coinBalance }}, (updateErr, updateRes) => {
+						if (updateErr) {
+							updateError = 'Unable to update capcoin balance for user \'' + entry.userId + '\'. ERROR: ' + updateErr;
+							return;
+						}
+					});
 
       		// add entry to history collection
       		CapcoinHistory.create({ gameId: game.gameId, userId: entry.userId, date: Date.now(), balance: coinBalance }, (updateErr, updateRes) => {
