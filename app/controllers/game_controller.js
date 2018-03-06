@@ -66,7 +66,6 @@ export const getEntry = (req, res) => {
 
 // updates entry specified by game and user ids (creates a new entry if one doesn't already exist)
 export const createAndUpdateEntry = (req, res) => {
-	console.log(req.params);
 	GameEntry.find({ gameId: req.params.gameId, userId: req.params.userId }, (error, result) => {
 
 		// entry does not already exist
@@ -84,39 +83,35 @@ export const createAndUpdateEntry = (req, res) => {
 				// ensure user won't go negative
 				userBalance = result.coinBalance;
 				req.body.choices.forEach(choice => totalCapcoin += choice.allocation);
+				console.log(req.body);
 				if (totalCapcoin > userBalance) {
 					res.status(200).json({'error': 'insufficient funds'});
 					return;
 				}
 
 				// create new game entry
-				console.log('creating new entry');
 				GameEntry.findOneAndUpdate(
 					{ gameId: req.params.gameId, userId: req.params.userId },
 					{ $set: { gameId: req.params.gameId, userId: req.params.userId, choices: req.body.choices, last_updated: Date.now() }},
 					{ upsert: true, new: true, setDefaultsOnInsert: true }, (newError, newResult) => {
-					console.log('created new entry for user');
 					if (newError || !newResult) {
-						console.log('no error or result');
 						res.status(500).send('unable to create game entry');
 						return;
 					}
 
 					// withdraw capcoin from user's account
 					totalCapcoin *= -1;
-					console.log('updating user capcoin balance');
 					User.findOneAndUpdate(
 						{ _id: req.params.userId },
 						{ $inc: { coinBalance: totalCapcoin }},
 						(userError, userResult) => {
 						if (userError || !userResult) {
-							console.log('error or result. error ' + userError);
+							console.log('error or result. error: ' + userError);
 							res.status(500).send('unable to update user capcoin balance');
 							return;
 						}
 
 						// we made it
-						console.log('we made it');
 						res.status(200).send(newResult);
 					});
 				});
