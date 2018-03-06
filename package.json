@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo test script",
     "updateGame": "while [ True ]; do curl -X POST https://coinduel-cs98.herokuapp.com/api/leaderboard/update; echo updated capcoin balances; sleep 900; done",
-    "endGame": "curl -X POST https://coinduel-cs98.herokuapp.com/api/leaderboard/update -d '{ \"endGame\": true}' -H \"Content-Type: application/json\"; curl -X POST https://coinduel-cs98.herokuapp.com/api/game/create",
+    "endGame": "curl -X POST https://coinduel-cs98.herokuapp.com/api/leaderboard/update -d '{ \"endGame\": true }' -H \"Content-Type: application/json\"; curl -X POST https://coinduel-cs98.herokuapp.com/api/game/end; curl -X POST https://coinduel-cs98.herokuapp.com/api/game/create",
     "startGame": "curl -X POST https://coinduel-cs98.herokuapp.com/api/game/initialize",
     "dev": "nodemon app/server.js --exec babel-node",
     "start": "babel-node app/server.js",
