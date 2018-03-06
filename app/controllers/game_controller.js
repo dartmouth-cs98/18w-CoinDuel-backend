@@ -82,8 +82,13 @@ export const createAndUpdateEntry = (req, res) => {
 
 				// ensure user won't go negative
 				userBalance = result.coinBalance;
-				req.body.choices.forEach(choice => totalCapcoin += choice.allocation);
 				console.log(req.body);
+				req.body.choices.forEach(choice => {
+					console.log(choice);
+					console.log(choice.allocation);
+					totalCapcoin += choice.allocation;
+					console.log(totalCapcoin);
+				});
 				if (totalCapcoin > userBalance) {
 					res.status(200).json({'error': 'insufficient funds'});
 					return;

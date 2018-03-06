@@ -36,7 +36,7 @@ db.capcoin_history.insertMany([
 /* Commands for testing game_controller functions:
 
   getLatestGame: curl -X GET http://localhost:9000/api/game/
-  createAndUpdateEntry (create): curl -X POST http://localhost:9000/api/game/5a8608233d378876bf62d817/5a8607d4971c50fbf29726a2/ -d '{ "choices": [{"symbol": "SFC", "allocation": 1.0}, {"symbol": "PRE", "allocation": 1.0}, {"symbol": "POLIS", "allocation": 2.0}, {"symbol": "WETH", "allocation": 2.0}, {"symbol": "GLS", "allocation": 4.0}] }' -H "Content-Type: application/json"
+  createAndUpdateEntry (create): curl -X POST http://localhost:9000/api/game/5a8608233d378876bf62d817/5a8607d4971c50fbf29726a2/ -d '{ "choices": [{"symbol": "BTC", "allocation": 1.0}, {"symbol": "LTC", "allocation": 1.0}, {"symbol": "BCH", "allocation": 2.0}, {"symbol": "XRP", "allocation": 2.0}, {"symbol": "ETH", "allocation": 4.0}] }' -H "Content-Type: application/json"
   createAndUpdateEntry (update): curl -X PUT http://localhost:9000/api/game/5a8607d4971c50fbf29726a2/5a8608233d378876bf62d817/ -d '{ "choices": [["BTC", 5], ["ETH", 0], ["XRP", 2], ["BCH", 2], ["LTC", 1]] }' -H "Content-Type: application/json"
   getEntry: curl -X GET http://localhost:9000/api/game/5a8607d4971c50fbf29726a2/5a8608233d378876bf62d817/
   deleteEntry: curl -X DELETE http://localhost:9000/api/game/5a8607d4971c50fbf29726a2/5a8608233d378876bf62d817/
