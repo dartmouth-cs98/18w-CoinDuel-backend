@@ -107,7 +107,7 @@ export const getCoinReturns = (req, res) => {
     var initialPrices = {};
     var tickerFlags = {};
     result.coins.forEach(coin => {
-      initialPrices[coin.name] = coin.value;
+      initialPrices[coin.name] = coin.startPrice;
       tickerFlags[coin.name] = true;
     });
 

@@ -11,7 +11,7 @@ import mongoose, { Schema } from 'mongoose';
 const GameSchema = new Schema({
     start_date: { type: Date, default: Date.now },
     finish_date: { type: Date },
-    coins: [{ name: { type: String }, value: { type: Number }}],
+    coins: [{ name: { type: String }, startPrice: { type: Number }, endPrice: { type: Number }}],
 });
 
 GameSchema.set('toJSON', {

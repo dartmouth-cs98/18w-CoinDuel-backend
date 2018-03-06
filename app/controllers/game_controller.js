@@ -161,15 +161,17 @@ export const createNextGame = (req, res) => {
 	// 	return;
 	// }
 
-		// get two monday's from now at 10:00:00PM UTC (5:00:00PM EST)
+	// get two monday's from now at 10:00:00PM UTC (5:00:00PM EST)
 	var startDate = new Date();
-	startDate.setHours(17, 0, 0, 0);
-	startDate.setDate(startDate.getDate() + 10);
+	startDate.setMinutes(startDate.getMinutes() + 30);
+	// startDate.setHours(17, 0, 0, 0);
+	// startDate.setDate(startDate.getDate() + 10);
 
 	// get two friday's from now at 2:00:10PM UTC (9:00:10AM EST)
 	var endDate = new Date();
-	endDate.setHours(9, 0, 10, 0);
-	endDate.setDate(endDate.getDate() + 14);
+	endDate.setHours(endDate.getHours() + 1);
+	// endDate.setHours(9, 0, 10, 0);
+	// endDate.setDate(endDate.getDate() + 14);
 
 	// create choices
 	const tickers = req.app.locals.resources.tickers;
@@ -180,14 +182,23 @@ export const createNextGame = (req, res) => {
 	  }
 	}
 
-	// randomly select 5 tickers
-	var choices = [];
-	var flags = {};
-	while (choices.length < 5) {
-		let index = tickerChoices.length * Math.random() << 0;
-		if (!(index in flags)) choices.push({"name":tickerChoices[index], "value":null});
-		flags[index] = true;
-	}
+	// // randomly select 5 tickers
+	// var choices = [];
+	// var flags = {};
+	// while (choices.length < 5) {
+	// 	let index = tickerChoices.length * Math.random() << 0;
+	// 	if (!(index in flags)) choices.push({"name":tickerChoices[index], "startPrice":null});
+	// 	flags[index] = true;
+	// }
+
+	// default choices
+	var choices = [
+		{"name": "BTC", "startPrice": null, "endPrice":null},
+		{"name": "ETH", "startPrice": null, "endPrice":null},
+		{"name": "XRP", "startPrice": null, "endPrice":null},
+		{"name": "BCH", "startPrice": null, "endPrice":null},
+		{"name": "LTC", "startPrice": null, "endPrice":null}
+	];
 
 	// create db entry for game in 2 weeks (next game should already be created)
 	Game.create({ start_date: startDate, finish_date: endDate, coins: choices }, (err, res) => {
@@ -202,25 +213,27 @@ export const createNextGame = (req, res) => {
 };
 
 /*
- * Start of each game - set initial prices for coins and take capcoin from user.
+ * End of each game - set end prices for coins and give capcoin back to user.
  * @param req, ex. { }
  */
-export const initializeGame = (req, res) => {
-	// bail if today isn't monday
+export const endGame = (req, res) => {
+	// bail if today isn't friday
 
 	/****************************************
 	**	COMMENTING OUT FOR CS98 GALA DEMO  **
 	****************************************/
 
 	// var today = new Date();
-	// if (today.getDay() != 1) {
-	// 	res.status(422).send('ERROR: initial prices can only be set at the start of games on Mondays')
+	// if (today.getDay() != 5) {
+	// 	res.status(422).send('ERROR: games can only be ended on Fridays')
 	// 	return;
 	// }
 
 	// set initial coin prices for game
-  Game.find({ finish_date: {$gt: Date.now()},  start_date: {$lt: Date.now()}}, (error, result) => {
-    if (error || !result) {
+	var date = Date.now();
+	Game.find({ finish_date: {$lt: date}})
+	.sort('-finish_date').exec((error, result) => {
+    if (error || !result || result.length == 0) {
       res.status(422).send('No game currently available');
       return;
     }
@@ -245,7 +258,86 @@ export const initializeGame = (req, res) => {
 
 			// change prices in coins array
 			var coinChoices = [];
-			game.coins.forEach(coin => coinChoices.push({"name": coin.name, "value": currentPrices[coin.name]}));
+			game.coins.forEach(coin => coinChoices.push({"name": coin.name, "startPrice": coin.startPrice, "endPrice":currentPrices[coin.name]}));
+
+      // update coins array
+			var updateGame = true;
+      Game.findOneAndUpdate({ _id: game._id }, { $set: { coins: coinChoices }}, (updateErr, updateRes) => {
+					if (updateErr) {
+						res.status(500).send('unable to set end prices for game ' + game._id);
+						return;
+					}
+
+					// give capcoin winnings back to all users
+					var updateError = 'none';
+					GameEntry.find({ gameId: game._id }, (entryErr, entryRes) => {
+						entryRes.forEach(entry => {
+							var winnings = entry.coin_balance;
+							User.findOneAndUpdate({ _id: entry.userId }, { $inc: { coinBalance: winnings }}, (winningsErr, winningsRes) => {
+									updateError = winningsErr ? 'unable to update capcoin balance for user \'' + entry.userId + '\'. ERROR: ' + err : 'none';
+							});
+						});
+					})
+
+					// send back errors if any
+					if (updateError != 'none') {
+						res.status(500).send(updateError);
+						return
+					}
+
+					// we made it
+					res.status(200).send('successful');
+			});
+    });
+  });
+};
+
+
+/*
+ * Start of each game - set initial prices for coins and take capcoin from user.
+ * @param req, ex. { }
+ */
+export const initializeGame = (req, res) => {
+	// bail if today isn't monday
+
+	/****************************************
+	**	COMMENTING OUT FOR CS98 GALA DEMO  **
+	****************************************/
+
+	// var today = new Date();
+	// if (today.getDay() != 1) {
+	// 	res.status(422).send('ERROR: initial prices can only be set at the start of games on Mondays')
+	// 	return;
+	// }
+
+	// set initial coin prices for game
+  Game.find({ finish_date: {$gt: Date.now()},  start_date: {$lt: Date.now()}}, (error, result) => {
+    if (error || !result || result.length == 0) {
+      res.status(422).send('No game currently available');
+      return;
+    }
+		var game = result[0];
+
+    // save tickers in obj
+    var tickerFlags = {};
+    game.coins.forEach(coin => tickerFlags[coin.name] = true);
+
+    // get current prices of coins
+    var currentPrices = {};
+    getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=0', (subErr, cryptos) => {
+      if (subErr || !cryptos) {
+        res.status(422).send('Unable to retrieve prices - please check http://api.coinmarketcap.com/. ERROR: ' + subErr);
+        return;
+      }
+
+      // store game's current coin prices
+      cryptos.forEach(crypto => {
+        if (tickerFlags[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
+      });
+
+			// change prices in coins array
+			var coinChoices = [];
+			game.coins.forEach(coin => coinChoices.push({"name": coin.name, "startPrice": currentPrices[coin.name], "endPrice":null}));
 
       // update coins array
 			var updateGame = true;

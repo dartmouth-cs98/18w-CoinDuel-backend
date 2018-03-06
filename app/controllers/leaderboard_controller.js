@@ -13,8 +13,84 @@ import CapcoinHistory from '../models/capcoin_history.js';
 
 const getJSON = require('get-json');
 
+/*
+ * Sets leaderboard list during game.
+ * @param req, ex. { }
+ */
+export const setRankings = (req, res) => {
+	// end game flag
+	const endGame = "endGame" in req.body;
+
+	// get latest game
+	var date = Date.now();
+	Game.find({ start_date: {$lt: date}})
+	.sort('-start_date').exec((error, result) => {
+
+		// no games found
+		if (!result || result.length == 0) {
+			res.status(422).send('Couldn\'t find games.');
+			return;
+		}
+		var game = result[0];
+
+    // save tickers and prices in obj
+    var initialPrices = {};
+    game.coins.forEach(coin => initialPrices[coin.name] = coin.startPrice);
+
+    // get current prices of coins
+    var currentPrices = {};
+    getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=0', (error, result) => {
+    	if (error || !result) {
+    		res.status(422).send('Unable to retrieve prices - please check http://api.coinmarketcap.com/. ERROR: ' + error);
+    		return;
+    	}
+
+    	// store game's current coin prices
+    	result.forEach(crypto => {
+    		if (initialPrices[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
+    	});
+
+    	// loop through each entry (user) of the game
+			let updateError = 'none';
+    	GameEntry.find({ gameId: game._id }, (error, result) => {
+      	result.forEach(entry => {
+
+      		// calculate and update user's capcoin balance if game in progress OR end of game
+					var coinBalance = 0;
+					if (endGame || (game.start_date < date && game.finish_date > date)) {
+						console.log(endGame);
+	      		entry.choices.forEach((choice) => {
+	      			let percent_change = 1 - (initialPrices[choice.symbol] / currentPrices[choice.symbol]);
+	      			coinBalance += (1 + percent_change) * choice.allocation;
+	      		});
+
+						// update entry with new balance
+						entry.update({ $set: { coin_balance: coinBalance }}, (updateErr, updateRes) => {
+							if (updateErr) {
+								updateError = 'Unable to update capcoin balance for user \'' + entry.userId + '\'. ERROR: ' + updateErr;
+								return;
+							}
+						});
+					}
+
+      		// add entry to history collection
+      		CapcoinHistory.create({ gameId: game.gameId, userId: entry.userId, date: Date.now(), balance: coinBalance }, (updateErr, updateRes) => {
+						if (updateErr) {
+							updateError = 'Unable to add entry to collection for user \'' + entry.userId + '\'. ERROR: ' + updateErr;
+							return;
+						}
+      		});
+			 	});
+				if (updateError != 'none') res.status(500).send(updateError);
+				else res.status(200).send('succesful');
+			});
+		});
+	});
+}
+
 // returns sorted leaderboard list for specified game
-// @param req, ex. { }
+// and sets capcoin balance for game
+// @param req, ex. { gameId: '12783687126387172836'}
 export const getRankings = (req, res) => {
 	const gameId = req.params.gameId;
 
@@ -27,7 +103,7 @@ export const getRankings = (req, res) => {
 
 	    // save tickers and prices in obj
 	    var initialPrices = {};
-	    result.coins.forEach(coin => initialPrices[coin.name] = coin.value);
+	    result.coins.forEach(coin => initialPrices[coin.name] = coin.startPrice);
 
 	    // get current prices of coins
 	    var currentPrices = {};
@@ -55,13 +131,16 @@ export const getRankings = (req, res) => {
 		      			coin_balance += (1 + percent_change) * choice.allocation;
 		      		});
 
-		      		// save updated coin_balance in entry document
-		      		entry.update({ $set: { coin_balance: coin_balance, last_updated: Date.now() }}, (err4, result4) => {
-		      			if (err4 || !result4) {
-		      				updateError = 'Error saving updated coin balance. ERROR: ' + err4;
-	    						return;
-		      			}
-	      			});
+		      		// save updated coin_balance in entry document if game is in progress
+							var date = Date.now();
+							if (result.start_date < date && result.finish_date > date) {
+			      		entry.update({ $set: { coin_balance: coin_balance, last_updated: Date.now() }}, (err4, result4) => {
+			      			if (err4 || !result4) {
+			      				updateError = 'Error saving updated coin balance. ERROR: ' + err4;
+		    						return;
+			      			}
+		      			});
+							}
 		 				});
 
 						// send back errors if any
@@ -103,7 +182,7 @@ export const getAllTimeRankings = (req, res) => {
 
 		    // save tickers and prices in obj
 		    var initialPrices = {};
-		    result.coins.forEach(coin => initialPrices[coin.name] = coin.value);
+		    result.coins.forEach(coin => initialPrices[coin.name] = coin.startPrice);
 
 		    // get current prices of coins
 		    var currentPrices = {};
@@ -175,72 +254,5 @@ export const getAllTimeRankings = (req, res) => {
 		});
 	}).catch((error) => {
 		res.status(500).json({ error });
-	});
-}
-
-/*
- * Sets leaderboard list during game.
- * @param req, ex. { }
- */
-export const setRankings = (req, res) => {
-	// check for endGame flag
-	const endGame = "endGame" in req.body;
-
-	// get current game
-	Game.find({ finish_date: {$gt: Date.now()},  start_date: {$lt: Date.now()}}, (error, result) => {
-		if (error || !result || result.length == 0) {
-			res.status(422).send('No game currently available.');
-			return;
-		}
-		var game = result[0];
-
-	    // save tickers and prices in obj
-	    var initialPrices = {};
-	    game.coins.forEach(coin => initialPrices[coin.name] = coin.value);
-
-	    // get current prices of coins
-	    var currentPrices = {};
-	    getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=0', (error, result) => {
-	    	if (error || !result) {
-	    		res.status(422).send('Unable to retrieve prices - please check http://api.coinmarketcap.com/. ERROR: ' + error);
-	    		return;
-	    	}
-
-	    	// store game's current coin prices
-	    	result.forEach(crypto => {
-	    		if (initialPrices[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
-	    	});
-
-	    	// loop through each entry (user) of the game
-				let updateAll = true;
-	    	GameEntry.find({ gameId: game._id }, (error, result) => {
-		      	result.forEach(entry => {
-
-		      		// calculate entry's current capcoin balance
-		      		let coinBalance = 0;
-		      		entry.choices.forEach((choice) => {
-		      			let percent_change = 1 - (initialPrices[choice.symbol] / currentPrices[choice.symbol]);
-		      			coinBalance += (1 + percent_change) * choice.allocation;
-		      		});
-
-		      		// add entry to history collection
-		      		CapcoinHistory.create({ gameId: game.gameId, userId: entry.userId, date: Date.now(), balance: coinBalance }, (error, result) => {
-								if (error) console.log('Unable to add entry to collection for user \'' + entry.userId + '\'. ERROR: ' + error);
-		      		});
-
-							// give user back capcoin if end of game
-							if (endGame) {
-								User.findOneAndUpdate({ _id: entry.userId }, { $inc: { coinBalance }}, (err, res) => {
-										if (err) {
-											console.log('unable to update capcoin balance for user \'' + entry.userId + '\'. ERROR: ' + err);
-											updateAll = false;
-										}
-								});
-							}
-			 	});
-				if (!updateAll) res.status(500).send('unable to update all capcoin balances');
-				else res.status(200).send('succesful');
-			});
-		});
 	});
 }

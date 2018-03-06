@@ -12,15 +12,15 @@ db.getCollectionNames().forEach(
 
 db.users.insertMany([
 	{ _id: new ObjectId("5a8607d4971c50fbf29726a2"), email: '1@gmail.com', username: 'p1', password: '1', coinBalance: 10 },
-	{ _id: new ObjectId("5a8607d5971c50fbf29726a3"), email: '2@gmail.com', username: 'p2', password: '2', coinBalance: 10 },
+	{ _id: new ObjectId("5a8607d5971c50fbf29726a3"), email: '2@gmail.com', username: 'p2', password: '2', coinBalance: 20 },
 	{ _id: new ObjectId("5a8607d6971c50fbf29726a4"), email: '3@gmail.com', username: 'p3', password: '3', coinBalance: 30 },
 	{ _id: new ObjectId("5a8607d6971c50fbf29726a5"), email: '4@gmail.com', username: 'p4', password: '4', coinBalance: 40 }])
 
-db.games.insertMany([
-  { _id: new ObjectId("5a8608233d378876bf62d819"), start_date: new Date(1519048800000), finish_date: new Date(1519423200000), "coins": [ {"name":"BTC", "value": 11129}, {"name": "ETH", "value": 973.93}, {"name": "XRP", "value": 1.05}, {"name": "BCH", "value": 1527.79}, {"name": "LTC", "value": 218.82}] },
-  { _id: new ObjectId("5a8608233d378876bf62d820"), start_date: new Date(1519682400000), finish_date: new Date(1519999200000), "coins": [ {"name":"BTC", "value": 11129}, {"name": "ETH", "value": 973.93}, {"name": "XRP", "value": 1.05}, {"name": "BCH", "value": 1527.79}, {"name": "LTC", "value": 218.82}] },
-  { _id: new ObjectId("5a8608233d378876bf62d821"), start_date: new Date(1519048800000), finish_date: new Date(1519423200000), "coins": [ {"name":"BTC", "value": 11129}, {"name": "ETH", "value": 973.93}, {"name": "XRP", "value": 1.05}, {"name": "BCH", "value": 1527.79}, {"name": "LTC", "value": 218.82}] },
-  { _id: new ObjectId("5a99b4944ca7a11092a9e971"), start_date: new Date(1519048800000), finish_date: new Date(1619523200000), "coins": [ {"name":"SFC", "value": null}, {"name": "PRE", "value": null}, {"name": "POLIS", "value": null}, {"name": "WETH", "value": null}, {"name": "GLS", "value": null} ] } ])
+// db.games.insertMany([
+//   { _id: new ObjectId("5a99b4944ca7a11092a9e971"), start_date: new Date(1519048800000), finish_date: new Date(1619048800001), "coins": [ {"name":"SFC", "startPrice": null, "endPrice": null}, {"name": "PRE", "startPrice": null, "endPrice": null}, {"name": "POLIS", "startPrice": null, "endPrice": null}, {"name": "WETH", "startPrice": null, "endPrice": null}, {"name": "GLS", "startPrice": null, "endPrice": null} ] } ])
+
+  db.games.insertMany([
+    { _id: new ObjectId("5a99b4944ca7a11092a9e971"), start_date: new Date(1519048800000), finish_date: new Date(1519048800001), "coins": [ {"name":"SFC", "startPrice": 100, "endPrice": null}, {"name": "PRE", "startPrice": 100, "endPrice": null}, {"name": "POLIS", "startPrice": 100, "endPrice": null}, {"name": "WETH", "startPrice": 100, "endPrice": null}, {"name": "GLS", "startPrice": 100, "endPrice": null} ] } ])
 
 db.entries.insertMany([
   { _id: new ObjectId("5a8ace5a53bb81002573c1f0"), gameId: new ObjectId("5a99b4944ca7a11092a9e971"), userId: new ObjectId("5a8607d6971c50fbf29726a4"), coin_balance: 8.4, choices: [ {"symbol": "SFC", "allocation": 1.0}, {"symbol": "PRE", "allocation": 1.0}, {"symbol": "POLIS", "allocation": 2.0}, {"symbol": "WETH", "allocation": 2.0}, {"symbol": "GLS", "allocation": 4.0} ], last_updated: Date.now() },

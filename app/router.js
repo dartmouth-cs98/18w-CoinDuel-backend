@@ -31,6 +31,7 @@ router.post('/signup', User.signup);
 router.get('/game', Game.getLatestGame);
 router.post('/game/create', Game.createNextGame);
 router.post('/game/initialize', Game.initializeGame);
+router.post('/game/end', Game.endGame);
 router.route('/game/:gameId/:userId')
   .get(Game.getEntry)
   .post(Game.createAndUpdateEntry)
