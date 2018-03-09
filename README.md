@@ -2,53 +2,36 @@
 
 Backend API repo for CoinDuel iOS app.
 
-https://coinduel-cs98.herokuapp.com/api/user
-^ send post endpoint with username to find if one exists
-^ send delete request with usernamen to delete
+https://coinduel-cs98.herokuapp.com/api/{endpoint}
 
-https://coinduel-cs98.herokuapp.com/api/signup
-^add user with a post request with email, password, and username
+Look at the router.js file to view all the different endpoints created. They include creating a new user, initializing a new game, retrieving the leaderboard, viewing a user's current/all-time live balance, and more.
 
 * Data models:
 
 ```
-user: {
-    user_id,
-    email,
-    password_hash,
-    balance
+User: {
+    email: { type: String, unique: true, lowercase: true },
+    username: String,
+    password: String,
+    coinBalance: { type: Number, default: 0 }
 },
-coin: {
-    id,
-    name,
-    symbol,
-    market_cap_usd
+Game: {
+    start_date: { type: Date, default: Date.now },
+    finish_date: { type: Date },
+    coins: [{ name: { type: String }, startPrice: { type: Number }, endPrice: { type: Number }}],
 },
-coinPrices: {
-    coin_id,
-    price,
-    date
+GameEntry: {
+    gameId: { type: Schema.Types.ObjectId, ref: 'Game' },
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
+    choices: [{ symbol: { type: String }, allocation: { type: Number, min: 0, max: 10 }}],
+    coin_balance: { type: Number, default: 0 },
+    last_updated: { type: Date, default: Date.now }
 },
-capCoinHistory: {
-    user_id,
-    balance,
-    date
-},
-game: {
-    game_id,
-    start_date,
-    finish_date
-},
-gameLeaderboard: {
-    game_id,
-    user_id,
-    percent_return,
-    time_of_observation
-},
-gameUserChoices: {
-    game_id,
-    user_id,
-    selections: {[selection_1, percent_mix,], ...,[selection_3, percent_mix]}
+CapcoinHistory: {
+    gameId: { type: Schema.Types.ObjectId, ref: 'Game' },
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
+    balance: { type: Number, default: 0 },
+    date: { type: Date, default: Date.now }
 }
 ```
 ## Architecture
@@ -60,7 +43,7 @@ The backend is comprised of Node.js and Express for the server, and MongoDB for 
 1) clone backend repo
 1.5) If necessary, get homebrew and download mongo using 'brew install mongodb'
 2) 'brew services start mongodb' OR 'mongod' (if not using brew)
-3) mongo < test_data.js 
+3) Open the mongo shell with 'mongo' and copy paste the code from test_data.js into the shell
 4) npm install
 5) npm run dev
 6) To test, try http://localhost:9000/api/game. This should return the most recent game from test_data.js.
@@ -68,11 +51,11 @@ The backend is comprised of Node.js and Express for the server, and MongoDB for 
 
 ## Deployment
 
-Heroku
+Heroku, using an automatic scheduler for certain jobs
 
 ## Authors
 
-Kooshul Jhaveri, Anish Chadalavada, Mitchell Revers, Rajiv Ramaiah, Henry Wilson, Josh Kerber
+Kooshul Jhaveri, Josh Kerber, Anish Chadalavada, Mitchell Revers, Rajiv Ramaiah, Henry Wilson
 
 ## Acknowledgments
 
