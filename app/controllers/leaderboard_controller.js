@@ -13,9 +13,6 @@ import CapcoinHistory from '../models/capcoin_history.js';
 
 const getJSON = require('get-json');
 
-// magnify coin returns by a contast
-const returnMagnifier = 2;
-
 /*
  * Sets leaderboard list during game.
  * @param req, ex. { }
@@ -23,6 +20,7 @@ const returnMagnifier = 2;
 export const setRankings = (req, res) => {
 	// end game flag
 	const endGame = "endGame" in req.body;
+	const returnMagnifier = req.app.locals.resources.returnMagnifier;   // global return magnifier
 
 	// get latest game
 	var date = Date.now();
@@ -102,6 +100,7 @@ export const setRankings = (req, res) => {
 // @param req, ex. { gameId: '12783687126387172836'}
 export const getRankings = (req, res) => {
 	const gameId = req.params.gameId;
+	const returnMagnifier = req.app.locals.resources.returnMagnifier;   // global return magnifier
 
 	// get initial coin prices for game
   	Game.findById(gameId, (err, result) => {
@@ -179,6 +178,8 @@ export const getRankings = (req, res) => {
 // returns sorted leaderboard list for all time game
 // @param req, ex. { }
 export const getAllTimeRankings = (req, res) => {
+	const returnMagnifier = req.app.locals.resources.returnMagnifier;   // global return magnifier
+
 	// retrieve active game id and update balances with live prices
 	Game.find({ finish_date: {$gt: Date.now()} })
 	.sort('finish_date')
