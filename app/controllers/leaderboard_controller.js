@@ -13,6 +13,9 @@ import CapcoinHistory from '../models/capcoin_history.js';
 
 const getJSON = require('get-json');
 
+// magnify coin returns by a contast
+const returnMagnifier = 2;
+
 /*
  * Sets leaderboard list during game.
  * @param req, ex. { }
@@ -65,6 +68,9 @@ export const setRankings = (req, res) => {
 					var coinBalance = 0;
       		entry.choices.forEach((choice) => {
       			let percent_change = 1 - (initialPrices[choice.symbol] / currentPrices[choice.symbol]);
+
+						// magnify returns
+						percent_change *= returnMagnifier;
       			coinBalance += (1 + percent_change) * choice.allocation;
       		});
 
@@ -131,6 +137,9 @@ export const getRankings = (req, res) => {
 		      		let coin_balance = 0;
 		      		entry.choices.forEach((choice) => {
 		      			let percent_change = 1 - (initialPrices[choice.symbol] / currentPrices[choice.symbol]);
+
+								// magnify returns
+								percent_change *= returnMagnifier;
 		      			coin_balance += (1 + percent_change) * choice.allocation;
 		      		});
 
@@ -211,6 +220,9 @@ export const getAllTimeRankings = (req, res) => {
 			      		let coin_balance = 0;
 			      		entry.choices.forEach((choice) => {
 			      			let percent_change = 1 - (initialPrices[choice.symbol] / currentPrices[choice.symbol]);
+
+									// magnify returns
+									percent_change *= returnMagnifier;
 			      			coin_balance += (1 + percent_change) * choice.allocation;
 			      		});
 			      		balances[entry.userId] = coin_balance;
