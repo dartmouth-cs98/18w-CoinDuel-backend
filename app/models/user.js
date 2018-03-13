@@ -33,9 +33,7 @@ UserSchema.pre('save', function beforeyYourModelSave(callback) {
 
   // generate encrypted password
   var hash = cryptr.encrypt(user.password);
-  console.log(hash);
   user.password = hash;
-  console.log(user);
   return callback();
 });
 

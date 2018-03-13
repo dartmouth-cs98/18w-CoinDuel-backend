@@ -15,8 +15,6 @@ dotenv.config({ silent: true });
 const cryptr = new Cryptr(process.env.API_SECRET);
 
 export const signup = (req, res, next) => {
-  console.log('Signing up user...');
-  console.log(req.body);
   const email = req.body.email;
   const password = req.body.password;
   const username = req.body.username;
@@ -52,8 +50,6 @@ export const signup = (req, res, next) => {
 
 // check if user exists
 export const findUser = (req, res) => {
-  console.log('Signing in user...');
-  console.log(req.body);
   User.findOne({ "username": req.body.username })
   .then((user) => {
       if (user) {
@@ -75,6 +71,9 @@ export const getAllUsers = (req, res) => {
   User.find()
   .then((users) => {
       if (users) {
+
+        // decrypt all passwords
+        users.forEach(user => user.password = cryptr.decrypt(user.password));
         res.send(users);
       } else {
         return res.status(422).send('No users found!');
