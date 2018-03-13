@@ -165,13 +165,15 @@ export const createNextGame = (req, res) => {
 	var startDate = new Date();
 	// startDate.setMinutes(startDate.getHours() + 1);
 	startDate.setHours(17, 0, 0, 0);
-	// startDate.setDate(startDate.getDate() + 1);
+	startDate.setDate(startDate.getDate() + 1);
 
 	// next day at 1:00:00PM UTC (9:00:00AM EST)
 	var endDate = new Date();
 	// endDate.setHours(endDate.getHours() + 2);
 	endDate.setHours(9, 0, 0, 0);
-	endDate.setDate(endDate.getDate() + 1);
+	endDate.setDate(endDate.getDate() + 2);
+	console.log(startDate);
+	console.log(endDate);
 
 	// create choices
 	const tickers = req.app.locals.resources.tickers;
