@@ -142,10 +142,10 @@ export const getCoinReturns = (req, res) => {
         entry.choices.forEach(choice => {
           let ticker = choice.symbol;
           let percentChange = (currentPrices[ticker] - initialPrices[ticker]) / currentPrices[ticker];
+          let capCoin = choice.allocation * percentChange + choice.allocation;
 
           // magnify returns
-          percentChange *= returnMagnifier;
-          let capCoin = choice.allocation * percentChange + choice.allocation;
+          capCoin *= returnMagnifier;
           fullResults.returns[ticker] = {
             'initialPrice': initialPrices[ticker].toString(),
             'currentPrice': currentPrices[ticker].toString(),
