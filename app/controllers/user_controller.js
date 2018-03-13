@@ -56,6 +56,7 @@ export const findUser = (req, res) => {
 
         // decrypt password
         user.password = cryptr.decrypt(user.password);
+        console.log(user);
         res.send(user);
       } else {
         return res.status(422).send('No user found!');
@@ -74,6 +75,7 @@ export const getAllUsers = (req, res) => {
 
         // decrypt all passwords
         users.forEach(user => user.password = cryptr.decrypt(user.password));
+        console.log(users);
         res.send(users);
       } else {
         return res.status(422).send('No users found!');
