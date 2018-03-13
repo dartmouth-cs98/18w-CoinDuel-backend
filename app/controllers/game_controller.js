@@ -172,8 +172,6 @@ export const createNextGame = (req, res) => {
 	// endDate.setHours(endDate.getHours() + 2);
 	endDate.setHours(9, 0, 0, 0);
 	endDate.setDate(endDate.getDate() + 2);
-	console.log(startDate);
-	console.log(endDate);
 
 	// create choices
 	const tickers = req.app.locals.resources.tickers;
