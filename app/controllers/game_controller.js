@@ -187,7 +187,7 @@ export const createNextGame = (req, res) => {
 	var flags = {};
 	while (choices.length < 5) {
 		let index = tickerChoices.length * Math.random() << 0;
-		if (!(index in flags)) choices.push({"name":tickerChoices[index], "startPrice":null});
+		if (!(index in flags)) choices.push({"name":tickerChoices[index], "startPrice":null, "endPrice":null});
 		flags[index] = true;
 	}
 
