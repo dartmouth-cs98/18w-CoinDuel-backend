@@ -20,6 +20,7 @@ const getJSON = require('get-json');
 export const setRankings = (req, res) => {
 	// end game flag
 	const endGame = "endGame" in req.body;
+	const returnMagnifier = req.app.locals.resources.returnMagnifier;   // global return magnifier
 
 	// get latest game
 	var date = Date.now();
@@ -65,6 +66,9 @@ export const setRankings = (req, res) => {
 					var coinBalance = 0;
       		entry.choices.forEach((choice) => {
       			let percent_change = 1 - (initialPrices[choice.symbol] / currentPrices[choice.symbol]);
+
+						// magnify returns
+						percent_change *= returnMagnifier;
       			coinBalance += (1 + percent_change) * choice.allocation;
       		});
 
@@ -96,6 +100,7 @@ export const setRankings = (req, res) => {
 // @param req, ex. { gameId: '12783687126387172836'}
 export const getRankings = (req, res) => {
 	const gameId = req.params.gameId;
+	const returnMagnifier = req.app.locals.resources.returnMagnifier;   // global return magnifier
 
 	// get initial coin prices for game
   	Game.findById(gameId, (err, result) => {
@@ -131,6 +136,9 @@ export const getRankings = (req, res) => {
 		      		let coin_balance = 0;
 		      		entry.choices.forEach((choice) => {
 		      			let percent_change = 1 - (initialPrices[choice.symbol] / currentPrices[choice.symbol]);
+
+								// magnify returns
+								percent_change *= returnMagnifier;
 		      			coin_balance += (1 + percent_change) * choice.allocation;
 		      		});
 
@@ -170,12 +178,13 @@ export const getRankings = (req, res) => {
 // returns sorted leaderboard list for all time game
 // @param req, ex. { }
 export const getAllTimeRankings = (req, res) => {
+	const returnMagnifier = req.app.locals.resources.returnMagnifier;   // global return magnifier
+
 	// retrieve active game id and update balances with live prices
 	Game.find({ finish_date: {$gt: Date.now()} })
 	.sort('finish_date')
 	.limit(1)
-	.then((result) => {
-		
+	.then((result) => {		
 		// if no current game, create an array of Objects, sort by coin balance, and send the array as a JSON response
 		if (!result[0]) {
 			User.find({ }, (err, result2) => {
@@ -221,7 +230,7 @@ export const getAllTimeRankings = (req, res) => {
 
 			      	// loop through each entry of the game
 			      	var balances = {};
-					var updateError = 'none';
+					    var updateError = 'none';
 			      	GameEntry.find({ gameId }, (err3, result3) => {
 				      	result3.forEach((entry) => {
 
@@ -230,6 +239,8 @@ export const getAllTimeRankings = (req, res) => {
 				      		let coin_balance = 0;
 				      		entry.choices.forEach((choice) => {
 				      			let percent_change = 1 - (initialPrices[choice.symbol] / currentPrices[choice.symbol]);
+                    // magnify returns
+									  percent_change *= returnMagnifier;
 				      			coin_balance += (1 + percent_change) * choice.allocation;
 				      		});
 				      		balances[entry.userId] = coin_balance;
@@ -251,15 +262,15 @@ export const getAllTimeRankings = (req, res) => {
 
 				      	// sum up the user's all time balance and the current game balance (if it exists)
 				      	var usernames = {}
-						User.find({ }, (err4, result4) => {
-			      			result4.forEach((entry) => {
-			      				if (balances[entry.id]) {
-			      					balances[entry.id] += entry.coinBalance;
-				      			} else {
-				      				balances[entry.id] = entry.coinBalance;
-				      			}
-				      			usernames[entry.id] = entry.username;
-			 				})
+                User.find({ }, (err4, result4) => {
+                    result4.forEach((entry) => {
+                      if (balances[entry.id]) {
+                        balances[entry.id] += entry.coinBalance;
+                      } else {
+                        balances[entry.id] = entry.coinBalance;
+                      }
+                      usernames[entry.id] = entry.username;
+                  });
 
 			      			// create an array of Objects, sort by coin balance, and send the array as a JSON response
 				      		var user_data = []

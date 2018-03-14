@@ -95,6 +95,7 @@ export const getCoinPrices = (req, res) => {
 export const getCoinReturns = (req, res) => {
   const gameId = req.params.gameId;
   const userId = req.params.userId;
+  const returnMagnifier = req.app.locals.resources.returnMagnifier;   // global return magnifier
 
   // get initial coin prices for game
   Game.findById(gameId, (err, result) => {
@@ -141,7 +142,11 @@ export const getCoinReturns = (req, res) => {
         entry.choices.forEach(choice => {
           let ticker = choice.symbol;
           let percentChange = (currentPrices[ticker] - initialPrices[ticker]) / currentPrices[ticker];
-          let capCoin = choice.allocation * percentChange + choice.allocation;
+          let capCoin = choice.allocation * percentChange;
+
+          // magnify returns
+          capCoin *= returnMagnifier;
+          capCoin += choice.allocation;
           fullResults.returns[ticker] = {
             'initialPrice': initialPrices[ticker].toString(),
             'currentPrice': currentPrices[ticker].toString(),

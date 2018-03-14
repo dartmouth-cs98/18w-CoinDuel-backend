@@ -161,17 +161,17 @@ export const createNextGame = (req, res) => {
 	// 	return;
 	// }
 
-	// get two monday's from now at 10:00:00PM UTC (5:00:00PM EST)
+	// same day at 9:00:00PM UTC (5:00:00PM EST)
 	var startDate = new Date();
-	startDate.setMinutes(startDate.getMinutes() + 30);
-	// startDate.setHours(17, 0, 0, 0);
-	// startDate.setDate(startDate.getDate() + 10);
+	// startDate.setMinutes(startDate.getHours() + 1);
+	startDate.setHours(17, 0, 0, 0);
+	startDate.setDate(startDate.getDate() + 1);
 
-	// get two friday's from now at 2:00:10PM UTC (9:00:10AM EST)
+	// next day at 6:00:00PM UTC (2:00:00PM EST)
 	var endDate = new Date();
-	endDate.setHours(endDate.getHours() + 1);
-	// endDate.setHours(9, 0, 10, 0);
-	// endDate.setDate(endDate.getDate() + 14);
+	// endDate.setHours(endDate.getHours() + 2);
+	endDate.setHours(14, 0, 0, 0);
+	endDate.setDate(endDate.getDate() + 2);
 
 	// create choices
 	const tickers = req.app.locals.resources.tickers;
@@ -182,23 +182,23 @@ export const createNextGame = (req, res) => {
 	  }
 	}
 
-	// // randomly select 5 tickers
-	// var choices = [];
-	// var flags = {};
-	// while (choices.length < 5) {
-	// 	let index = tickerChoices.length * Math.random() << 0;
-	// 	if (!(index in flags)) choices.push({"name":tickerChoices[index], "startPrice":null});
-	// 	flags[index] = true;
-	// }
+	// randomly select 5 tickers
+	var choices = [];
+	var flags = {};
+	while (choices.length < 5) {
+		let index = tickerChoices.length * Math.random() << 0;
+		if (!(index in flags)) choices.push({"name":tickerChoices[index], "startPrice":null, "endPrice":null});
+		flags[index] = true;
+	}
 
-	// default choices
-	var choices = [
-		{"name": "BTC", "startPrice": null, "endPrice":null},
-		{"name": "ETH", "startPrice": null, "endPrice":null},
-		{"name": "XRP", "startPrice": null, "endPrice":null},
-		{"name": "BCH", "startPrice": null, "endPrice":null},
-		{"name": "LTC", "startPrice": null, "endPrice":null}
-	];
+	// // default choices
+	// var choices = [
+	// 	{"name": "BTC", "startPrice": null, "endPrice":null},
+	// 	{"name": "ETH", "startPrice": null, "endPrice":null},
+	// 	{"name": "XRP", "startPrice": null, "endPrice":null},
+	// 	{"name": "BCH", "startPrice": null, "endPrice":null},
+	// 	{"name": "LTC", "startPrice": null, "endPrice":null}
+	// ];
 
 	// create db entry for game in 2 weeks (next game should already be created)
 	Game.create({ start_date: startDate, finish_date: endDate, coins: choices }, (err, res) => {
