@@ -15,12 +15,16 @@ router.route('/user')
 // coin controller
 router.route('/coin/:symbol')
   .get(Coin.getCoin);
+
 router.route('/return/:gameId/:userId')
   .get(Coin.getCoinReturns);
+
 router.route('/game/prices/:gameId')
   .get(Coin.getCoinPrices);
+
 router.route('/capcoin/:userId')
   .get(Coin.getCapcoinHistory);
+
 router.route('/capcoin/:gameId/:userId')
   .get(Coin.getCapcoinHistoryForGame);
 
@@ -32,6 +36,7 @@ router.get('/game', Game.getLatestGame);
 router.post('/game/create', Game.createNextGame);
 router.post('/game/initialize', Game.initializeGame);
 router.post('/game/end', Game.endGame);
+
 router.route('/game/:gameId/:userId')
   .get(Game.getEntry)
   .post(Game.createAndUpdateEntry)
@@ -40,12 +45,13 @@ router.route('/game/:gameId/:userId')
 
 // leaderboard controller
 router.route('/leaderboard/:gameId')
-  .get(Leaderboard.getRankings)
+  .get(Leaderboard.getRankings);
+
 router.route('/leaderboard/update')
-  .post(Leaderboard.setRankings)
+  .post(Leaderboard.setRankings);
 
 router.route('/leaderboard/')
-  .get(Leaderboard.getAllTimeRankings)
+  .get(Leaderboard.getAllTimeRankings);
 
 
 export default router;
