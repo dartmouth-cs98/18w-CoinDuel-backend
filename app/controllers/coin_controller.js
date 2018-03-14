@@ -19,7 +19,7 @@ const getJSON = require('get-json');
  */
 export const getCoin = (req, res) => {
   const symbol = req.params.symbol;
-  const tickers = req.app.locals.resources.tickers;   // global ticker dict
+  const tickers = req.app.locals.resources.tickers; // global ticker dict
 
   // check if request has ticker
   if (!symbol) {
@@ -78,7 +78,10 @@ export const getCoinPrices = (req, res) => {
       });
 
       // calculate return for each coin
-      var fullResults = {'gameId': gameId, 'prices':{}};
+      var fullResults = {
+        'gameId': gameId,
+        'prices': {}
+      };
       result.coins.forEach(coin => {
         let ticker = coin.name;
         fullResults.prices[ticker] = currentPrices[ticker].toString();
@@ -95,7 +98,7 @@ export const getCoinPrices = (req, res) => {
 export const getCoinReturns = (req, res) => {
   const gameId = req.params.gameId;
   const userId = req.params.userId;
-  const returnMagnifier = req.app.locals.resources.returnMagnifier;   // global return magnifier
+  const returnMagnifier = req.app.locals.resources.returnMagnifier; // global return magnifier
 
   // get initial coin prices for game
   Game.findById(gameId, (err, result) => {
@@ -131,14 +134,21 @@ export const getCoinReturns = (req, res) => {
       });
 
       // get users coin choices
-      GameEntry.findOne({ gameId: gameId, userId: userId }, (subSubErr, entry) => {
+      GameEntry.findOne({
+        gameId: gameId,
+        userId: userId
+      }, (subSubErr, entry) => {
         if (subSubErr || !entry) {
           res.status(422).send('No game entries found for user ' + userId + ' and game ' + gameId);
           return;
         }
 
         // calculate return for each coin
-        var fullResults = {'userId': userId, 'gameId': gameId, 'returns':{}};
+        var fullResults = {
+          'userId': userId,
+          'gameId': gameId,
+          'returns': {}
+        };
         entry.choices.forEach(choice => {
           let ticker = choice.symbol;
           let percentChange = (currentPrices[ticker] - initialPrices[ticker]) / currentPrices[ticker];
@@ -152,7 +162,8 @@ export const getCoinReturns = (req, res) => {
             'currentPrice': currentPrices[ticker].toString(),
             'allocation': choice.allocation.toString(),
             'capCoin': capCoin.toString(),
-            'percent': (percentChange * 100).toString() };
+            'percent': (percentChange * 100).toString()
+          };
         });
         res.status(200).send(fullResults);
       });
@@ -168,7 +179,9 @@ export const getCapcoinHistory = (req, res) => {
   const userId = req.params.userId;
 
   // get all history for user
-  CapcoinHistory.find({ userId: userId }, (err, history) => {
+  CapcoinHistory.find({
+    userId: userId
+  }, (err, history) => {
     if (err || !history) {
       res.status(422).send('No capcoin history for user \'' + userId + '\'');
       return;
@@ -176,7 +189,10 @@ export const getCapcoinHistory = (req, res) => {
 
     // clean up data
     var balances = [];
-    history.forEach(entry => balances.push({'date': entry['date'], 'balance': entry['balance']}));
+    history.forEach(entry => balances.push({
+      'date': entry['date'],
+      'balance': entry['balance']
+    }));
     res.status(200).send(balances);
   });
 };
@@ -190,7 +206,10 @@ export const getCapcoinHistoryForGame = (req, res) => {
   const gameId = req.params.gameId;
 
   // get all history for user during game
-  CapcoinHistory.find({ userId: userId, gameId: gameId }, (err, history) => {
+  CapcoinHistory.find({
+    userId: userId,
+    gameId: gameId
+  }, (err, history) => {
     if (err || !history) {
       res.status(422).send('No capcoin history for user \'' + userId + '\' during game \'' + gameId + '\'');
       return;
@@ -198,7 +217,10 @@ export const getCapcoinHistoryForGame = (req, res) => {
 
     // clean up data
     var balances = [];
-    history.forEach(entry => balances.push({'date': entry['date'], 'balance': entry['balance']}));
+    history.forEach(entry => balances.push({
+      'date': entry['date'],
+      'balance': entry['balance']
+    }));
     res.status(200).send(balances);
   });
 };

@@ -1,4 +1,6 @@
-import { Router } from 'express';
+import {
+  Router
+} from 'express';
 import * as User from './controllers/user_controller.js';
 import * as Game from './controllers/game_controller.js';
 import * as Coin from './controllers/coin_controller.js';
@@ -52,6 +54,5 @@ router.route('/leaderboard/update')
 
 router.route('/leaderboard/')
   .get(Leaderboard.getAllTimeRankings);
-
 
 export default router;
