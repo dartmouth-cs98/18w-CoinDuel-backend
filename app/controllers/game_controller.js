@@ -164,13 +164,13 @@ export const createNextGame = (req, res) => {
 	// same day at 9:00:00PM UTC (5:00:00PM EST)
 	var startDate = new Date();
 	// startDate.setMinutes(startDate.getHours() + 1);
-	startDate.setHours(17, 0, 0, 0);
+	startDate.setHours(21, 0, 0, 0);
 	startDate.setDate(startDate.getDate() + 1);
 
 	// next day at 6:00:00PM UTC (2:00:00PM EST)
 	var endDate = new Date();
 	// endDate.setHours(endDate.getHours() + 2);
-	endDate.setHours(14, 0, 0, 0);
+	endDate.setHours(18, 0, 0, 0);
 	endDate.setDate(endDate.getDate() + 2);
 
 	// create choices
