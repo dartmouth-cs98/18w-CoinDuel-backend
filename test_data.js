@@ -16,14 +16,14 @@ db.users.insertMany([
 	{ _id: new ObjectId("5a8607d6971c50fbf29726a4"), email: '3@gmail.com', username: 'p3', password: '3', coinBalance: 30 },
 	{ _id: new ObjectId("5a8607d6971c50fbf29726a5"), email: '4@gmail.com', username: 'p4', password: '4', coinBalance: 40 }])
 
-db.games.insertMany([
-  { _id: new ObjectId("5a99b4944ca7a11092a9e971"), start_date: new Date(1519048800000), finish_date: new Date(1619048800001), "coins": [ {"name":"SFC", "startPrice": null, "endPrice": null}, {"name": "PRE", "startPrice": null, "endPrice": null}, {"name": "POLIS", "startPrice": null, "endPrice": null}, {"name": "WETH", "startPrice": null, "endPrice": null}, {"name": "GLS", "startPrice": null, "endPrice": null} ] } ])
+// db.games.insertMany([
+//   { _id: new ObjectId("5a99b4944ca7a11092a9e971"), start_date: new Date(1519048800000), finish_date: new Date(1619048800001), "coins": [ {"name":"SFC", "startPrice": null, "endPrice": null}, {"name": "PRE", "startPrice": null, "endPrice": null}, {"name": "POLIS", "startPrice": null, "endPrice": null}, {"name": "WETH", "startPrice": null, "endPrice": null}, {"name": "GLS", "startPrice": null, "endPrice": null} ] } ])
 
-  // db.games.insertMany([
-  //   { _id: new ObjectId("5a99b4944ca7a11092a9e971"), start_date: new Date(1519048800000), finish_date: new Date(1519048800001), "coins": [ {"name":"SFC", "startPrice": 100, "endPrice": null}, {"name": "PRE", "startPrice": 100, "endPrice": null}, {"name": "POLIS", "startPrice": 100, "endPrice": null}, {"name": "WETH", "startPrice": 100, "endPrice": null}, {"name": "GLS", "startPrice": 100, "endPrice": null} ] } ])
+  db.games.insertMany([
+    { _id: new ObjectId("5a99b4944ca7a11092a9e971"), start_date: new Date(1519048800000), finish_date: new Date(1519048800001), "coins": [ {"name":"SFC", "startPrice": 100, "endPrice": null}, {"name": "PRE", "startPrice": 100, "endPrice": null}, {"name": "POLIS", "startPrice": 100, "endPrice": null}, {"name": "WETH", "startPrice": 100, "endPrice": null}, {"name": "GLS", "startPrice": 100, "endPrice": null} ] } ])
 
 db.entries.insertMany([
-  { _id: new ObjectId("5a8ace5a53bb81002573c1f0"), gameId: new ObjectId("5a99b4944ca7a11092a9e971"), userId: new ObjectId("5a8607d6971c50fbf29726a4"), coin_balance: 8.4, choices: [ {"symbol": "SFC", "allocation": 1.0}, {"symbol": "PRE", "allocation": 1.0}, {"symbol": "POLIS", "allocation": 2.0}, {"symbol": "WETH", "allocation": 2.0}, {"symbol": "GLS", "allocation": 4.0} ], last_updated: Date.now() },
+  { _id: new ObjectId("5a8ace5a53bb81002573c1f0"), gameId: new ObjectId("5a99b4944ca7a11092a9e971"), userId: new ObjectId("5a8607d6971c50fbf29726a4"), coin_balance: -3.3, choices: [ {"symbol": "SFC", "allocation": 1.0}, {"symbol": "PRE", "allocation": 1.0}, {"symbol": "POLIS", "allocation": 2.0}, {"symbol": "WETH", "allocation": 2.0}, {"symbol": "GLS", "allocation": 4.0} ], last_updated: Date.now() },
   { _id: new ObjectId("5a8ace5a53bb81002573c1f1"), gameId: new ObjectId("5a8608233d378876bf62d820"), userId: new ObjectId("5a8607d4971c50fbf29726a2"), coin_balance: 3.9, choices: [ {"symbol": "BTC", "allocation": 1.0}, {"symbol": "ETH", "allocation": 2.0}, {"symbol": "XRP", "allocation": 2.0}, {"symbol": "BCH", "allocation": 2.0}, {"symbol": "LTC", "allocation": 5.0} ], last_updated: Date.now() },
   { _id: new ObjectId("5a8ace5a53bb12302573c1f2"), gameId: new ObjectId("5a8608233d378876bf62d820"), userId: new ObjectId("5a8607d5971c50fbf29726a3"), coin_balance: 5.3, choices: [ {"symbol": "BTC", "allocation": 1.0}, {"symbol": "ETH", "allocation": 1.0}, {"symbol": "XRP", "allocation": 2.0}, {"symbol": "BCH", "allocation": 0.0}, {"symbol": "LTC", "allocation": 6.0} ], last_updated: Date.now() } ])
 
