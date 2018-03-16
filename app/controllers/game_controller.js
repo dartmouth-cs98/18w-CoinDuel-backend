@@ -182,10 +182,11 @@ export const createNextGame = (req, res) => {
 	  }
 	}
 
-	// randomly select 5 tickers
+	// randomly select tickers
+	const numChoices = req.app.locals.resources.numChoices;
 	var choices = [];
 	var flags = {};
-	while (choices.length < 5) {
+	while (choices.length < numChoices) {
 		let index = tickerChoices.length * Math.random() << 0;
 		if (!(index in flags)) choices.push({"name":tickerChoices[index], "startPrice":null, "endPrice":null});
 		flags[index] = true;
@@ -201,8 +202,8 @@ export const createNextGame = (req, res) => {
 	// ];
 
 	// create db entry for game in 2 weeks (next game should already be created)
-	Game.create({ start_date: startDate, finish_date: endDate, coins: choices }, (err, res) => {
-		if (err || !res) {
+	Game.create({ start_date: startDate, finish_date: endDate, coins: choices }, (err, result) => {
+		if (err || !result) {
 			res.status(500).send('Unable to create db entry for new game');
 			return;
 		}

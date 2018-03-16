@@ -14,5 +14,8 @@ resources['tickers'] = {"42":"42-coin","300":"300-token","611":"sixeleven","808"
 // magnify coin returns by a contast
 resources['returnMagnifier'] = 10;
 
+// number of coins per game
+resources['numChoices'] = 10;
+
 // export all resources
 export default resources;
