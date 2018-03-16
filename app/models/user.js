@@ -19,10 +19,6 @@ UserSchema.set('toJSON', {
   virtuals: true,
 });
 
-// UserSchema.virtual('balance').get(function balance() {
-//   return this.coinBalance;
-// });
-
 // encrypt passwords before saving
 // based on http://cs52.me/assignments/hw5p2/
 UserSchema.pre('save', function beforeyYourModelSave(callback) {
@@ -33,9 +29,7 @@ UserSchema.pre('save', function beforeyYourModelSave(callback) {
 
   // generate encrypted password
   var hash = cryptr.encrypt(user.password);
-  console.log(hash);
   user.password = hash;
-  console.log(user);
   return callback();
 });
 
