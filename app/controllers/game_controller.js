@@ -350,15 +350,9 @@ export const endGame = (req, res) => {
 						gameId: game._id
 					}, (entryErr, entryRes) => {
 						entryRes.forEach(entry => {
-							var winnings = entry.coin_balance;
-							User.findOneAndUpdate({
-								_id: entry.userId
-							}, {
-								$inc: {
-									coinBalance: winnings
-								}
-							}, (winningsErr, winningsRes) => {
-								updateError = winningsErr ? 'unable to update capcoin balance for user \'' + entry.userId + '\'. ERROR: ' + err : 'none';
+							var winnings = entry.coin_balance > 0 ? entry.coin_balance : 0;
+							User.findOneAndUpdate({ _id: entry.userId }, { $inc: { coinBalance: winnings }}, (winningsErr, winningsRes) => {
+									updateError = winningsErr ? 'unable to update capcoin balance for user \'' + entry.userId + '\'. ERROR: ' + err : 'none';
 							});
 						});
 					})
