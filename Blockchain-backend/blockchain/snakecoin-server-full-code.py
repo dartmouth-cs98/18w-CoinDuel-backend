@@ -63,7 +63,7 @@ def transaction():
 
 @node.route('/blocks', methods=['GET'])
 def get_blocks():
-  chain_to_send = blockchain
+  chain_to_send = blockchain[:]
   # Convert our blocks into dictionaries
   # so we can send them as json objects later
   for i in range(len(chain_to_send)):
