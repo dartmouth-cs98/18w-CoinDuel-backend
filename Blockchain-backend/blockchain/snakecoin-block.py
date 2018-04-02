@@ -1,6 +1,7 @@
 import hashlib as hasher
 import datetime as date
 
+# Code based on https://medium.com/crypto-currently/lets-build-the-tiniest-blockchain-e70965a248b
 # Define what a Snakecoin block is
 class Block:
   def __init__(self, index, timestamp, data, previous_hash):
@@ -44,4 +45,4 @@ for i in range(0, num_of_blocks_to_add):
   previous_block = block_to_add
   # Tell everyone about it!
   print "Block #{} has been added to the blockchain!".format(block_to_add.index)
-  print "Hash: {}\n".format(block_to_add.hash) 
+  print "Hash: {}\n".format(block_to_add.hash)
