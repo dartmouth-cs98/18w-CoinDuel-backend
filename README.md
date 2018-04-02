@@ -13,6 +13,7 @@ User: {
     email: { type: String, unique: true, lowercase: true },
     username: String,
     password: String,
+    profile_url: { type: String, default: 'profile' },
     coinBalance: { type: Number, default: 0 }
 },
 Game: {
