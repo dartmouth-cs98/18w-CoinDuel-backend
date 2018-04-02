@@ -20,6 +20,7 @@ export const signup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const username = req.body.username;
+  const profile_url = req.body.profile_url;
 
   if (!email || !password || !username) {
     return res.status(422).send('You must provide an email, a password, and a username to sign up!');
@@ -38,6 +39,7 @@ export const signup = (req, res, next) => {
         newUser.password = password;
         newUser.username = username;
         newUser.coinBalance = 30;
+        newUser.profile_url = profile_url
         newUser.save()
           .then((result) => {
             res.send(newUser);
