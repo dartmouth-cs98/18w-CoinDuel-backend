@@ -23,7 +23,9 @@
     "dotenv": "^5.0.1",
     "express": "^4.15.2",
     "get-json": "^1.0.0",
-    "mongoose": "^5.0.3"
+    "mongoose": "^5.0.3",
+    "request": "^2.85.0",
+    "sms-sending": "0.0.5"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"

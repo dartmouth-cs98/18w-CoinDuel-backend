@@ -40,6 +40,7 @@ export const signup = (req, res, next) => {
         newUser.username = username;
         newUser.coinBalance = 30;
         newUser.profile_url = profile_url
+        newUser.verified = false;
         newUser.save()
           .then((result) => {
             res.send(newUser);

@@ -227,48 +227,59 @@ export const createNextGame = (req, res) => {
 	endDate.setHours(18, 0, 0, 0);
 	endDate.setDate(endDate.getDate() + 2);
 
-	// create choices
-	const tickers = req.app.locals.resources.tickers;
-	var tickerChoices = [];
-	for (var prop in tickers) {
-		if (tickers.hasOwnProperty(prop)) {
-			tickerChoices.push(prop);
-		}
-	}
-
-	// randomly select tickers
-	const numChoices = req.app.locals.resources.numChoices;
-	var choices = [];
+	// contact coin market cap for coins
 	var flags = {};
-	while (choices.length < numChoices) {
-		let index = tickerChoices.length * Math.random() << 0;
-		if (!(index in flags)) choices.push({
-			"name": tickerChoices[index],
-			"startPrice": null,
-			"endPrice": null
-		});
-		flags[index] = true;
-	}
-
-	// // default choices
-	// var choices = [
-	// 	{"name": "BTC", "startPrice": null, "endPrice":null},
-	// 	{"name": "ETH", "startPrice": null, "endPrice":null},
-	// 	{"name": "XRP", "startPrice": null, "endPrice":null},
-	// 	{"name": "BCH", "startPrice": null, "endPrice":null},
-	// 	{"name": "LTC", "startPrice": null, "endPrice":null}
-	// ];
-
-	// create db entry for game in 2 weeks (next game should already be created)
-	Game.create({ start_date: startDate, finish_date: endDate, coins: choices }, (err, result) => {
-		if (err || !result) {
-			res.status(500).send('Unable to create db entry for new game');
+	var choices = [];
+  getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=50', (error, cryptos) => {
+		if (error || !cryptos) {
+			res.status(500).send('Unable to retrieve coins - please check http://api.coinmarketcap.com/. ERROR: ' + error);
 			return;
 		}
-	});
 
-	// we made it
-	res.status(200).send('successful');
+		// get top 7 coin market cap coins
+		const mcChoices = req.app.locals.resources.mcChoices;
+		for (let i = 0; i < mcChoices; i++) {
+			let crypto = cryptos[i];
+			choices.push({
+				"name": crypto['symbol'],
+				"startPrice": null,
+				"endPrice": null
+			});
+			flags[i] = true;
+		}
+
+		// randomly select 3 tickers
+		const randChoices = req.app.locals.resources.randomChoices;
+		while (choices.length < randChoices + mcChoices) {
+			let index = cryptos.length * Math.random() << 0;
+			if (!(index in flags)) choices.push({
+				"name": cryptos[index]['symbol'],
+				"startPrice": null,
+				"endPrice": null
+			});
+			flags[index] = true;
+		}
+
+		// // default choices
+		// var choices = [
+		// 	{"name": "BTC", "startPrice": null, "endPrice":null},
+		// 	{"name": "ETH", "startPrice": null, "endPrice":null},
+		// 	{"name": "XRP", "startPrice": null, "endPrice":null},
+		// 	{"name": "BCH", "startPrice": null, "endPrice":null},
+		// 	{"name": "LTC", "startPrice": null, "endPrice":null}
+		// ];
+
+		// create db entry for game in 2 weeks (next game should already be created)
+		Game.create({ start_date: startDate, finish_date: endDate, coins: choices }, (err, result) => {
+			if (err || !result) {
+				res.status(500).send('Unable to create db entry for new game');
+				return;
+			}
+
+			// we made it
+			res.status(200).send('successful');
+		});
+	});
 };
 
 /*
