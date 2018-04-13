@@ -4,9 +4,14 @@ import {
 import * as User from './controllers/user_controller.js';
 import * as Game from './controllers/game_controller.js';
 import * as Coin from './controllers/coin_controller.js';
+import * as Test from './controllers/test_controller.js';
 import * as Leaderboard from './controllers/leaderboard_controller.js';
 
 const router = Router();
+
+// for testing
+router.route('/test')
+  .get(Test.test)
 
 // user controller
 router.route('/user')

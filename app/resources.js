@@ -14,8 +14,11 @@ resources['tickers'] = {"42":"42-coin","300":"300-token","611":"sixeleven","808"
 // magnify coin returns by a constant
 resources['returnMagnifier'] = 10;
 
-// number of coins per game
-resources['numChoices'] = 10;
+// number of random coins per game
+resources['randomChoices'] = 3;
+
+// number of coins per game by market cap
+resources['mcChoices'] = 7;
 
 // export all resources
 export default resources;
