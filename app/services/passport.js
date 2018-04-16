@@ -31,3 +31,18 @@ const localLogin = new LocalStrategy(localOptions, (username, password, done) =>
     });
   });
 });
+
+const jwtLogin = new JwtStrategy(jwtOptions, (payload, done) => {
+  // See if the user ID in the payload exists in our database
+  // If it does, call 'done' with that other
+  // otherwise, call done without a user object
+  User.findById(payload.sub, (err, user) => {
+    if (err) {
+      done(err, false);
+    } else if (user) {
+      done(null, user);
+    } else {
+      done(null, false);
+    }
+  });
+});
