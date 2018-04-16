@@ -1,6 +1,4 @@
-import {
-  Router
-} from 'express';
+import { Router } from 'express';
 import * as User from './controllers/user_controller.js';
 import * as Game from './controllers/game_controller.js';
 import * as Coin from './controllers/coin_controller.js';
