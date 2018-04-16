@@ -46,3 +46,9 @@ const jwtLogin = new JwtStrategy(jwtOptions, (payload, done) => {
     }
   });
 });
+
+passport.use(jwtLogin);
+passport.use(localLogin);
+
+export const requireAuth = passport.authenticate('jwt', { session: false });
+export const requireSignin = passport.authenticate('local', { session: false });
