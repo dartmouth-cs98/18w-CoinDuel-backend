@@ -7,6 +7,5 @@
  */
 
 export const test = (req, res) => {
-  var sms = require('sms-sending');
-  sms.send('text message', 9784605401);
+  res.status(200).send('test success')
 }
