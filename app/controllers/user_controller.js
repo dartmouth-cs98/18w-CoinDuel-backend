@@ -17,10 +17,10 @@ dotenv.config({ silent: true });
 export const signin = (req, res) => {
   const username = req.body.username;
   User.findOne({ username })
-  .then(user => {
+  .then(myUser => {
 
     // generate and send back new token
-    if (user) res.send({ token: tokenForUser(user) });
+    if (myUser) res.status(200).send({ token: tokenForUser(myUser), user: myUser });
     else res.status(400).send('user \'' + username + '\' not found');
   })
   .catch(err => {
@@ -33,7 +33,7 @@ export const signup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const username = req.body.username;
-
+  console.log(req.body)
   if (!email || !password || !username) {
     return res.status(422).send('You must provide an email, a password, and a username to sign up!');
   }
@@ -56,7 +56,7 @@ export const signup = (req, res, next) => {
         .then(result => {
 
           // return token
-          res.send({ token: tokenForUser(newUser) });
+          res.status(200).send({ token: tokenForUser(newUser), user: newUser });
         })
         .catch(err => {
           res.status(400).send(`${err}`);
@@ -119,7 +119,5 @@ export const deleteUser = (req, res) => {
 // based off CS52 passport auth guide http://cs52.me/assignments/hw5p2/ (URL subject to change)
 function tokenForUser(user) {
   const timestamp = new Date().getTime();
-  const token = jwt.encode({ user: user.id, iat: timestamp }, process.env.API_SECRET);
-  const decode = jwt.decode(token, process.env.API_SECRET);
-  return token;
+  return jwt.encode({ user: user.id, iat: timestamp }, process.env.API_SECRET);
 }
