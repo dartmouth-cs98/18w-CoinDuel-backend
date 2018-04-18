@@ -7,5 +7,6 @@
  */
 
 export const test = (req, res) => {
-  res.status(200).send('test success')
+  console.log('test endpoint');
+  res.status(200).send('test success');
 }

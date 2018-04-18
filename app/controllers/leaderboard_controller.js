@@ -235,8 +235,6 @@ export const getAllTimeRankings = (req, res) => {
                     user_data.sort((a, b) => {
                         return (a.coin_balance < b.coin_balance) ? 1 : ((a.coin_balance > b.coin_balance) ? -1 : 0);
                     });
-
-                    console.log(user_data);
                     res.json(user_data);
                     return;
                 });

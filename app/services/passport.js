@@ -1,54 +1,55 @@
+/*
+ * passport.js
+ *
+ * Passport authentication.
+ * Based on CS52 auth guide http://cs52.me/assignments/hw5p2/ (URL subject to change)
+ * Apr 17 2018
+ * Kooshul Jhaveri & Josh Kerber
+ * Credits to Tim Tregubov of course
+ */
+
 import passport from 'passport';
 import LocalStrategy from 'passport-local';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import User from '../models/user';
+import dotenv from 'dotenv';
+dotenv.config({ silent: true });
 
-const localOptions = { usernameField: 'email' };
+// options for local strategy
+const localOptions = { usernameField: 'username' };
 
+// options for jwt strategy
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromHeader('authorization'),
-  secretOrKey: process.env.AUTH_SECRET,
+  secretOrKey: process.env.API_SECRET
 };
 
+// username, password authentication strategy
 const localLogin = new LocalStrategy(localOptions, (username, password, done) => {
-  // Verify this email and password, call done with the user
-  // if it is the correct email and password
-  // otherwise, call done with false
   User.findOne({ username }, (err, user) => {
-    if (err) { return done(err); }
+    if (err) return done(err);
+    if (!user) return done(null, false);
 
-    if (!user) { return done(null, false); }
-
-    // compare passwords - is `password` equal to user.password?
+    // compare candidate password to user.password
     user.comparePassword(password, (err, isMatch) => {
-      if (err) {
-        done(err);
-      } else if (!isMatch) {
-        done(null, false);
-      } else {
-        done(null, user);
-      }
+      if (err) done(err);
+      else if (!isMatch) done('error: incorrect password', false);
+      else done(null, user);
     });
   });
 });
 
+// check database for user ID in the payload
 const jwtLogin = new JwtStrategy(jwtOptions, (payload, done) => {
-  // See if the user ID in the payload exists in our database
-  // If it does, call 'done' with that other
-  // otherwise, call done without a user object
-  User.findById(payload.sub, (err, user) => {
-    if (err) {
-      done(err, false);
-    } else if (user) {
-      done(null, user);
-    } else {
-      done(null, false);
-    }
+  User.findById(payload.user, (err, user) => {
+    if (err) done(err, false);
+    else if (user) done(null, user);
+    else done(null, false);
   });
 });
 
+// set passport procedure
 passport.use(jwtLogin);
 passport.use(localLogin);
-
 export const requireAuth = passport.authenticate('jwt', { session: false });
 export const requireSignin = passport.authenticate('local', { session: false });

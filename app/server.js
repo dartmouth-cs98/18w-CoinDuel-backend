@@ -1,5 +1,6 @@
 // From http://cs52.me/assignments/sa/server-side/
 
+import cors from 'cors';
 import express from 'express';
 import mongoose from 'mongoose';
 import apiRouter from './router';
@@ -8,6 +9,9 @@ import bodyParser from 'body-parser';
 
 // instantiate app
 const app = express();
+
+// cross origin resource sharing
+app.use(cors());
 
 // load in resources
 app.locals.resources = resources;
