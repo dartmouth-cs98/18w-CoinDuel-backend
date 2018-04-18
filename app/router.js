@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { requireAuth, requireSignin } from './services/passport';
 import * as User from './controllers/user_controller.js';
 import * as Game from './controllers/game_controller.js';
 import * as Coin from './controllers/coin_controller.js';
@@ -9,7 +10,11 @@ const router = Router();
 
 // for testing
 router.route('/test')
-  .get(Test.test)
+  .get(requireAuth, Test.test)
+
+// user auth
+router.post('/signup', User.signup);
+router.post('/signin', requireSignin, User.signin);
 
 // user controller
 router.route('/user')
@@ -32,9 +37,6 @@ router.route('/capcoin/:userId')
 
 router.route('/capcoin/:gameId/:userId')
   .get(Coin.getCapcoinHistoryForGame);
-
-// signup user
-router.post('/signup', User.signup);
 
 // game controller
 router.get('/game', Game.getLatestGame);

@@ -8,20 +8,31 @@
 
 import User from '../models/user.js';
 import dotenv from 'dotenv';
-import Cryptr from 'cryptr';
+import jwt from 'jwt-simple';
 
-// password decryption
-dotenv.config({
-  silent: true
-});
-const cryptr = new Cryptr(process.env.API_SECRET);
+// password encryption
+dotenv.config({ silent: true });
 
+// generate token upon sign in
+export const signin = (req, res) => {
+  const username = req.body.username;
+  User.findOne({ username })
+  .then(myUser => {
+
+    // generate and send back new token
+    if (myUser) res.status(200).send({ token: tokenForUser(myUser), user: myUser });
+    else res.status(400).send('user \'' + username + '\' not found');
+  })
+  .catch(err => {
+    res.status(400).send(`${err}`);
+  });
+};
+
+// signup user
 export const signup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const username = req.body.username;
-  const profile_url = req.body.profile_url;
-
   if (!email || !password || !username) {
     return res.status(422).send('You must provide an email, a password, and a username to sign up!');
   }
@@ -39,15 +50,16 @@ export const signup = (req, res, next) => {
         newUser.password = password;
         newUser.username = username;
         newUser.coinBalance = 30;
-        newUser.profile_url = profile_url
         newUser.verified = false;
         newUser.save()
-          .then((result) => {
-            res.send(newUser);
-          })
-          .catch(err => {
-            res.send(`${err}`);
-          });
+        .then(result => {
+
+          // return token
+          res.status(200).send({ token: tokenForUser(newUser), user: newUser });
+        })
+        .catch(err => {
+          res.status(400).send(`${err}`);
+        });
       }
     })
     .catch(err => {
@@ -62,9 +74,6 @@ export const findUser = (req, res) => {
     })
     .then((user) => {
       if (user) {
-
-        // decrypt password
-        user.password = cryptr.decrypt(user.password);
         res.send(user);
       } else {
         return res.status(422).send('No user found!');
@@ -80,9 +89,6 @@ export const getAllUsers = (req, res) => {
   User.find()
     .then((users) => {
       if (users) {
-
-        // decrypt all passwords
-        users.forEach(user => user.password = cryptr.decrypt(user.password));
         res.send(users);
       } else {
         return res.status(422).send('No users found!');
@@ -107,3 +113,10 @@ export const deleteUser = (req, res) => {
       });
     });
 };
+
+// encodes new token for a user
+// based off CS52 passport auth guide http://cs52.me/assignments/hw5p2/ (URL subject to change)
+function tokenForUser(user) {
+  const timestamp = new Date().getTime();
+  return jwt.encode({ user: user.id, iat: timestamp }, process.env.API_SECRET);
+}
