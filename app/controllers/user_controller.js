@@ -13,6 +13,9 @@ import jwt from 'jwt-simple';
 // password encryption
 dotenv.config({ silent: true });
 
+const uuidv4 = require('uuid/v4');
+const mailgun = require('mailgun-js')({apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN, retry: 3});
+
 // generate token upon sign in
 export const signin = (req, res) => {
   const username = req.body.username;
@@ -51,9 +54,11 @@ export const signup = (req, res, next) => {
         newUser.username = username;
         newUser.coinBalance = 30;
         newUser.verified = false;
+        const verificationId = uuidv4();
+        newUser.verificationId = verificationId;
         newUser.save()
         .then(result => {
-
+          sendVerificationEmail(email, username, verificationId);
           // return token
           res.status(200).send({ token: tokenForUser(newUser), user: newUser });
         })
@@ -113,6 +118,32 @@ export const deleteUser = (req, res) => {
       });
     });
 };
+
+// verify a user
+export const verifyUser = (req, res) => {
+  User.findOne({ verificationId: req.params.verificationId })
+    .then((result) => {
+      result.update({
+        $set: {
+          verified: true,
+        }
+      });
+    }).catch(error => {
+      res.status(400).send('Emailed verification failed');
+    });
+};
+
+function sendVerificationEmail (email, username, verificationId) {
+  var data = {
+    from: 'CoinDuel Mailer <noreply@coinduel.mailgun.org>',
+    to: email,
+    subject: 'CoinDuel Email Verification',
+    html: `Hello ${username},<br />Thank you for signing up for CoinDuel! To get started, please verify your email using the link below:
+           <br />&#9;<a href='https://coinduel-cs98.herokuapp.com/api/verify/${verificationId}'>Verify My Account</a><br />See you on the app!<br /><br />CoinDuel Team`
+  };
+
+  mailgun.messages().send(data, function (error, body) { });
+}
 
 // encodes new token for a user
 // based off CS52 passport auth guide http://cs52.me/assignments/hw5p2/ (URL subject to change)
