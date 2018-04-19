@@ -13,6 +13,8 @@ import jwt from 'jwt-simple';
 // password encryption
 dotenv.config({ silent: true });
 
+const uuidv4 = require('uuid/v4');
+
 // generate token upon sign in
 export const signin = (req, res) => {
   const username = req.body.username;
@@ -51,6 +53,7 @@ export const signup = (req, res, next) => {
         newUser.username = username;
         newUser.coinBalance = 30;
         newUser.verified = false;
+        newUser.verification_id = uuidv4();
         newUser.save()
         .then(result => {
 
@@ -111,6 +114,20 @@ export const deleteUser = (req, res) => {
       res.json({
         error
       });
+    });
+};
+
+// delete a user, used for account deletion
+export const deleteUser = (req, res) => {
+  User.findOne({ verification_id: req.params.verification_id })
+    .then((result) => {
+      result.update({
+        $set: {
+          verified: true,
+        }
+      });
+    }).catch(error => {
+      res.status(400).send('Emailed verification failed');
     });
 };
 

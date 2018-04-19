@@ -5,9 +5,10 @@ import bcrypt from 'bcrypt-nodejs';
 
 const UserSchema = new Schema({
   email: { type: String, unique: true, lowercase: true },
-  username: String,
-  password: String,
+  username: { type: String },
+  password: { type: String },
   verified: { type: Boolean, default: false },
+  verification_id: { type: String },
   profile_url: { type: String, default: 'profile' },
   coinBalance: { type: Number, default: 0 }
 });
