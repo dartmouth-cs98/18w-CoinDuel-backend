@@ -22,6 +22,10 @@ router.route('/user')
   .post(User.findUser)
   .delete(User.deleteUser);
 
+// user verification
+router.route('/verify/:verificationId')
+  .get(User.verifyUser);
+
 // coin controller
 router.route('/coin/:symbol')
   .get(Coin.getCoin);
