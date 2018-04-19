@@ -8,7 +8,7 @@ const UserSchema = new Schema({
   username: { type: String },
   password: { type: String },
   verified: { type: Boolean, default: false },
-  verification_id: { type: String },
+  verificationId: { type: String },
   profile_url: { type: String, default: 'profile' },
   coinBalance: { type: Number, default: 0 }
 });
