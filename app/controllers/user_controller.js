@@ -123,6 +123,7 @@ export const deleteUser = (req, res) => {
 export const verifyUser = (req, res) => {
   User.findOne({ verificationId: req.params.verificationId })
     .then((result) => {
+      console.log(result);
       result.update({
         $set: {
           verified: true,
