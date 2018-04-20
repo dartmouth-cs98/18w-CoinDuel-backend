@@ -128,6 +128,7 @@ export const verifyUser = (req, res) => {
           verified: true,
         }
       });
+      res.status(200).send('Email verification successful!');
     }).catch(error => {
       res.status(400).send('Emailed verification failed');
     });
@@ -138,13 +139,12 @@ function sendVerificationEmail (email, username, verificationId) {
     from: 'CoinDuel Mailer <noreply@coinduel.mailgun.org>',
     to: email,
     subject: 'CoinDuel Email Verification',
-    html: `Hello ${username},<br />Thank you for signing up for CoinDuel! To get started, please verify your email using the link below:
-           <br />&#9;<a href='https://coinduel-cs98.herokuapp.com/api/verify/${verificationId}'>Verify My Account</a><br />See you on the app!<br /><br />CoinDuel Team`
+    html: `Hello ${username},<br /><br />Thank you for signing up for CoinDuel! To get started, please verify your email using the link below:<br /><br />
+           <a href='https://coinduel-cs98.herokuapp.com/api/verify/${verificationId}'>Verify My Account</a><br /><br />See you on the app!<br />CoinDuel Team`
   };
 
   mailgun.messages().send(data, function (error, body) {
-    if (error) console.log(error);
-    if (body) console.log(body);
+    if (error) console.log('Mailgun Error: ' + error);
   });
 }
 
