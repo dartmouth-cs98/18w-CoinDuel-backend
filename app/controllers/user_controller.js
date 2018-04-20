@@ -142,7 +142,10 @@ function sendVerificationEmail (email, username, verificationId) {
            <br />&#9;<a href='https://coinduel-cs98.herokuapp.com/api/verify/${verificationId}'>Verify My Account</a><br />See you on the app!<br /><br />CoinDuel Team`
   };
 
-  mailgun.messages().send(data, function (error, body) { });
+  mailgun.messages().send(data, function (error, body) {
+    if (error) console.log(error);
+    if (body) console.log(body);
+  });
 }
 
 // encodes new token for a user
