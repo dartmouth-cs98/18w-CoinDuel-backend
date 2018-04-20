@@ -58,9 +58,12 @@ export const signup = (req, res, next) => {
         newUser.verificationId = verificationId;
         newUser.save()
         .then(result => {
-          sendVerificationEmail(email, username, verificationId);
-          // return token
-          res.status(200).send({ token: tokenForUser(newUser), user: newUser });
+          if !sendVerificationEmail(email, username, verificationId) {
+            res.status(400).send('Create user failed – error sending verification email.');
+          } else {
+            // return token
+            res.status(200).send({ token: tokenForUser(newUser), user: newUser });
+          }
         })
         .catch(err => {
           res.status(400).send(`${err}`);
@@ -144,7 +147,7 @@ function sendVerificationEmail (email, username, verificationId) {
   };
 
   mailgun.messages().send(data, function (error, body) {
-    if (error) console.log('Mailgun Error: ' + error);
+    return !error;
   });
 }
 
