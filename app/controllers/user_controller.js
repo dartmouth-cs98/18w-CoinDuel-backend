@@ -128,10 +128,15 @@ export const verifyUser = (req, res) => {
         $set: {
           verified: true,
         }
+      }, (updateErr, updateRes) => {
+          if (updateErr || !updateRes) {
+              res.status(400).send('Error verifying account.');
+              return;
+          }
       });
-      res.status(200).send('Email verification successful!');
+      res.status(200).send('Account verification successful!');
     }).catch(error => {
-      res.status(400).send('Emailed verification failed');
+      res.status(400).send('Account verification failed');
     });
 };
 
