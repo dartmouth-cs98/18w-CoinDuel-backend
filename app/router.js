@@ -16,7 +16,7 @@ router.get('/', (req, res) => {
 router.route('/test')
   .get(requireAuth, Test.test)
 
-// user authherok
+// user auth
 router.post('/signup', User.signup);
 router.post('/signin', requireSignin, User.signin);
 

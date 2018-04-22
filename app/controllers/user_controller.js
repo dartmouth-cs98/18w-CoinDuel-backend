@@ -8,7 +8,6 @@
 
 import User from '../models/user.js';
 import dotenv from 'dotenv';
-// import mailgun from 'mailgun-js';
 import jwt from 'jwt-simple';
 
 // password encryption
