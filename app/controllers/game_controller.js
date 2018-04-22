@@ -223,7 +223,6 @@ export const createNextGame = (req, res) => {
 
 	// next day at 6:00:00PM UTC (2:00:00PM EST)
 	var endDate = new Date();
-	
 	// endDate.setHours(endDate.getHours() + 2);
 	endDate.setHours(endDate.getHours() + 1);
 	// endDate.setHours(23, 0, 0, 0);
