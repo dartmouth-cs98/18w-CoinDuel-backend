@@ -8,11 +8,15 @@ import * as Leaderboard from './controllers/leaderboard_controller.js';
 
 const router = Router();
 
+router.get('/', (req, res) => {
+  res.send('cryptos always, in all ways');
+});
+
 // for testing
 router.route('/test')
   .get(requireAuth, Test.test)
 
-// user auth
+// user authherok
 router.post('/signup', User.signup);
 router.post('/signin', requireSignin, User.signin);
 
