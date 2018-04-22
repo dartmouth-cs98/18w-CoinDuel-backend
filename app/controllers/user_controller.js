@@ -59,10 +59,10 @@ export const signup = (req, res, next) => {
         newUser.save()
         .then(result => {
           if !sendVerificationEmail(email, username, verificationId) {
-            res.status(400).send('Create user failed – error sending verification email.');
+            res.status(400).send('Create user failed – error sending verification email.');
           } else {
             // return token
-            res.status(200).send({ token: tokenForUser(newUser), user: newUser });
+            res.status(200).send({ token  : tokenForUser(newUser), user: newUser });
           }
         })
         .catch(err => {
