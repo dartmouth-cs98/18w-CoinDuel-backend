@@ -8,6 +8,7 @@
 
 import User from '../models/user.js';
 import dotenv from 'dotenv';
+// import mailgun from 'mailgun-js';
 import jwt from 'jwt-simple';
 
 // password encryption
@@ -58,11 +59,11 @@ export const signup = (req, res, next) => {
         newUser.verificationId = verificationId;
         newUser.save()
         .then(result => {
-          if !sendVerificationEmail(email, username, verificationId) {
-            res.status(400).send('Create user failed – error sending verification email.');
+          if (sendVerificationEmail(email, username, verificationId)) {
+            res.status(200).send({ token: tokenForUser(newUser), user: newUser });
           } else {
             // return token
-            res.status(200).send({ token: tokenForUser(newUser), user: newUser });
+            res.status(400).send('Create user failed – error sending verification email.');
           }
         })
         .catch(err => {
