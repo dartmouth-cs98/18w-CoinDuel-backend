@@ -8,6 +8,7 @@
 
 import User from '../models/user.js';
 import dotenv from 'dotenv';
+// import mailgun from 'mailgun-js';
 import jwt from 'jwt-simple';
 
 // password encryption
@@ -126,14 +127,20 @@ export const deleteUser = (req, res) => {
 export const verifyUser = (req, res) => {
   User.findOne({ verificationId: req.params.verificationId })
     .then((result) => {
+      console.log(result);
       result.update({
         $set: {
           verified: true,
         }
+      }, (updateErr, updateRes) => {
+          if (updateErr || !updateRes) {
+              res.status(400).send('Error verifying account.');
+              return;
+          }
       });
-      res.status(200).send('Email verification successful!');
+      res.status(200).send('Account verification successful!');
     }).catch(error => {
-      res.status(400).send('Emailed verification failed');
+      res.status(400).send('Account verification failed');
     });
 };
 
