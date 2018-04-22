@@ -219,7 +219,7 @@ export const createNextGame = (req, res) => {
 	var startDate = new Date();
 	// startDate.setMinutes(startDate.getHours() + 1);
 	// startDate.setHours(22, 0, 0, 0);
-	startDate.setDate(startDate.getDate();
+	startDate.setDate(startDate.getDate());
 
 	// next day at 6:00:00PM UTC (2:00:00PM EST)
 	var endDate = new Date();
