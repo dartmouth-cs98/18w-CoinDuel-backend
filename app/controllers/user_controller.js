@@ -52,6 +52,7 @@ export const signup = (req, res, next) => {
         newUser.email = email;
         newUser.password = password;
         newUser.username = username;
+        newUser.profile_url = req.body.profile_url
         newUser.coinBalance = 30;
         newUser.verified = false;
         const verificationId = uuidv4();
