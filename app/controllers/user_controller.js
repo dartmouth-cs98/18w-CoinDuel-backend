@@ -81,6 +81,7 @@ export const signup = (req, res, next) => {
         })
         .catch(err => {
           console.log("Validation error")
+          console.log(err)
           res.status(400).send(`${err}`);
         });
       }
