@@ -48,6 +48,7 @@ router.route('/capcoin/:gameId/:userId')
 
 // game controller
 router.get('/game', Game.getLatestGame);
+router.get('/game/performance/:gameId/:userId', Game.getCapcoinPerformanceForGame);
 router.post('/game/create', Game.createNextGame);
 router.post('/game/initialize', Game.initializeGame);
 router.post('/game/end', Game.endGame);

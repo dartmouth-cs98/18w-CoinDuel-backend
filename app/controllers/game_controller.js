@@ -13,6 +13,19 @@ import GameEntry from '../models/gameentry.js';
 // for calls to CoinMarketCap
 const getJSON = require('get-json');
 
+export const getCapcoinPerformanceForGame = (req, res) => {
+	console.log("asdf")
+	gameId = req.params.gameId
+	userId = req.params.userId
+
+	GameEntry.findOne({
+		userId: userId,
+		gameId: gameId
+	}, (error, result) => {
+		console.log(result);
+	});
+}
+
 // returns most recent game
 // // @param req, ex. { }
 export const getLatestGame = (req, res) => {
