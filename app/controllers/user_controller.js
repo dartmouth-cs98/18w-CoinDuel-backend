@@ -59,12 +59,12 @@ export const signup = (req, res, next) => {
         newUser.verificationId = verificationId;
         newUser.save()
         .then(result => {
-          const template = req.app.locals.resources.mailgun_email;
+          var email_html = req.app.locals.resources.mailgun_email1 + username + req.app.locals.resources.mailgun_email2 + verificationId + req.app.locals.resources.mailgun_email3;
           var data = {
             from: 'CoinDuel Mailer <noreply@coinduel.co>',
             to: email,
             subject: 'CoinDuel Email Verification',
-            html: template,
+            html: email_html,
             inline: '../images/logo.png'
           };
           mailgun.messages().send(data, function (error, body) {
