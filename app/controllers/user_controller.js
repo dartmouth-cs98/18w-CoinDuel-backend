@@ -59,21 +59,20 @@ export const signup = (req, res, next) => {
         newUser.verificationId = verificationId;
         newUser.save()
         .then(result => {
-          console.log("Got here");
+          const template = req.app.locals.resources.mailgun_email;
           var data = {
-            from: 'CoinDuel Mailer <noreply@coinduel.mailgun.org>',
+            from: 'CoinDuel Mailer <noreply@coinduel.co>',
             to: email,
             subject: 'CoinDuel Email Verification',
-            html: `Hello ${username},<br /><br />Thank you for signing up for CoinDuel! To get started, please verify your email using the link below:<br /><br />
-                   <a href='https://coinduel-cs98.herokuapp.com/api/verify/${verificationId}'>Verify My Account</a><br /><br />See you on the app!<br />CoinDuel Team`
+            html: template,
+            inline: '../images/logo.png'
           };
           mailgun.messages().send(data, function (error, body) {
-            console.log(error);
             if (error == undefined) {
               console.log("Succeeded verification");
               res.status(200).send({ token  : tokenForUser(newUser), user: newUser });
             } else {
-              console.log("Failed verification");
+              console.log("Failed verification. Error: ${error}");
               newUser.remove();
               res.status(400).send('Create user failed – error sending verification email.');
             }
