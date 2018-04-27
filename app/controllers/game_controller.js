@@ -38,9 +38,6 @@ export const getCapcoinPerformanceForGame = (req, res) => {
 		endTime = game.finish_date
 		durationOfGameSeconds = parseInt((endTime-startTime)/1000); // Difference in milliseconds.
 		durationOfGameMinutes = durationOfGameSeconds/60;
-		console.log("printing duration")
-		console.log(durationOfGameMinutes)
-
 
 		// initialize data array which will be the end product
 		for(var i = 0; i < durationOfGameMinutes+1; i++) {
@@ -112,10 +109,13 @@ export const getCapcoinPerformanceForGame = (req, res) => {
 					};
 				}
 			});
-
 		});
-
 	});
+}
+
+function myFunction(p1, p2) {
+    console.log(p1*p2);
+
 }
 
 // returns most recent game
