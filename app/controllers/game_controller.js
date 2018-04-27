@@ -80,7 +80,6 @@ export const getCapcoinPerformanceForGame = (req, res) => {
 							console.log(`Allocation for ${coin.symbol} is ${capcoinAllocation} at a starting price of ${startingPrice}`);
 						}
 					});
-					// console.log(startingPrice);
 					//SOURCE: https://www.learnhowtoprogram.com/javascript/asynchrony-and-apis-in-javascript/making-api-calls-with-javascript
 
 					var request = new XMLHttpRequest();
