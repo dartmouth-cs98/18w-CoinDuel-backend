@@ -9,20 +9,112 @@
 import User from '../models/user.js';
 import Game from '../models/game.js';
 import GameEntry from '../models/gameentry.js';
+// import XMLHttpRequest from 'xmlhttprequest'
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+var xhr = new XMLHttpRequest();
 
 // for calls to CoinMarketCap
 const getJSON = require('get-json');
 
 export const getCapcoinPerformanceForGame = (req, res) => {
-	console.log("asdf")
-	gameID = req.params.gameId
-	userID = req.params.userId
+	var data = [];
+	var performanceArray = [];
+	var initialAllocation;
+	var startTime;
+	var endTime;
+	var durationOfGameMinutes;
+	var durationOfGameSeconds;
 
-	GameEntry.findOne({
-		userId: userID,
-		gameId: gameID
-	}, (error, result) => {
-		console.log(result);
+	Game.findOne({
+		_id: req.params.gameId
+	}, (error, game) => {
+		if (error || !game){
+			res.status(500).send('unable to get game performance, no game found');
+			return
+		}
+		var gameCoins = game.coins
+		//get the duration of a game to calculate price history for
+		startTime = game.start_date
+		endTime = game.finish_date
+		durationOfGameSeconds = parseInt((endTime-startTime)/1000); // Difference in milliseconds.
+		durationOfGameMinutes = durationOfGameSeconds/60;
+		console.log("printing duration")
+		console.log(durationOfGameMinutes)
+
+
+		// initialize data array which will be the end product
+		for(var i = 0; i < durationOfGameMinutes+1; i++) {
+		    data.push({
+					"time": 0,
+					"unixTime": 0,
+					"capCoin": 0
+				});
+		}
+
+
+		//find game entry to get allocations for each coin and calculate return for each minute.
+		GameEntry.findOne({
+			userId: req.params.userId,
+			gameId: req.params.gameId
+		}, (error, entry) => {
+			if (error || !entry){
+				res.status(500).send('Unable to find entry for user');
+				return
+			}
+			var progress = 0;
+			var numberAllocated = 0;
+			//add check if game hasn't started yet. although this endpoint should only be called
+			// if a game has ended or is in progress
+			entry.choices.forEach(coin => {
+				console.log(progress);
+				var amountCapCoinAllocated;
+				var capcoinAllocation = coin.allocation
+				// only get price data if coin has been allocated
+				if (capcoinAllocation > 0) {
+					numberAllocated += 1;
+					amountCapCoinAllocated = amountCapCoinAllocated + capcoinAllocation;
+					var startingPrice;
+					gameCoins.forEach(gameCoin => {
+						if(coin.symbol == gameCoin.name){
+							startingPrice = gameCoin.startPrice;
+							console.log(`Allocation for ${coin.symbol} is ${capcoinAllocation} at a starting price of ${startingPrice}`);
+						}
+					});
+					//SOURCE: https://www.learnhowtoprogram.com/javascript/asynchrony-and-apis-in-javascript/making-api-calls-with-javascript
+
+					var request = new XMLHttpRequest();
+					let url = `https://min-api.cryptocompare.com/data/histominute?fsym=${coin.symbol}&tsym=USD&limit=${durationOfGameMinutes}`;
+
+					let request = new XMLHttpRequest();
+					request.open("GET", url, true);
+					//networking call.
+					request.onload = function () {
+						var x = 0;
+						let response = JSON.parse(this.responseText);
+						response.Data.forEach(price => {
+							var currentPrice = price['high'];
+							var percentChange = ( (currentPrice - startingPrice) / startingPrice )
+							var capcoinChange = capcoinAllocation * percentChange
+
+							data[x].time = x;
+							data[x].unixTime = price['time'];
+							data[x].capCoin += capcoinChange;
+
+							x = x + 1;
+							//Calculate capcoin change for each minute/time interval
+						});
+						console.log(data);
+						// res.status(200).send(data);
+						progress = progress + 1;
+						if (progress == numberAllocated) {
+							res.status(200).send(data);
+						}
+					};
+				}
+			});
+
+		});
+
 	});
 }
 
@@ -30,7 +122,6 @@ export const getCapcoinPerformanceForGame = (req, res) => {
 // // @param req, ex. { }
 export const getLatestGame = (req, res) => {
 	var date = Date.now()
-
 	Game.find({
 			finish_date: {
 				$gt: date
