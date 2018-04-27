@@ -15,12 +15,12 @@ const getJSON = require('get-json');
 
 export const getCapcoinPerformanceForGame = (req, res) => {
 	console.log("asdf")
-	gameId = req.params.gameId
-	userId = req.params.userId
+	gameID = req.params.gameId
+	userID = req.params.userId
 
 	GameEntry.findOne({
-		userId: userId,
-		gameId: gameId
+		userId: userID,
+		gameId: gameID
 	}, (error, result) => {
 		console.log(result);
 	});
