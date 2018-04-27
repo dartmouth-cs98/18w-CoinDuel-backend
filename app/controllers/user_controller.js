@@ -68,11 +68,11 @@ export const signup = (req, res, next) => {
           };
           mailgun.messages().send(data, function (error, body) {
             if (error == undefined) {
-              console.log("Succeeded verification");
+              console.log("Verification email sent");
               res.status(200).send({ token  : tokenForUser(newUser), user: newUser });
             } else {
-              console.log("Failed verification. Error: ${error}");
               newUser.remove();
+              console.log("Error sending verification email – ${error}");
               res.status(400).send('Create user failed – error sending verification email.');
             }
           });
