@@ -60,14 +60,14 @@ export const signup = (req, res, next) => {
         newUser.save()
         .then(result => {
           var email_html = req.app.locals.resources.mailgun_email1 + username + req.app.locals.resources.mailgun_email2 + verificationId + req.app.locals.resources.mailgun_email3;
-          var filepath = path.join('/app/images/logo.png');
-          console.log(filepath);
+          // var filepath = path.join('/app/images/logo.png');
+          // console.log(filepath);
           var data = {
             from: 'CoinDuel Mailer <noreply@coinduel.co>',
             to: email,
             subject: 'CoinDuel Email Verification',
             html: email_html,
-            inline: filepath
+            inline: '/app/images/logo.png'
           };
           mailgun.messages().send(data, function (error, body) {
             if (error == undefined) {
