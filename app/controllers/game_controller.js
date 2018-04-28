@@ -62,14 +62,16 @@ export const getCapcoinPerformanceForGame = (req, res) => {
 			var numberAllocated = 0;
 			//add check if game hasn't started yet. although this endpoint should only be called
 			// if a game has ended or is in progress
+			var amountCapCoinAllocated = 0;
 			entry.choices.forEach(coin => {
 				console.log(progress);
-				var amountCapCoinAllocated;
+
 				var capcoinAllocation = coin.allocation
 				// only get price data if coin has been allocated
 				if (capcoinAllocation > 0) {
 					numberAllocated += 1;
 					amountCapCoinAllocated = amountCapCoinAllocated + capcoinAllocation;
+					console.log(amountCapCoinAllocated);
 					var startingPrice;
 					gameCoins.forEach(gameCoin => {
 						if(coin.symbol == gameCoin.name){
@@ -79,15 +81,16 @@ export const getCapcoinPerformanceForGame = (req, res) => {
 					});
 					//SOURCE: https://www.learnhowtoprogram.com/javascript/asynchrony-and-apis-in-javascript/making-api-calls-with-javascript
 
+					var url = `https://min-api.cryptocompare.com/data/histominute?fsym=${coin.symbol}&tsym=USD&limit=${durationOfGameMinutes}`;
+					console.log(url);
 					var request = new XMLHttpRequest();
-					let url = `https://min-api.cryptocompare.com/data/histominute?fsym=${coin.symbol}&tsym=USD&limit=${durationOfGameMinutes}`;
 
-					let request = new XMLHttpRequest();
 					request.open("GET", url, true);
 					//networking call.
 					request.onload = function () {
+						console.log("herer");
 						var x = 0;
-						let response = JSON.parse(this.responseText);
+						var response = JSON.parse(this.responseText);
 						response.Data.forEach(price => {
 							var currentPrice = price['high'];
 							var percentChange = ( (currentPrice - startingPrice) / startingPrice )
@@ -104,9 +107,15 @@ export const getCapcoinPerformanceForGame = (req, res) => {
 						// res.status(200).send(data);
 						progress = progress + 1;
 						if (progress == numberAllocated) {
+							// add final capcoin changes to initial amount allocated for entry
+							for(var i = 0; i < durationOfGameMinutes+1; i++) {
+								data[i].capCoin += data[i].capCoin + amountCapCoinAllocated;
+							}
 							res.status(200).send(data);
 						}
 					};
+					request.send();
+
 				}
 			});
 		});
