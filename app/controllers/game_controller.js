@@ -328,20 +328,13 @@ export const createNextGame = (req, res) => {
 	// 	return;
 	// }
 
-	// same day at 9:00:00PM UTC (5:00:00PM EST)
+	// start datetime in 30 mins
 	var startDate = new Date();
-	// startDate.setMinutes(startDate.getHours() + 1);
-	// startDate.setHours(22, 0, 0, 0);
+	startDate.setMinutes(startDate.getMinutes() + 30);
 
-	startDate.setMinutes(startDate.getMinutes()+30);
-	startDate.setDate(startDate.getDate());
-	// next day at 6:00:00PM UTC (2:00:00PM EST)
+	// end datetime in 1 hour
 	var endDate = new Date();
-	// endDate.setHours(endDate.getHours() + 2);
-	endDate.setMinutes(endDate.getMinutes()+60);
-	// endDate.setHours(endDate.getHours() + 1);
-	// endDate.setHours(23, 0, 0, 0);
-	endDate.setDate(endDate.getDate());
+	endDate.setMinutes(endDate.getMinutes() + 60);
 
 	// contact coin market cap for coins
 	var flags = {};
