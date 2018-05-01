@@ -36,59 +36,79 @@ export const signup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const username = req.body.username;
+
+  // ensure all fields exist
   if (!email || !password || !username) {
-    return res.status(422).send('You must provide an email, a password, and a username to sign up!');
+    return res.status(422).json({'errTitle': 'Oops! Our server seems to running into some trouble.', 'errBody': 'Please wait a moment and try again.'});
   }
 
-  // add query to check if user exists
+  // check database for username
   User.findOne({
       "username": username
     })
     .then((user) => {
+
+      // username already exists in database
       if (user) {
-        return res.status(422).send('The password or email or username you entered has been taken!');
+        res.status(422).json({'errTitle':'We\'re sorry! This username has already been taken.', 'errBody':'Please enter a new username and try again.'})
+        return;
+
+      // instantiate user and signup
       } else {
         const newUser = new User();
         newUser.email = email;
         newUser.password = password;
         newUser.username = username;
-        newUser.profile_url = req.body.profile_url
+        newUser.profile_url = req.body.profile_url;
         newUser.coinBalance = 30;
         newUser.verified = false;
-        const verificationId = uuidv4();
-        newUser.verificationId = verificationId;
+        newUser.verificationId = uuidv4();
+
+        // proceed with verification email
         newUser.save()
         .then(result => {
-          var email_html = req.app.locals.resources.mailgun_email1 + username + req.app.locals.resources.mailgun_email2 + verificationId + req.app.locals.resources.mailgun_email3;
+          var email_html = req.app.locals.resources.mailgun_email1 + username + req.app.locals.resources.mailgun_email2 + newUser.verificationId + req.app.locals.resources.mailgun_email3;
           var data = {
             from: 'CoinDuel Mailer <noreply@coinduel.co>',
             to: email,
             subject: 'CoinDuel Email Verification',
             html: email_html,
           };
+
+          // send email through mailgun
           mailgun.messages().send(data, function (error, body) {
-            if (error == undefined) {
+            if (!error) {
               console.log("Verification email sent");
-              res.status(200).send({ token  : tokenForUser(newUser), user: newUser });
+              res.status(200).send({ token: tokenForUser(newUser), user: newUser });
+
+            // unable to send user a verification email
             } else {
-              newUser.remove();
-              console.log("Error sending verification email – ${error}");
-              res.status(400).send('Create user failed – error sending verification email.');
+              //newUser.remove();
+              console.log("Error sending verification email – ${" + error + "}");
+              res.status(422).json({'errTitle': 'Oops! We were unable to send you a verification email.', 'errBody': 'Please check your email address and try again.'});
             }
           });
         })
         .catch(err => {
-          if (newUser) {
-            newUser.remove();
+
+          // error saving user in database
+          if (newUser) newUser.remove();
+          console.log(err.name);
+          console.log(err.message);
+
+          // catch duplicate email error
+          if (err.message.startsWith('E11000')) {
+            res.status(422).json({'errTitle': 'Hmm, it seems this email address belongs to another user.', 'errBody': 'Please use another email address.'});
+          } else {
+            res.status(422).json({'errTitle': 'Oops! Our server seems to running into some trouble.', 'errBody': 'Please wait a moment and try again.'});
           }
-          console.log("Validation error");
-          console.log(err);
-          res.status(400).send(`${err}`);
         });
       }
     })
     .catch(err => {
-      res.status(400).send(`${err}`);
+
+      // error querying database for username
+      res.status(422).json({'errTitle': 'Oops! Our server seems to running into some trouble.--', 'errBody': 'Please wait a moment and try again.'});
     });
 };
 
