@@ -174,9 +174,9 @@ export const verifyUser = (req, res) => {
               return;
           }
       });
-      res.status(200).send('Account verification successful!');
+      res.status(200).send('Email verification successful! You will now be able to login through our app.');
     }).catch(error => {
-      res.status(400).send('Account verification failed');
+      res.status(400).send('Email verification failed.');
     });
 };
 
