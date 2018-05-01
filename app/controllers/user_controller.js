@@ -83,7 +83,7 @@ export const signup = (req, res, next) => {
 
             // unable to send user a verification email
             } else {
-              //newUser.remove();
+              newUser.remove();
               console.log("Error sending verification email – ${" + error + "}");
               res.status(422).json({'errTitle': 'Oops! We were unable to send you a verification email.', 'errBody': 'Please check your email address and try again.'});
             }
