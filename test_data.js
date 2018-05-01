@@ -11,10 +11,10 @@ db.getCollectionNames().forEach(
 );
 
 db.users.insertMany([
-	{ _id: new ObjectId("5a8607d4971c50fbf29726a2"), email: '1@gmail.com', username: 'p1', password: '1', coinBalance: 10 },
-	{ _id: new ObjectId("5a8607d5971c50fbf29726a3"), email: '2@gmail.com', username: 'p2', password: '2', coinBalance: 20 },
-	{ _id: new ObjectId("5a8607d6971c50fbf29726a4"), email: '3@gmail.com', username: 'p3', password: '3', coinBalance: 30 },
-	{ _id: new ObjectId("5a8607d6971c50fbf29726a5"), email: '4@gmail.com', username: 'p4', password: '4', coinBalance: 40 }])
+	{ _id: new ObjectId("5a8607d4971c50fbf29726a2"), email: '1@gmail.com', username: 'p1', password: '$2a$10$PDe3pgi69xj.sTE8Xmhjv.p48qdQKutlV8qONaJqiEoDN75TyJbxG', coinBalance: 10, verified: false },
+	// { _id: new ObjectId("5a8607d5971c50fbf29726a3"), email: '2@gmail.com', username: 'p2', password: '2', coinBalance: 20 },
+	// { _id: new ObjectId("5a8607d6971c50fbf29726a4"), email: '3@gmail.com', username: 'p3', password: '3', coinBalance: 30 },
+	{ _id: new ObjectId("5a8607d6971c50fbf29726a5"), email: '4@gmail.com', username: 'p4', password: '$2a$10$PDe3pgi69xj.sTE8Xmhjv.p48qdQKutlV8qONaJqiEoDN75TyJbxG', coinBalance: 40, verified: true }])
 
 // db.games.insertMany([
 //   { _id: new ObjectId("5a99b4944ca7a11092a9e971"), start_date: new Date(1519048800000), finish_date: new Date(1619048800001), "coins": [ {"name":"SFC", "startPrice": null, "endPrice": null}, {"name": "PRE", "startPrice": null, "endPrice": null}, {"name": "POLIS", "startPrice": null, "endPrice": null}, {"name": "WETH", "startPrice": null, "endPrice": null}, {"name": "GLS", "startPrice": null, "endPrice": null} ] } ])

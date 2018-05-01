@@ -27,13 +27,13 @@ const jwtOptions = {
 // username, password authentication strategy
 const localLogin = new LocalStrategy(localOptions, (username, password, done) => {
   User.findOne({ username }, (err, user) => {
-    if (err) return done(err);
-    if (!user) return done(null, false);
+    if (err) return done('error-else');
+    if (!user) return done('error-username', false);
 
     // compare candidate password to user.password
     user.comparePassword(password, (err, isMatch) => {
-      if (err) done(err);
-      else if (!isMatch) done('error: incorrect password', false);
+      if (err) done('error-else');
+      else if (!isMatch) done('error-password', false);
       else done(null, user);
     });
   });

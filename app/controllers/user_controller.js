@@ -22,12 +22,15 @@ export const signin = (req, res) => {
   User.findOne({ username })
   .then(myUser => {
 
+    // check for errors
+    if (!myUser) res.status(404).send('error-username');
+    else if (!myUser.verified) res.status(423).send('error-verify')
+
     // generate and send back new token
-    if (myUser) res.status(200).send({ token: tokenForUser(myUser), user: myUser });
-    else res.status(400).send('user \'' + username + '\' not found');
+    else res.status(200).send({ token: tokenForUser(myUser), user: myUser });
   })
   .catch(err => {
-    res.status(400).send(`${err}`);
+    res.status(500).send('error-else');
   });
 };
 
