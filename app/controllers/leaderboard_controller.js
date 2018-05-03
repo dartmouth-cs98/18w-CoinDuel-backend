@@ -305,7 +305,8 @@ export const getAllTimeRankings = (req, res) => {
                             }
 
                             // sum up the user's all time balance and the current game balance (if it exists)
-                            var usernames = {}
+                            var usernames = {};
+                            var profilePictures = {};
                             User.find({}, (err4, result4) => {
                                 result4.forEach((entry) => {
                                     if (balances[entry.id]) {
