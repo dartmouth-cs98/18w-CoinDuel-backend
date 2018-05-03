@@ -228,7 +228,8 @@ export const getAllTimeRankings = (req, res) => {
                         user_data.push({
                             userId: user.id,
                             username: user.username,
-                            coin_balance: user.coinBalance
+                            coin_balance: user.coinBalance,
+                            profilePicture: user.profile_url
                         });
                     });
 
@@ -313,6 +314,7 @@ export const getAllTimeRankings = (req, res) => {
                                         balances[entry.id] = entry.coinBalance;
                                     }
                                     usernames[entry.id] = entry.username;
+                                    profilePictures[entry.id] = entry.profile_url;
                                 });
 
                                 // create an array of Objects, sort by coin balance, and send the array as a JSON response
@@ -321,7 +323,8 @@ export const getAllTimeRankings = (req, res) => {
                                     user_data.push({
                                         userId,
                                         username: usernames[userId],
-                                        coin_balance: balances[userId]
+                                        coin_balance: balances[userId],
+                                        profilePicture: profilePictures[userId]
                                     });
                                 }
                                 user_data.sort((a, b) => {
