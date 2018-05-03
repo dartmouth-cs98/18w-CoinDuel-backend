@@ -67,6 +67,6 @@ router.route('/leaderboard/update')
   .post(Leaderboard.setRankings);
 
 router.route('/leaderboard/')
-  .get(Leaderboard.getAllTimeRankings);
+  .get(requireAuth, Leaderboard.getAllTimeRankings);
 
 export default router;
