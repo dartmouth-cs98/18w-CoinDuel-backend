@@ -53,31 +53,29 @@ export const getCoinPrices = (req, res) => {
     }
 
     // save tickers and prices in obj
-    var tickerFlags = {};
-    result.coins.forEach(coin => tickerFlags[coin.name] = true);
+    var tickerString = "";
+    for (var i = 0; i < result.coins.length; i++) {
+      if (i != result.coins.length - 1) {
+        tickerString = tickerString.concat(result.coins[i].name, ",");
+      } else {
+        tickerString = tickerString.concat(result.coins[i].name);
+      }
+    }
 
-    // get current prices of coins
-    var currentPrices = {};
-    getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=0', (subErr, cryptos) => {
-      if (subErr || !cryptos) {
-        res.status(422).send('Unable to retrieve prices - please check http://api.coinmarketcap.com/. ERROR: ' + subErr);
+    getJSON('https://min-api.cryptocompare.com/data/pricemulti?fsyms=' + tickerString + '&tsyms=USD', (err, prices) => {
+      if (err || !prices) {
+        res.status(422).send('Unable to retrieve price - please check https://min-api.cryptocompare.com. Error: ' + err);
         return;
       }
-
-      // store user's coin's current prices
-      cryptos.forEach(crypto => {
-        if (tickerFlags[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
-      });
 
       // calculate return for each coin
       var fullResults = {
         'gameId': gameId,
         'prices': {}
       };
-      result.coins.forEach(coin => {
-        let ticker = coin.name;
-        fullResults.prices[ticker] = currentPrices[ticker].toString();
-      });
+      for (var coin in prices) {
+        fullResults.prices[coin] = prices[coin]['USD'];
+      }
       res.status(200).send(fullResults);
     });
   });
