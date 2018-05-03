@@ -19,7 +19,6 @@ const getJSON = require('get-json');
  */
 export const getCoin = (req, res) => {
   const symbol = req.params.symbol;
-  const tickers = req.app.locals.resources.tickers; // global ticker dict
 
   // check if request has ticker
   if (!symbol) {
@@ -27,23 +26,16 @@ export const getCoin = (req, res) => {
     return;
   }
 
-  // ensure ticker is a valid cryptocurrency
-  var coinId = tickers[symbol];
-  if (!coinId) {
-    res.status(422).send('Coin with ticker \'' + symbol + '\' not found.');
-  } else {
+  // get coin data from CoinMarketCap
+  getJSON('https://min-api.cryptocompare.com/data/price?fsym=' + symbol + '&tsyms=USD', (err, crypto) => {
+    if (err) {
+      res.status(422).send('Unable to retrieve price - please check https://min-api.cryptocompare.com. Error: ' + err);
+      return;
+    }
 
-    // get coin data from CoinMarketCap
-    getJSON('https://api.coinmarketcap.com/v1/ticker/' + coinId + '/', (err, crypto) => {
-      if (err) {
-        res.status(422).send('Unable to retrieve price - please check http://api.coinmarketcap.com/. ERROR: ' + err);
-        return;
-      }
-
-      // send back data as object
-      res.status(200).send(crypto[0]);
-    });
-  }
+    // send back data as object
+    res.status(200).send(crypto['USD']);
+  });
 };
 
 /*
