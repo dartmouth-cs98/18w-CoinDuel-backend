@@ -1,7 +1,7 @@
 /*
  * coin_controller.js
  *
- * Cryptocurrency coin operations via CoinMarketCap
+ * Cryptocurrency coin operations via CryptoCompare
  * 14 Feb 2018
  * Josh Kerber
  */
@@ -10,7 +10,7 @@ import Game from '../models/game.js';
 import GameEntry from '../models/gameentry.js';
 import CapcoinHistory from '../models/capcoin_history.js';
 
-// for calls to CoinMarketCap
+// for calls to CryptoCompare
 const getJSON = require('get-json');
 
 /*
@@ -26,7 +26,7 @@ export const getCoin = (req, res) => {
     return;
   }
 
-  // get coin data from CoinMarketCap
+  // get coin data from CryptoCompare
   getJSON('https://min-api.cryptocompare.com/data/price?fsym=' + symbol + '&tsyms=USD', (err, crypto) => {
     if (err) {
       res.status(422).send('Unable to retrieve price - please check https://min-api.cryptocompare.com. Error: ' + err);
