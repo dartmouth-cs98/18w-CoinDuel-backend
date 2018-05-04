@@ -97,31 +97,34 @@ export const getCoinReturns = (req, res) => {
       return;
     }
 
-    // save tickers and prices in obj
-    var initialPrices = {};
-    var tickerFlags = {};
-    result.coins.forEach(coin => {
-      initialPrices[coin.name] = coin.startPrice;
-      tickerFlags[coin.name] = true;
-    });
+    var tickerString = "";
+    for (var i = 0; i < result.coins.length; i++) {
+      if (i != result.coins.length - 1) {
+        tickerString = tickerString.concat(result.coins[i].name, ",");
+      } else {
+        tickerString = tickerString.concat(result.coins[i].name);
+      }
+    }
 
     // get current prices of coins
-    var currentPrices = {};
-    getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=0', (subErr, cryptos) => {
-      if (subErr || !cryptos) {
-        res.status(422).send('Unable to retrieve prices - please check http://api.coinmarketcap.com/. ERROR: ' + subErr);
+    getJSON('https://min-api.cryptocompare.com/data/pricemulti?fsyms=' + tickerString + '&tsyms=USD', (subErr, prices) => {
+      if (subErr || !prices) {
+        res.status(422).send('Unable to retrieve price - please check https://min-api.cryptocompare.com. Error: ' + subErr);
         return;
       }
 
-      // store game's current coin prices
-      cryptos.forEach(crypto => {
-        if (tickerFlags[crypto.symbol]) {
-          currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
-
-          // set initial price to current price if game hasn't started
-          initialPrices[crypto.symbol] = initialPrices[crypto.symbol] ? initialPrices[crypto.symbol] : parseFloat(crypto.price_usd);
-        }
+      // save tickers and prices in obj
+      var initialPrices = {};
+      result.coins.forEach(coin => {
+        initialPrices[coin.name] = coin.startPrice;
       });
+
+      var currentPrices = {};
+      for (var coin in prices) {
+        currentPrices[coin] = parseFloat(prices[coin]['USD']);
+        // set initial price to current price if game hasn't started
+        initialPrices[coin] = initialPrices[coin] ? initialPrices[coin] : currentPrices[coin];
+      }
 
       // get users coin choices
       GameEntry.findOne({
