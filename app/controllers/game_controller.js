@@ -13,7 +13,7 @@ import GameEntry from '../models/gameentry.js';
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var xhr = new XMLHttpRequest();
 
-// for calls to CoinMarketCap
+// for calls to CryptoCompare
 const getJSON = require('get-json');
 
 export const getCapcoinPerformanceForGame = (req, res) => {
