@@ -122,11 +122,6 @@ export const getCapcoinPerformanceForGame = (req, res) => {
 	});
 }
 
-function myFunction(p1, p2) {
-    console.log(p1*p2);
-
-}
-
 // returns most recent game
 // // @param req, ex. { }
 export const getLatestGame = (req, res) => {
@@ -422,29 +417,28 @@ export const endGame = (req, res) => {
 			}
 			var game = result[0];
 
-			// save tickers in obj
-			var tickerFlags = {};
-			game.coins.forEach(coin => tickerFlags[coin.name] = true);
+			// format string for API call
+	    var tickerString = "";
+	    for (var i = 0; i < game.coins.length; i++) {
+	      if (i != game.coins.length - 1) {
+	        tickerString = tickerString.concat(game.coins[i].name, ",");
+	      } else {
+	        tickerString = tickerString.concat(game.coins[i].name);
+	      }
+	    }
 
-			// get current prices of coins
-			var currentPrices = {};
-			getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=0', (subErr, cryptos) => {
-				if (subErr || !cryptos) {
-					res.status(422).send('Unable to retrieve prices - please check http://api.coinmarketcap.com/. ERROR: ' + subErr);
-					return;
-				}
-
-				// store game's current coin prices
-				cryptos.forEach(crypto => {
-					if (tickerFlags[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
-				});
+	    getJSON('https://min-api.cryptocompare.com/data/pricemulti?fsyms=' + tickerString + '&tsyms=USD', (err, prices) => {
+	      if (err || !prices) {
+	        res.status(422).send('Unable to retrieve price - please check https://min-api.cryptocompare.com. Error: ' + err);
+	        return;
+	      }
 
 				// change prices in coins array
 				var coinChoices = [];
 				game.coins.forEach(coin => coinChoices.push({
 					"name": coin.name,
 					"startPrice": coin.startPrice,
-					"endPrice": currentPrices[coin.name]
+					"endPrice": parseFloat(prices[coin.name]['USD'])
 				}));
 
 				// update coins array
@@ -520,33 +514,33 @@ export const initializeGame = (req, res) => {
 		}
 		var game = result[0];
 
-		// save tickers in obj
-		var tickerFlags = {};
-		game.coins.forEach(coin => tickerFlags[coin.name] = true);
+		// format string for API call
+		var tickerString = "";
+		for (var i = 0; i < game.coins.length; i++) {
+			if (i != game.coins.length - 1) {
+				tickerString = tickerString.concat(game.coins[i].name, ",");
+			} else {
+				tickerString = tickerString.concat(game.coins[i].name);
+			}
+		}
 
 		// get current prices of coins
-		var currentPrices = {};
-		getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=0', (subErr, cryptos) => {
-			if (subErr || !cryptos) {
-				res.status(422).send('Unable to retrieve prices - please check http://api.coinmarketcap.com/. ERROR: ' + subErr);
+		getJSON('https://min-api.cryptocompare.com/data/pricemulti?fsyms=' + tickerString + '&tsyms=USD', (err, prices) => {
+			if (err || !prices) {
+				res.status(422).send('Unable to retrieve price - please check https://min-api.cryptocompare.com. Error: ' + err);
 				return;
 			}
-
-			// store game's current coin prices
-			cryptos.forEach(crypto => {
-				if (tickerFlags[crypto.symbol]) currentPrices[crypto.symbol] = parseFloat(crypto.price_usd);
-			});
 
 			// change prices in coins array
 			var coinChoices = [];
 			game.coins.forEach(coin => coinChoices.push({
 				"name": coin.name,
-				"startPrice": currentPrices[coin.name],
+				"startPrice": parseFloat(prices[coin.name]['USD']),
 				"endPrice": null
 			}));
 
 			// update coins array
-			var updateGameError = 'none';
+			var updateGameError = '';
 			Game.findOneAndUpdate({
 				_id: game._id
 			}, {
@@ -559,7 +553,7 @@ export const initializeGame = (req, res) => {
 					return;
 				}
 			});
-			if (updateGameError != 'none') res.status(500).send(updateGameError);
+			if (updateGameError != '') res.status(500).send(updateGameError);
 
 			// we made it
 			else res.status(200).send('successful');

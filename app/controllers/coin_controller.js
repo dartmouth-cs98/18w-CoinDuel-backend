@@ -52,7 +52,7 @@ export const getCoinPrices = (req, res) => {
       return;
     }
 
-    // save tickers and prices in obj
+    // format string for API call
     var tickerString = "";
     for (var i = 0; i < result.coins.length; i++) {
       if (i != result.coins.length - 1) {
