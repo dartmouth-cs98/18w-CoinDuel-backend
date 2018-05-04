@@ -9,11 +9,10 @@
 import User from '../models/user.js';
 import Game from '../models/game.js';
 import GameEntry from '../models/gameentry.js';
-// import XMLHttpRequest from 'xmlhttprequest'
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var xhr = new XMLHttpRequest();
 
-// for calls to CryptoCompare
+// for calls to CryptoCompare/CoinMarketCap
 const getJSON = require('get-json');
 
 export const getCapcoinPerformanceForGame = (req, res) => {
@@ -331,38 +330,50 @@ export const createNextGame = (req, res) => {
 	var endDate = new Date();
 	endDate.setMinutes(endDate.getMinutes() + 60);
 
-	// contact coin market cap for coins
+	// contact CoinMarketCap for top 50 coins by market cap
 	var flags = {};
 	var choices = [];
-  getJSON('https://api.coinmarketcap.com/v1/ticker/?limit=50', (error, cryptos) => {
+  getJSON('https://api.coinmarketcap.com/v2/ticker/?limit=50', (error, cryptos) => {
 		if (error || !cryptos) {
-			res.status(500).send('Unable to retrieve coins - please check http://api.coinmarketcap.com/. ERROR: ' + error);
+			res.status(500).send('Unable to retrieve coins - please check http://api.coinmarketcap.com/. Error: ' + error);
 			return;
 		}
 
-		// get top 7 coin market cap coins
+		// put top 7 coins by market cap in the game
 		const mcChoices = req.app.locals.resources.mcChoices;
-		for (let i = 0; i < mcChoices; i++) {
-			let crypto = cryptos[i];
-			choices.push({
-				"name": crypto['symbol'],
-				"startPrice": null,
-				"endPrice": null
-			});
-			flags[i] = true;
+
+		for (var obj in cryptos.data) {
+			if (parseInt(cryptos.data[obj].rank) <= mcChoices) {
+				choices.push({
+					"name": cryptos.data[obj].symbol,
+					"startPrice": null,
+					"endPrice": null
+				});
+				flags[parseInt(cryptos.data[obj].rank)] = true;
+			}
 		}
+
+		var numCoins = Object.keys(cryptos.data).length
 
 		// randomly select 3 tickers
 		const randChoices = req.app.locals.resources.randomChoices;
 		while (choices.length < randChoices + mcChoices) {
-			let index = cryptos.length * Math.random() << 0;
-			if (!(index in flags)) choices.push({
-				"name": cryptos[index]['symbol'],
-				"startPrice": null,
-				"endPrice": null
-			});
-			flags[index] = true;
+			let randomRank = numCoins * Math.random() << 0;
+			if (!(randomRank in flags)) {
+				for (var obj in cryptos.data) {
+					if (parseInt(cryptos.data[obj].rank) == randomRank) {
+						choices.push({
+							"name": cryptos.data[obj].symbol,
+							"startPrice": null,
+							"endPrice": null
+						});
+						flags[randomRank] = true;
+					}
+				}
+			}
 		}
+
+		console.log(choices);
 
 		// // default choices
 		// var choices = [
