@@ -87,7 +87,6 @@ export const getCapcoinPerformanceForGame = (req, res) => {
 					request.open("GET", url, true);
 					//networking call.
 					request.onload = function () {
-						console.log("herer");
 						var x = 0;
 						var response = JSON.parse(this.responseText);
 						response.Data.forEach(price => {
@@ -372,9 +371,7 @@ export const createNextGame = (req, res) => {
 				}
 			}
 		}
-
-		console.log(choices);
-
+		
 		// // default choices
 		// var choices = [
 		// 	{"name": "BTC", "startPrice": null, "endPrice":null},
