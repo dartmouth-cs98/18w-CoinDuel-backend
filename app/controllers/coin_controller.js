@@ -45,7 +45,7 @@ export const getCoinLogo = (req, res) => {
     let logoUrl = crypto['Data']['General']['ImageUrl'];
 
     // send back data as object
-    res.status(200).send('https://www.cryptocompare.com' + logoUrl);
+    res.status(200).json({'url': 'https://www.cryptocompare.com' + logoUrl});
   });
 };
 
