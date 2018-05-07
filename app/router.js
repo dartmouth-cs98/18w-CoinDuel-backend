@@ -34,6 +34,10 @@ router.route('/verify/:verificationId')
 router.route('/coin/:symbol')
   .get(Coin.getCoin);
 
+
+router.route('/coin/logo/:ticker')
+  .get(Coin.getCoinLogo);
+
 router.route('/return/:gameId/:userId')
   .get(Coin.getCoinReturns);
 

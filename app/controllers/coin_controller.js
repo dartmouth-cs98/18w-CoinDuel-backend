@@ -14,6 +14,42 @@ import CapcoinHistory from '../models/capcoin_history.js';
 const getJSON = require('get-json');
 
 /*
+ * Get the current ticker url for a cryptocurrency.
+ * @param req, ex. {ticker: 'ETH'}
+ */
+export const getCoinLogo = (req, res) => {
+  const symbol = req.params.ticker;
+  const tickerDict = req.app.locals.resources.tickers; // global id dict
+
+  // check if request has ticker
+  if (!symbol) {
+    res.status(422).send('You must provide a cryptocurrency ticker.');
+    return;
+  }
+
+  // map ticker to CryptoCompare id
+  let coinId = tickerDict[symbol]
+  if (!coinId) {
+    res.status(422).send('Invalid ticker.');
+    return;
+  }
+
+  // get coin logo from CryptoCompare
+  getJSON('https://www.cryptocompare.com/api/data/coinsnapshotfullbyid/?id=' + coinId, (err, crypto) => {
+    if (err) {
+      res.status(422).send('Unable to retrieve logo - please check https://min-api.cryptocompare.com. Error: ' + err);
+      return;
+    }
+
+    // get logo
+    let logoUrl = crypto['Data']['General']['ImageUrl'];
+
+    // send back data as object
+    res.status(200).send('https://www.cryptocompare.com' + logoUrl);
+  });
+};
+
+/*
  * Get the current data about a cryptocurrency.
  * @param req, ex. {symbol: 'ETH'}
  */
