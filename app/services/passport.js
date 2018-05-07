@@ -33,7 +33,7 @@ const localLogin = new LocalStrategy(localOptions, (username, password, done) =>
     // compare candidate password to user.password
     user.comparePassword(password, (err, isMatch) => {
       if (err) done('error-else');
-      else if (!isMatch) done('error-password', false);
+      else if (!isMatch) done('error-password', true);
       else done(null, user);
     });
   });
