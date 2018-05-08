@@ -608,11 +608,13 @@ export const initializeGame = (req, res) => {
 
 			// change prices in coins array
 			var coinChoices = [];
-			game.coins.forEach(coin => coinChoices.push({
-				"name": coin.name,
-				"startPrice": parseFloat(prices[coin.name]['USD']),
-				"endPrice": null
-			}));
+			game.coins.forEach(coin => {
+				const startPrice = prices[coin.name] ? parseFloat(prices[coin.name]['USD']) : null;
+				coinChoices.push({
+					"name": coin.name,
+					"startPrice": startPrice,
+					"endPrice": null});
+			});
 
 			// update coins array
 			var updateGameError = '';
