@@ -12,6 +12,11 @@ import GameEntry from '../models/gameentry.js';
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var xhr = new XMLHttpRequest();
 
+// for hashing scheduler token
+import bcrypt from 'bcrypt-nodejs';
+import dotenv from 'dotenv';
+dotenv.config({ silent: true });
+
 // for calls to CryptoCompare/CoinMarketCap
 const getJSON = require('get-json');
 
@@ -309,7 +314,28 @@ export const deleteEntry = (req, res) => {
  * @param req, ex. { }
  */
 export const createNextGame = (req, res) => {
-	// bail if today isn't friday
+	const schedulerToken = req.body.schedulerToken;
+	const schedulerTokenHash = req.app.locals.resources.schedulerTokenHash;
+
+	// compare schedular token with stored hash
+	var isErr = false;
+	bcrypt.compare(schedulerToken, schedulerTokenHash, (err, isMatch) => {
+		if (err) {
+			res.status(422).send('Unable to verify token.');
+			isErr = true;
+		}
+
+		// raise error if no match
+		if (!isMatch) {
+			res.status(422).send('Invalid token.');
+			isErr = true;
+		}
+	});
+
+	// bail if error was raised
+	if (isErr) {
+		return;
+	}
 
 	/****************************************
 	 **	COMMENTING OUT FOR CS98 GALA DEMO  **
@@ -371,7 +397,7 @@ export const createNextGame = (req, res) => {
 				}
 			}
 		}
-		
+
 		// // default choices
 		// var choices = [
 		// 	{"name": "BTC", "startPrice": null, "endPrice":null},
@@ -399,6 +425,35 @@ export const createNextGame = (req, res) => {
  * @param req, ex. { }
  */
 export const endGame = (req, res) => {
+	const schedulerToken = req.body.schedulerToken;
+	const schedulerTokenHash = req.app.locals.resources.schedulerTokenHash;
+
+	// ensure scheduler token is present
+	if (!schedulerToken) {
+		res.status(422).send('No scheduler token.');
+		return;
+	}
+
+	// compare schedular token with stored hash
+	var isErr = false;
+	bcrypt.compare(schedulerToken, schedulerTokenHash, (err, isMatch) => {
+    if (err) {
+			res.status(422).send('Unable to verify token.');
+			isErr = true;
+		}
+
+		// raise error if no match
+		if (!isMatch) {
+			res.status(422).send('Invalid token.');
+			isErr = true;
+		}
+  });
+
+	// bail if error was raised
+	if (isErr) {
+		return;
+	}
+
 	// bail if today isn't friday
 
 	/****************************************
@@ -495,7 +550,28 @@ export const endGame = (req, res) => {
  * @param req, ex. { }
  */
 export const initializeGame = (req, res) => {
-	// bail if today isn't monday
+	const schedulerToken = req.body.schedulerToken;
+	const schedulerTokenHash = req.app.locals.resources.schedulerTokenHash;
+
+	// compare schedular token with stored hash
+	var isErr = false;
+	bcrypt.compare(schedulerToken, schedulerTokenHash, (err, isMatch) => {
+    if (err) {
+			res.status(422).send('Unable to verify token.');
+			isErr = true;
+		}
+
+		// raise error if no match
+		if (!isMatch) {
+			res.status(422).send('Invalid token.');
+			isErr = true;
+		}
+  });
+
+	// bail if error was raised
+	if (isErr) {
+		return;
+	}
 
 	/****************************************
 	 **	COMMENTING OUT FOR CS98 GALA DEMO  **
