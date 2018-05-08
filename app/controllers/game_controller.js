@@ -314,12 +314,11 @@ export const deleteEntry = (req, res) => {
  * @param req, ex. { }
  */
 export const createNextGame = (req, res) => {
-	const schedulerToken = req.body.schedulerToken;
-	const schedulerTokenHash = req.app.locals.resources.schedulerTokenHash;
+	const schedulerTokenHash = req.body.schedulerTokenHash;
 
-	// compare schedular token with stored hash
+	// compare schedular token hash with stored token
 	var isErr = false;
-	bcrypt.compare(schedulerToken, schedulerTokenHash, (err, isMatch) => {
+	bcrypt.compare(process.env.SCHEDULER_TOKEN, schedulerTokenHash, (err, isMatch) => {
 		if (err) {
 			res.status(422).send('Unable to verify token.');
 			isErr = true;
@@ -425,19 +424,12 @@ export const createNextGame = (req, res) => {
  * @param req, ex. { }
  */
 export const endGame = (req, res) => {
-	const schedulerToken = req.body.schedulerToken;
-	const schedulerTokenHash = req.app.locals.resources.schedulerTokenHash;
+	const schedulerTokenHash = req.body.schedulerTokenHash;
 
-	// ensure scheduler token is present
-	if (!schedulerToken) {
-		res.status(422).send('No scheduler token.');
-		return;
-	}
-
-	// compare schedular token with stored hash
+	// compare schedular token hash with stored token
 	var isErr = false;
-	bcrypt.compare(schedulerToken, schedulerTokenHash, (err, isMatch) => {
-    if (err) {
+	bcrypt.compare(process.env.SCHEDULER_TOKEN, schedulerTokenHash, (err, isMatch) => {
+		if (err) {
 			res.status(422).send('Unable to verify token.');
 			isErr = true;
 		}
@@ -447,7 +439,7 @@ export const endGame = (req, res) => {
 			res.status(422).send('Invalid token.');
 			isErr = true;
 		}
-  });
+	});
 
 	// bail if error was raised
 	if (isErr) {
@@ -550,13 +542,12 @@ export const endGame = (req, res) => {
  * @param req, ex. { }
  */
 export const initializeGame = (req, res) => {
-	const schedulerToken = req.body.schedulerToken;
-	const schedulerTokenHash = req.app.locals.resources.schedulerTokenHash;
+	const schedulerTokenHash = req.body.schedulerTokenHash;
 
-	// compare schedular token with stored hash
+	// compare schedular token hash with stored token
 	var isErr = false;
-	bcrypt.compare(schedulerToken, schedulerTokenHash, (err, isMatch) => {
-    if (err) {
+	bcrypt.compare(process.env.SCHEDULER_TOKEN, schedulerTokenHash, (err, isMatch) => {
+		if (err) {
 			res.status(422).send('Unable to verify token.');
 			isErr = true;
 		}
@@ -566,7 +557,7 @@ export const initializeGame = (req, res) => {
 			res.status(422).send('Invalid token.');
 			isErr = true;
 		}
-  });
+	});
 
 	// bail if error was raised
 	if (isErr) {
