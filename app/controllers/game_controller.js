@@ -365,7 +365,6 @@ export const createNextGame = (req, res) => {
 
 		// put top 7 coins by market cap in the game
 		const mcChoices = req.app.locals.resources.mcChoices;
-
 		for (var obj in cryptos.data) {
 			if (parseInt(cryptos.data[obj].rank) <= mcChoices) {
 				choices.push({
@@ -376,16 +375,18 @@ export const createNextGame = (req, res) => {
 				flags[parseInt(cryptos.data[obj].rank)] = true;
 			}
 		}
-
 		var numCoins = Object.keys(cryptos.data).length
 
 		// randomly select 3 tickers
+		const cryptoCompareTickers = req.app.locals.resources.tickers;
 		const randChoices = req.app.locals.resources.randomChoices;
 		while (choices.length < randChoices + mcChoices) {
 			let randomRank = numCoins * Math.random() << 0;
 			if (!(randomRank in flags)) {
 				for (var obj in cryptos.data) {
-					if (parseInt(cryptos.data[obj].rank) == randomRank) {
+
+					// limit to tickers on cryptocompare
+					if (parseInt(cryptos.data[obj].rank) == randomRank && cryptoCompareTickers[cryptos.data[obj].symbol]) {
 						choices.push({
 							"name": cryptos.data[obj].symbol,
 							"startPrice": null,
