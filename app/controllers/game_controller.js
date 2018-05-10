@@ -67,7 +67,7 @@ export const getCapcoinPerformanceForGame = (req, res) => {
 			//add check if game hasn't started yet. although this endpoint should only be called
 			// if a game has ended or is in progress
 			var amountCapCoinAllocated = 0;
-			entry.choices.forEach(coin => {
+			entry.currentChoices.forEach(coin => {
 				console.log(progress);
 
 				var capcoinAllocation = coin.allocation
@@ -154,7 +154,7 @@ export const createGame = (req, res) => {
 			$set: {
 				gameId: req.params.gameId,
 				userId: req.params.userId,
-				choices: req.body.choices,
+				currentChoices: req.body.choices,
 				last_updated: Date.now()
 			}
 		}, {
@@ -232,7 +232,7 @@ export const createAndUpdateEntry = (req, res) => {
 					$set: {
 						gameId: req.params.gameId,
 						userId: req.params.userId,
-						choices: req.body.choices,
+						currentChoices: req.body.choices,
 						last_updated: Date.now()
 					}
 				}, {
@@ -276,7 +276,7 @@ export const createAndUpdateEntry = (req, res) => {
 			$set: {
 				gameId: req.params.gameId,
 				userId: req.params.userId,
-				choices: req.body.choices,
+				currentChoices: req.body.choices,
 				last_updated: Date.now()
 			}
 		}, {

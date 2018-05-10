@@ -74,7 +74,7 @@ export const setRankings = (req, res) => {
 
           // calculate and update user's capcoin balance if game in progress OR end of game
           var coinBalance = 0;
-          entry.choices.forEach((choice) => {
+          entry.currentChoices.forEach((choice) => {
             let percent_change = 1 - (initialPrices[choice.symbol] / parseFloat(prices[choice.symbol]['USD']));
 
             // magnify returns
@@ -160,7 +160,7 @@ export const getRankings = (req, res) => {
           // calculate entry's current capcoin balance
           let initial_coin_balance = entry.coin_balance
           let coin_balance = 0;
-          entry.choices.forEach((choice) => {
+          entry.currentChoices.forEach((choice) => {
             let percent_change = 1 - (initialPrices[choice.symbol] / parseFloat(prices[choice.symbol]['USD']));
 
             // magnify returns
@@ -287,7 +287,7 @@ export const getAllTimeRankings = (req, res) => {
               // calculate entry's current capcoin balance
               let initial_coin_balance = entry.coin_balance
               let coin_balance = 0;
-              entry.choices.forEach((choice) => {
+              entry.currentChoices.forEach((choice) => {
                 let percent_change = 1 - (initialPrices[choice.symbol] / parseFloat(prices[choice.symbol]['USD']));
                 // magnify returns
                 percent_change *= returnMagnifier;
