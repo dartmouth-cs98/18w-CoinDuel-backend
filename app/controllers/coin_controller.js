@@ -73,7 +73,7 @@ export const getCoin = (req, res) => {
     // send back data as object
     const coinName = tickerDict[symbol] ? tickerDict[symbol]['name'] : 'N/A';
     const coinData = {'name':coinName, 'price':crypto['USD']};
-    res.status(200).send(coinData);
+    res.send(200, coinData);
   });
 };
 
