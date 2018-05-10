@@ -165,7 +165,7 @@ export const getCoinReturns = (req, res) => {
         initialPrices[coin] = initialPrices[coin] ? initialPrices[coin] : currentPrices[coin];
       }
 
-      // get users coin choices
+      // get users current coin choices
       GameEntry.findOne({
         gameId: gameId,
         userId: userId
@@ -181,7 +181,7 @@ export const getCoinReturns = (req, res) => {
           'gameId': gameId,
           'returns': {}
         };
-        entry.choices.forEach(choice => {
+        entry.currentChoices.forEach(choice => {
           let ticker = choice.symbol;
           let percentChange = (currentPrices[ticker] - initialPrices[ticker]) / initialPrices[ticker];
           let capCoin = choice.allocation * percentChange;
