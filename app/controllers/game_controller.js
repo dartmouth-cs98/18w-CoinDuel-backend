@@ -166,11 +166,11 @@ export const createGame = (req, res) => {
 			if (result) {
 				res.json(result);
 			} else {
-				res.status(422).send('Unsuccessful create/update');
+				res.send(422, 'Unsuccessful create/update');
 			}
 		})
 		.catch((error) => {
-			res.status(422).send('Unsuccessful create/update');
+			res.send(422, 'Unsuccessful create/update');
 		});
 };
 
