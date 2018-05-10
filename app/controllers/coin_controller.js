@@ -28,7 +28,7 @@ export const getCoinLogo = (req, res) => {
   }
 
   // map ticker to CryptoCompare id
-  let coinId = tickerDict[symbol]
+  let coinId = tickerDict[symbol]['id'];
   if (!coinId) {
     res.status(422).send('Invalid ticker.');
     return;
@@ -55,6 +55,7 @@ export const getCoinLogo = (req, res) => {
  */
 export const getCoin = (req, res) => {
   const symbol = req.params.symbol;
+  const tickerDict = req.app.locals.resources.tickers; // global id dict
 
   // check if request has ticker
   if (!symbol) {
@@ -70,7 +71,9 @@ export const getCoin = (req, res) => {
     }
 
     // send back data as object
-    res.status(200).send(crypto['USD']);
+    const coinName = tickerDict[symbol] ? tickerDict[symbol]['name'] : 'N/A';
+    const coinData = {'name':coinName, 'price':crypto['USD']};
+    res.status(200).send(coinData);
   });
 };
 
