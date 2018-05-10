@@ -70,7 +70,7 @@ export const getCoin = (req, res) => {
     }
 
     // send back data as object
-    res.status(200).send(crypto['USD']);
+    res.status(200).send(crypto["USD"]);
   });
 };
 
