@@ -13,7 +13,7 @@ const TradeSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'User' },
     choices: [{ symbol: { type: String }, allocation: { type: Number, min: 0, max: 10 }, price: { type: Number, default: null }}],
     timestamp: { type: Date, default: Date.now },
-    initial: { type: Boolean, default: false }
+    isInitial: { type: Boolean, default: false }
 });
 
 const TradeModel = mongoose.model('Trade', TradeSchema, 'trades');
