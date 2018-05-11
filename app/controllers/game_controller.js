@@ -233,7 +233,6 @@ export const createAndUpdateEntry = (req, res) => {
 						gameId: req.params.gameId,
 						userId: req.params.userId,
 						currentChoices: req.body.choices,
-						coin_balance: 10,
 						last_updated: Date.now()
 					}
 				}, {
