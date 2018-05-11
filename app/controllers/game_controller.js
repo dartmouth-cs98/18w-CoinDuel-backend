@@ -266,28 +266,28 @@ export const createAndUpdateEntry = (req, res) => {
 						});
 				});
 			});
-			return;
-		}
 
-		// update entry
-		GameEntry.findOneAndUpdate({
-			gameId: req.params.gameId,
-			userId: req.params.userId
-		}, {
-			$set: {
+		// update existing entry
+		} else {
+			GameEntry.findOneAndUpdate({
 				gameId: req.params.gameId,
-				userId: req.params.userId,
-				currentChoices: req.body.choices,
-				last_updated: Date.now()
-			}
-		}, {
-			upsert: true,
-			new: true,
-			setDefaultsOnInsert: true
-		}, (upError, upResult) => {
-			if (upError || !upResult) res.status(500).send('unable to update game entry');
-			else res.status(200).send(upResult);
-		});
+				userId: req.params.userId
+			}, {
+				$set: {
+					gameId: req.params.gameId,
+					userId: req.params.userId,
+					currentChoices: req.body.choices,
+					last_updated: Date.now()
+				}
+			}, {
+				upsert: true,
+				new: true,
+				setDefaultsOnInsert: true
+			}, (upError, upResult) => {
+				if (upError || !upResult) res.status(500).send('unable to update game entry');
+				else res.status(200).send(upResult);
+			});
+		}
 	});
 };
 
