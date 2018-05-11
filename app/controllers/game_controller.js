@@ -260,7 +260,7 @@ export const createAndUpdateEntry = (req, res) => {
 							Trade.create({
 								gameId: req.params.gameId,
 								userId: req.params.userId,
-								trade: req.body.choices,
+								choices: req.body.choices,
 								initial: true
 							}, (createTradeError, newTrade) => {
 								if (createTradeError || !newTrade) {
