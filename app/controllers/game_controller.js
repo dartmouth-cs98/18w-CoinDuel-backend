@@ -8,6 +8,7 @@
 
 import User from '../models/user.js';
 import Game from '../models/game.js';
+import Trade from '../models/trade.js';
 import GameEntry from '../models/gameentry.js';
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var xhr = new XMLHttpRequest();
@@ -68,25 +69,21 @@ export const getCapcoinPerformanceForGame = (req, res) => {
 			// if a game has ended or is in progress
 			var amountCapCoinAllocated = 0;
 			entry.currentChoices.forEach(coin => {
-				console.log(progress);
-
 				var capcoinAllocation = coin.allocation
+
 				// only get price data if coin has been allocated
 				if (capcoinAllocation > 0) {
 					numberAllocated += 1;
 					amountCapCoinAllocated = amountCapCoinAllocated + capcoinAllocation;
-					console.log(amountCapCoinAllocated);
 					var startingPrice;
 					gameCoins.forEach(gameCoin => {
 						if(coin.symbol == gameCoin.name){
 							startingPrice = gameCoin.startPrice;
-							console.log(`Allocation for ${coin.symbol} is ${capcoinAllocation} at a starting price of ${startingPrice}`);
 						}
 					});
 					//SOURCE: https://www.learnhowtoprogram.com/javascript/asynchrony-and-apis-in-javascript/making-api-calls-with-javascript
 
 					var url = `https://min-api.cryptocompare.com/data/histominute?fsym=${coin.symbol}&tsym=USD&limit=${durationOfGameMinutes}`;
-					console.log(url);
 					var request = new XMLHttpRequest();
 
 					request.open("GET", url, true);
@@ -106,7 +103,7 @@ export const getCapcoinPerformanceForGame = (req, res) => {
 							x = x + 1;
 							//Calculate capcoin change for each minute/time interval
 						});
-						console.log(data);
+
 						// res.status(200).send(data);
 						progress = progress + 1;
 						if (progress == numberAllocated) {
@@ -217,8 +214,6 @@ export const createAndUpdateEntry = (req, res) => {
 				// ensure user won't go negative
 				userBalance = result.coinBalance;
 				req.body.choices.forEach(choice => totalCapcoin += parseFloat(choice.allocation));
-				console.log("3");
-				console.log(totalCapcoin);
 				if (totalCapcoin > userBalance) {
 					res.status(200).json({
 						'error': 'insufficient funds'
@@ -246,8 +241,6 @@ export const createAndUpdateEntry = (req, res) => {
 						res.status(500).send('unable to create game entry');
 						return;
 					}
-					console.log("1");
-					console.log(newResult);
 
 					// withdraw capcoin from user's account
 					totalCapcoin *= -1;
@@ -257,15 +250,27 @@ export const createAndUpdateEntry = (req, res) => {
 							$inc: {
 								coinBalance: totalCapcoin
 							}
-						},
-						(userError, userResult) => {
+						}, (userError, userResult) => {
 							if (userError || !userResult) {
 								res.status(500).send('unable to update user capcoin balance');
 								return;
 							}
 
-							// we made it
-							res.status(200).send(newResult);
+							// add initial entry to Trade collection as first trade
+							Trade.create({
+								gameId: req.params.gameId,
+								userId: req.params.userId,
+								trade: req.body.choices,
+								initial: true
+							}, (createTradeError, newTrade) => {
+								if (!createTradeError || !newTrade) {
+									res.status(422).send('unable to add inital allocations to trade collection');
+									return
+								}
+
+								// we made it
+								res.status(200).send(newResult);
+							});
 						});
 				});
 			});
@@ -287,8 +292,6 @@ export const createAndUpdateEntry = (req, res) => {
 				new: true,
 				setDefaultsOnInsert: true
 			}, (upError, upResult) => {
-				console.log("2");
-				console.log(upResult);
 				if (upError || !upResult) res.status(500).send('unable to update game entry');
 				else res.status(200).send(upResult);
 			});
