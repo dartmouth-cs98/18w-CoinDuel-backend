@@ -20,7 +20,7 @@ db.users.insertMany([
 //   { _id: new ObjectId("5a99b4944ca7a11092a9e971"), start_date: new Date(1519048800000), finish_date: new Date(1619048800001), "coins": [ {"name":"SFC", "startPrice": null, "endPrice": null}, {"name": "PRE", "startPrice": null, "endPrice": null}, {"name": "POLIS", "startPrice": null, "endPrice": null}, {"name": "WETH", "startPrice": null, "endPrice": null}, {"name": "GLS", "startPrice": null, "endPrice": null} ] } ])
 
   db.games.insertMany([
-    { _id: new ObjectId("5a99b4944ca7a11092a9e971"), start_date: new Date(1519048800000), finish_date: new Date(1519048800001), "coins": [ {"name":"SFC", "startPrice": 100, "endPrice": null}, {"name": "PRE", "startPrice": 100, "endPrice": null}, {"name": "POLIS", "startPrice": 100, "endPrice": null}, {"name": "WETH", "startPrice": 100, "endPrice": null}, {"name": "GLS", "startPrice": 100, "endPrice": null} ] } ])
+    { _id: new ObjectId("5a99b4944ca7a11092a9e971"), start_date: new Date(1519048800000), finish_date: new Date(1619048800001), "coins": [ {"name":"BTC", "startPrice": 100, "endPrice": null}, {"name": "LTC", "startPrice": 100, "endPrice": null}, {"name": "BCH", "startPrice": 100, "endPrice": null}, {"name": "XRP", "startPrice": 100, "endPrice": null}, {"name": "ETH", "startPrice": 100, "endPrice": null} ] } ])
 
 db.entries.insertMany([
   { _id: new ObjectId("5a8ace5a53bb81002573c1f0"), gameId: new ObjectId("5a99b4944ca7a11092a9e971"), userId: new ObjectId("5a8607d6971c50fbf29726a4"), coin_balance: -3.3, currentChoices: [ {"symbol": "SFC", "allocation": 1.0}, {"symbol": "PRE", "allocation": 1.0}, {"symbol": "POLIS", "allocation": 2.0}, {"symbol": "WETH", "allocation": 2.0}, {"symbol": "GLS", "allocation": 4.0} ], last_updated: Date.now() },
@@ -36,8 +36,8 @@ db.capcoin_history.insertMany([
 /* Commands for testing game_controller functions:
 
   getLatestGame: curl -X GET http://localhost:9000/api/game/
-  createAndUpdateEntry (create): curl -X POST http://localhost:9000/api/game/5a9def78e400e200258e0742/5a94827f467ed600259a7485/ -d '{ "currentChoices": [{"symbol": "BTC", "allocation": 1.0}, {"symbol": "LTC", "allocation": 1.0}, {"symbol": "BCH", "allocation": 2.0}, {"symbol": "XRP", "allocation": 2.0}, {"symbol": "ETH", "allocation": 4.0}] }' -H "Content-Type: application/json"
-  createAndUpdateEntry (update): curl -X PUT http://localhost:9000/api/game/5a8607d4971c50fbf29726a2/5a8608233d378876bf62d817/ -d '{ "currentChoices": [["BTC", 5], ["ETH", 0], ["XRP", 2], ["BCH", 2], ["LTC", 1]] }' -H "Content-Type: application/json"
+  createAndUpdateEntry (create): curl -X POST http://localhost:9000/api/game/5a9def78e400e200258e0742/5a94827f467ed600259a7485/ -d '{ "choices": [{"symbol": "BTC", "allocation": 1.0}, {"symbol": "LTC", "allocation": 1.0}, {"symbol": "BCH", "allocation": 2.0}, {"symbol": "XRP", "allocation": 2.0}, {"symbol": "ETH", "allocation": 4.0}] }' -H "Content-Type: application/json"
+  createAndUpdateEntry (update): curl -X PUT http://localhost:9000/api/game/5a8607d4971c50fbf29726a2/5a8608233d378876bf62d817/ -d '{ "choices": [["BTC", 5], ["ETH", 0], ["XRP", 2], ["BCH", 2], ["LTC", 1]] }' -H "Content-Type: application/json"
   getEntry: curl -X GET http://localhost:9000/api/game/5a8607d4971c50fbf29726a2/5a8608233d378876bf62d817/
   deleteEntry: curl -X DELETE http://localhost:9000/api/game/5a8607d4971c50fbf29726a2/5a8608233d378876bf62d817/
 

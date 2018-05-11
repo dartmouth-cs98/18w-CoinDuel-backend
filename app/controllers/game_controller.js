@@ -217,6 +217,8 @@ export const createAndUpdateEntry = (req, res) => {
 				// ensure user won't go negative
 				userBalance = result.coinBalance;
 				req.body.choices.forEach(choice => totalCapcoin += parseFloat(choice.allocation));
+				console.log("3");
+				console.log(totalCapcoin);
 				if (totalCapcoin > userBalance) {
 					res.status(200).json({
 						'error': 'insufficient funds'
@@ -244,6 +246,8 @@ export const createAndUpdateEntry = (req, res) => {
 						res.status(500).send('unable to create game entry');
 						return;
 					}
+					console.log("1");
+					console.log(newResult);
 
 					// withdraw capcoin from user's account
 					totalCapcoin *= -1;
@@ -283,6 +287,8 @@ export const createAndUpdateEntry = (req, res) => {
 				new: true,
 				setDefaultsOnInsert: true
 			}, (upError, upResult) => {
+				console.log("2");
+				console.log(upResult);
 				if (upError || !upResult) res.status(500).send('unable to update game entry');
 				else res.status(200).send(upResult);
 			});
