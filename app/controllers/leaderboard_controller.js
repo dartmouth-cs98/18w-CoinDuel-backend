@@ -225,13 +225,15 @@ export const getAllTimeRankings = (req, res) => {
   })
   .sort('finish_date')
   .limit(1)
-  .then((result) => {
-    // if no current game, create an array of Objects, sort by coin balance, and send the array as a JSON response
-    if (!result[0]) {
+  .then(result => {
+
+    // no current game
+    if (!result[0] || result[0].start_date > Date.now()) {
       User.find({}, (err, result2) => {
         var user_data = []
 
-        result2.forEach((user) => {
+        // create array of all users
+        result2.forEach(user => {
           user_data.push({
             userId: user.id,
             username: user.username,
@@ -240,14 +242,18 @@ export const getAllTimeRankings = (req, res) => {
           });
         });
 
+        // sort by coin balance
         user_data.sort((a, b) => {
           return (a.coin_balance < b.coin_balance) ? 1 : ((a.coin_balance > b.coin_balance) ? -1 : 0);
         });
         res.json(user_data);
         return;
       });
+
+    // current game
     } else {
       const gameId = result[0].id;
+
       // get initial coin prices for game
       Game.findById(gameId, (err, result) => {
         if (err || !result) {
@@ -282,12 +288,12 @@ export const getAllTimeRankings = (req, res) => {
           GameEntry.find({
             gameId
           }, (err3, result3) => {
-            result3.forEach((entry) => {
+            result3.forEach(entry => {
 
               // calculate entry's current capcoin balance
               let initial_coin_balance = entry.coin_balance
               let coin_balance = 0;
-              entry.currentChoices.forEach((choice) => {
+              entry.currentChoices.forEach(choice => {
                 let percent_change = 1 - (initialPrices[choice.symbol] / parseFloat(prices[choice.symbol]['USD']));
                 // magnify returns
                 percent_change *= returnMagnifier;
@@ -348,7 +354,7 @@ export const getAllTimeRankings = (req, res) => {
         });
       });
     }
-  }).catch((error) => {
+  }).catch(error => {
     res.status(500).send(error);
   });
 }
