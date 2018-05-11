@@ -263,9 +263,8 @@ export const createAndUpdateEntry = (req, res) => {
 								trade: req.body.choices,
 								initial: true
 							}, (createTradeError, newTrade) => {
-								if (!createTradeError || !newTrade) {
+								if (createTradeError || !newTrade) {
 									res.status(422).send('unable to add inital allocations to trade collection');
-									console.log(createTradeError);
 									return;
 								}
 
