@@ -292,8 +292,29 @@ export const createAndUpdateEntry = (req, res) => {
 				new: true,
 				setDefaultsOnInsert: true
 			}, (upError, upResult) => {
-				if (upError || !upResult) res.status(500).send('unable to update game entry');
-				else res.status(200).send(upResult);
+				if (upError || !upResult) {
+					res.status(500).send('unable to update game entry');
+					return;
+
+				// update initial trade for user
+				} else {
+					Trade.findOneAndUpdate({
+						gameId: req.params.gameId,
+						userId: req.params.userId
+					}, {
+						$set: {
+							choices: req.body.choices
+						}
+					}, (tradeError, tradeResult) => {
+						if (tradeError || !tradeResult) {
+							res.status(500).send('unable to update initial trade');
+							return;
+						}
+
+						// we made it
+						res.status(200).send(upResult);
+					});
+				}
 			});
 		}
 	});
