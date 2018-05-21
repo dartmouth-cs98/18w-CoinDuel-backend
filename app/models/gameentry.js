@@ -13,6 +13,7 @@ const GameEntrySchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'User' },
     currentChoices: [{ symbol: { type: String }, allocation: { type: Number, min: 0, max: 10 }}],
     coin_balance: { type: Number, default: 10 },
+    trades: [{ symbol: { type: String }, allocation: { type: Number, min: 0, max: 10 }, price: { type: Number, default: null }, timestamp: { type: Date, default: Date.now }}],
     last_updated: { type: Date, default: Date.now },
     game_performance: [{ time: { type: Number, default: 0 }, unixTime: { type: Number, default: Date.now }, capCoin: {type: Number, default: 0 } }]
 });
