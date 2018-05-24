@@ -11,6 +11,7 @@ import mongoose, { Schema } from 'mongoose';
 const GameSchema = new Schema({
     start_date: { type: Date, default: Date.now },
     finish_date: { type: Date },
+    has_ended: { type: Boolean, default: false },
     coins: [{ name: { type: String }, startPrice: { type: Number }, endPrice: { type: Number }}],
 });
 

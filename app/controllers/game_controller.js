@@ -219,6 +219,11 @@ export const createAndUpdateEntry = (req, res) => {
 						'error': 'insufficient funds'
 					});
 					return;
+				} else if (totalCapcoin > 10) {
+					res.status(200).json({
+						'error': 'over capcoin limit for game'
+					});
+					return;
 				}
 
 				// create new game entry
@@ -276,7 +281,18 @@ export const createAndUpdateEntry = (req, res) => {
 			});
 
 		// update existing entry
-		} else {
+	} else {
+			// ensure below 10 capcoin limit
+			var totalCapcoin = 0;
+			req.body.choices.forEach(choice => totalCapcoin += parseFloat(choice.allocation));
+
+			if (totalCapcoin > 10) {
+				res.status(200).json({
+					'error': 'over capcoin limit for game'
+				});
+				return;
+			}
+
 			GameEntry.findOneAndUpdate({
 				gameId: req.params.gameId,
 				userId: req.params.userId
@@ -494,7 +510,8 @@ export const endGame = (req, res) => {
 	Game.find({
 			finish_date: {
 				$lt: date
-			}
+			},
+			has_ended: false
 		})
 		.sort('-finish_date').exec((error, result) => {
 			if (error || !result || result.length == 0) {
@@ -533,7 +550,8 @@ export const endGame = (req, res) => {
 					_id: game._id
 				}, {
 					$set: {
-						coins: coinChoices
+						coins: coinChoices,
+						has_ended: true
 					}
 				}, (updateErr, updateRes) => {
 					if (updateErr) {
