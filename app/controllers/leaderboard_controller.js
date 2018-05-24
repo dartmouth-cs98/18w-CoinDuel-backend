@@ -75,11 +75,18 @@ export const setRankings = (req, res) => {
           // calculate and update user's capcoin balance if game in progress OR end of game
           var coinBalance = 0;
           entry.currentChoices.forEach((choice) => {
-            let percent_change = 1 - (initialPrices[choice.symbol] / parseFloat(prices[choice.symbol]['USD']));
+            console.log("Initial price:");
+            console.log(initialPrices[choice.symbol]);
+            if (initialPrices[choice.symbol] != null) {
+              console.log("Got here");
+              let percent_change = 1 - (initialPrices[choice.symbol] / parseFloat(prices[choice.symbol]['USD']));
 
-            // magnify returns
-            percent_change *= returnMagnifier;
-            coinBalance += (1 + percent_change) * choice.allocation;
+              // magnify returns
+              percent_change *= returnMagnifier;
+              coinBalance += (1 + percent_change) * choice.allocation;
+            } else {
+              coinBalance += choice.allocation;
+            }
           });
 
           // update entry with new balance
@@ -161,11 +168,15 @@ export const getRankings = (req, res) => {
           let initial_coin_balance = entry.coin_balance
           let coin_balance = 0;
           entry.currentChoices.forEach((choice) => {
-            let percent_change = 1 - (initialPrices[choice.symbol] / parseFloat(prices[choice.symbol]['USD']));
+            if (initialPrices[choice.symbol] != null) {
+              let percent_change = 1 - (initialPrices[choice.symbol] / parseFloat(prices[choice.symbol]['USD']));
 
-            // magnify returns
-            percent_change *= returnMagnifier;
-            coin_balance += (1 + percent_change) * choice.allocation;
+              // magnify returns
+              percent_change *= returnMagnifier;
+              coin_balance += (1 + percent_change) * choice.allocation;
+            } else {
+              coin_balance += choice.allocation;
+            }
           });
 
           // save updated coin_balance in entry document if game is in progress
@@ -294,10 +305,14 @@ export const getAllTimeRankings = (req, res) => {
               let initial_coin_balance = entry.coin_balance
               let coin_balance = 0;
               entry.currentChoices.forEach(choice => {
-                let percent_change = 1 - (initialPrices[choice.symbol] / parseFloat(prices[choice.symbol]['USD']));
-                // magnify returns
-                percent_change *= returnMagnifier;
-                coin_balance += (1 + percent_change) * choice.allocation;
+                if (initialPrices[choice.symbol] != null) {
+                  let percent_change = 1 - (initialPrices[choice.symbol] / parseFloat(prices[choice.symbol]['USD']));
+                  // magnify returns
+                  percent_change *= returnMagnifier;
+                  coin_balance += (1 + percent_change) * choice.allocation;
+                } else {
+                  coin_balance += choice.allocation;
+                }
               });
               balances[entry.userId] = coin_balance;
 
