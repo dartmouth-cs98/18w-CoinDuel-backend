@@ -288,7 +288,7 @@ export const createAndUpdateEntry = (req, res) => {
 				}
 
 				// ensure user won't go negative
-				userBalance = result.coinBalance;
+				userBalance = user_result.coinBalance;
 				choices.forEach(choice => totalCapcoin += parseFloat(choice.allocation));
 				if (totalCapcoin > userBalance) {
 					res.status(200).json({
@@ -426,35 +426,28 @@ export const createAndUpdateEntry = (req, res) => {
 				//choices now contains the updated prices and allocations for any choices any trades made
 				//update the coinballance and unallocated balance appropriaey.
 
-				console.log("herereer")
-				console.log(result);
-
 				var oldChoices = result[0].currentChoices
-				console.log(newChoices)
-				console.log(oldChoices)
 
-				var updatedCoinBalance = result[0].coin_balance
+				// var updatedCoinBalance = result[0].coin_balance
+				var updatedALlocatedCoin = result[0].unallocated_capcoin
 				oldChoices.forEach(oldChoice => {
 					newChoices.forEach(newChoice => {
 						if (oldChoice.symbol == newChoice.symbol){
+							//BUY ORDER
 							if (oldChoice.allocation < newChoice.allocation){
 								var diffCC = newChoice.allocation - oldChoice.allocation
-								var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
-								updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
-								newChoice.allocation = diffCC + (percentChange * oldChoice.allocation)
-								newChoice.unallocated_capcoin = newChoice.unallocated_capcoin - diffCC
+								// var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
+								// updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
+								newChoice.allocation = (oldChoice.allocation) + diffCC
+								updatedALlocatedCoin = updatedALlocatedCoin - diffCC
 							}
+							//SELL ORDER
 							if (oldChoice.allocation > newChoice.allocation){
-								var diffCC = newChoice.allocation - oldChoice.allocation
-								var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
-								updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
-								newChoice.allocation = diffCC + (percentChange * oldChoice.allocation)
-								newChoice.unallocated_capcoin = newChoice.unallocated_capcoin + (diffCC * percentChange)
-							}
-							if (oldChoice.allocation == newChoice.allocation){
-								var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
-								updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
-								newChoice.allocation = (percentChange * oldChoice.allocation)
+								var diffCC = oldChoice.allocation - newChoice.allocation
+								// var percentChange = 1 - (((currentPrice - oldPrice)/(oldPrice)) * -1)
+								// updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
+								newChoice.allocation = (oldChoice.allocation) - diffCC
+								updatedALlocatedCoin = updatedALlocatedCoin + (diffCC)
 							}
 						}
 					});
@@ -468,6 +461,7 @@ export const createAndUpdateEntry = (req, res) => {
 						gameId: req.params.gameId,
 						userId: req.params.userId,
 						currentChoices: newChoices,
+						unallocated_capcoin: updatedALlocatedCoin,
 						last_updated: Date.now()
 					}
 				}, {
@@ -486,7 +480,7 @@ export const createAndUpdateEntry = (req, res) => {
 							userId: req.params.userId
 						}, {
 							$set: {
-								choices: req.body.choices
+								choices: newChoices
 							}
 						}, (tradeError, tradeResult) => {
 							if (tradeError || !tradeResult) {
