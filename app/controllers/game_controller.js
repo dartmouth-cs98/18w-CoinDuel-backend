@@ -230,11 +230,6 @@ export const getEntry = (req, res) => {
 					console.log(choice)
 					newCoinBalance = newCoinBalance + choice.allocation
 				});
-				// for (var coin in choices) {
-				// 	console.log("here")
-				// 	newCoinBalance = newCoinBalance + coin.allocation
-				// }
-				// console.log(newCoinBalance)
 
 				// update entry
 				GameEntry.findOneAndUpdate({
