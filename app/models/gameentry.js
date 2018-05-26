@@ -11,7 +11,7 @@ import mongoose, { Schema } from 'mongoose';
 const GameEntrySchema = new Schema({
     gameId: { type: Schema.Types.ObjectId, ref: 'Game' },
     userId: { type: Schema.Types.ObjectId, ref: 'User' },
-    currentChoices: [{ symbol: { type: String }, allocation: { type: Number, min: 0, max: 10 }, initialPrice: {type: Number, default: null }}],
+    currentChoices: [{ symbol: { type: String }, allocation: { type: Number, min: 0, max: 10 }, price: {type: Number, default: null }}],
     coin_balance: { type: Number, default: 10 },
     unallocated_capcoin: { type: Number, default: 10},
     trades: [{ symbol: { type: String }, allocation: { type: Number, min: 0, max: 10 }, price: { type: Number, default: null }, timestamp: { type: Date, default: Date.now }}],

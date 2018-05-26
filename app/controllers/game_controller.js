@@ -192,11 +192,14 @@ export const getEntry = (req, res) => {
 
 // updates entry specified by game and user ids (creates a new entry if one doesn't already exist)
 export const createAndUpdateEntry = (req, res) => {
+
+	// choices[0].price = 10
 	GameEntry.find({
 		gameId: req.params.gameId,
 		userId: req.params.userId
 	}, (error, result) => {
-
+		var choices = req.body.choices
+		console.log(choices)
 		// entry does not already exist
 		if (error || !result || result.length == 0) {
 			var totalCapcoin = 0;
@@ -213,7 +216,7 @@ export const createAndUpdateEntry = (req, res) => {
 
 				// ensure user won't go negative
 				userBalance = result.coinBalance;
-				req.body.choices.forEach(choice => totalCapcoin += parseFloat(choice.allocation));
+				choices.forEach(choice => totalCapcoin += parseFloat(choice.allocation));
 				if (totalCapcoin > userBalance) {
 					res.status(200).json({
 						'error': 'insufficient funds'
@@ -226,7 +229,136 @@ export const createAndUpdateEntry = (req, res) => {
 					return;
 				}
 
-				// create new game entry
+				var unallocated = 10 - totalCapcoin
+				console.log(choices.length)
+				var tickerString = "";
+		    for (var i = 0; i < choices.length; i++) {
+		      if (i != choices.length - 1) {
+		        tickerString = tickerString.concat(choices[i].symbol, ",");
+		      } else {
+		        tickerString = tickerString.concat(choices[i].symbol);
+		      }
+		    }
+				console.log(tickerString);
+				// get current prices of coins
+		    getJSON('https://min-api.cryptocompare.com/data/pricemulti?fsyms=' + tickerString + '&tsyms=USD', (subErr, prices) => {
+		      if (subErr || !prices) {
+		        res.status(422).send('Unable to retrieve price - please check https://min-api.cryptocompare.com. Error: ' + subErr);
+		        return;
+		      }
+					var count = 0
+					console.log(prices)
+		      for (var coin in prices) {
+						if (choices[count].allocation > 0){
+							console.log('allocation > 0');
+							choices[count].price = prices[coin]['USD']
+						}
+						count = count + 1
+		      }
+					// create new game entry
+					GameEntry.findOneAndUpdate({
+						gameId: req.params.gameId,
+						userId: req.params.userId
+					}, {
+						$set: {
+							gameId: req.params.gameId,
+							userId: req.params.userId,
+							currentChoices: choices,
+							unallocated_capcoin: unallocated,
+							last_updated: Date.now()
+						}
+					}, {
+						upsert: true,
+						new: true,
+						setDefaultsOnInsert: true
+					}, (newError, newResult) => {
+						if (newError || !newResult) {
+							res.status(500).send('unable to create game entry');
+							return;
+						}
+
+						// withdraw capcoin from user's account
+						totalCapcoin *= -1;
+						User.findOneAndUpdate({
+								_id: req.params.userId
+							}, {
+								$inc: {
+									coinBalance: totalCapcoin
+								}
+							}, (userError, userResult) => {
+								if (userError || !userResult) {
+									res.status(500).send('unable to update user capcoin balance');
+									return;
+								}
+
+								// add initial entry to Trade collection as first trade
+								Trade.create({
+									gameId: req.params.gameId,
+									userId: req.params.userId,
+									choices: req.body.choices,
+									isInitial: true
+								}, (createTradeError, newTrade) => {
+									if (createTradeError || !newTrade) {
+										res.status(422).send('unable to add inital allocations to trade collection');
+										return;
+									}
+
+									// we made it
+									res.status(200).send(newResult);
+								});
+							});
+					});
+				});
+			});
+
+		// update existing entry
+	} else {
+			var choices = req.body.choices
+			console.log(choices)
+			// ensure below 10 capcoin limit
+			var totalCapcoin = 0;
+			var choices = req.body.choices
+			choices.forEach(choice => totalCapcoin += parseFloat(choice.allocation));
+
+			var tickerString = "";
+			for (var i = 0; i < choices.length; i++) {
+				if (i != choices.length - 1) {
+					tickerString = tickerString.concat(choices[i].symbol, ",");
+				} else {
+					tickerString = tickerString.concat(choices[i].symbol);
+				}
+			}
+			console.log(tickerString);
+
+			if (totalCapcoin > result.unallocated_capcoin) {
+				res.status(200).json({
+					'error': 'over capcoin limit for game, i.e. exceeds available unallocated capcoin limit'
+				});
+				return;
+			}
+
+			getJSON('https://min-api.cryptocompare.com/data/pricemulti?fsyms=' + tickerString + '&tsyms=USD', (subErr, prices) => {
+				if (subErr || !prices) {
+					res.status(422).send('Unable to retrieve price - please check https://min-api.cryptocompare.com. Error: ' + subErr);
+					return;
+				}
+				var count = 0
+				console.log(prices)
+				for (var coin in prices) {
+					if (choices[count].allocation > 0){
+						console.log('allocation > 0');
+						choices[count].price = prices[coin]['USD']
+					}
+					count = count + 1
+				}
+
+				//choices now contains the updated prices and allocations for any choices any trades made
+				//update the coinballance and unallocated balance appropriaey.
+
+				console.log("herereer")
+				console.log(result);
+
+
 				GameEntry.findOneAndUpdate({
 					gameId: req.params.gameId,
 					userId: req.params.userId
@@ -241,96 +373,31 @@ export const createAndUpdateEntry = (req, res) => {
 					upsert: true,
 					new: true,
 					setDefaultsOnInsert: true
-				}, (newError, newResult) => {
-					if (newError || !newResult) {
-						res.status(500).send('unable to create game entry');
+				}, (upError, upResult) => {
+					if (upError || !upResult) {
+						res.status(500).send('unable to update game entry');
 						return;
-					}
 
-					// withdraw capcoin from user's account
-					totalCapcoin *= -1;
-					User.findOneAndUpdate({
-							_id: req.params.userId
+					// update initial trade for user
+					} else {
+						Trade.findOneAndUpdate({
+							gameId: req.params.gameId,
+							userId: req.params.userId
 						}, {
-							$inc: {
-								coinBalance: totalCapcoin
+							$set: {
+								choices: req.body.choices
 							}
-						}, (userError, userResult) => {
-							if (userError || !userResult) {
-								res.status(500).send('unable to update user capcoin balance');
+						}, (tradeError, tradeResult) => {
+							if (tradeError || !tradeResult) {
+								res.status(500).send('unable to update initial trade');
 								return;
 							}
 
-							// add initial entry to Trade collection as first trade
-							Trade.create({
-								gameId: req.params.gameId,
-								userId: req.params.userId,
-								choices: req.body.choices,
-								isInitial: true
-							}, (createTradeError, newTrade) => {
-								if (createTradeError || !newTrade) {
-									res.status(422).send('unable to add inital allocations to trade collection');
-									return;
-								}
-
-								// we made it
-								res.status(200).send(newResult);
-							});
+							// we made it
+							res.status(200).send(upResult);
 						});
+					}
 				});
-			});
-
-		// update existing entry
-	} else {
-			// ensure below 10 capcoin limit
-			var totalCapcoin = 0;
-			req.body.choices.forEach(choice => totalCapcoin += parseFloat(choice.allocation));
-
-			if (totalCapcoin > 10) {
-				res.status(200).json({
-					'error': 'over capcoin limit for game'
-				});
-				return;
-			}
-
-			GameEntry.findOneAndUpdate({
-				gameId: req.params.gameId,
-				userId: req.params.userId
-			}, {
-				$set: {
-					gameId: req.params.gameId,
-					userId: req.params.userId,
-					currentChoices: req.body.choices,
-					last_updated: Date.now()
-				}
-			}, {
-				upsert: true,
-				new: true,
-				setDefaultsOnInsert: true
-			}, (upError, upResult) => {
-				if (upError || !upResult) {
-					res.status(500).send('unable to update game entry');
-					return;
-
-				// update initial trade for user
-				} else {
-					Trade.findOneAndUpdate({
-						gameId: req.params.gameId,
-						userId: req.params.userId
-					}, {
-						$set: {
-							choices: req.body.choices
-						}
-					}, (tradeError, tradeResult) => {
-						if (tradeError || !tradeResult) {
-							res.status(500).send('unable to update initial trade');
-							return;
-						}
-
-						// we made it
-						res.status(200).send(upResult);
-					});
-				}
 			});
 		}
 	});
