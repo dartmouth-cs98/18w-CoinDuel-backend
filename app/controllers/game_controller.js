@@ -224,8 +224,19 @@ export const getEntry = (req, res) => {
 					}
 					count = count + 1
 				}
+				// //update coinBalance
+				var newCoinBalance = result.unallocated_capcoin
+				choices.forEach(choice => {
+					console.log(choice)
+					newCoinBalance = newCoinBalance + choice.allocation
+				});
+				// for (var coin in choices) {
+				// 	console.log("here")
+				// 	newCoinBalance = newCoinBalance + coin.allocation
+				// }
+				// console.log(newCoinBalance)
 
-				// create new game entry
+				// update entry
 				GameEntry.findOneAndUpdate({
 					gameId: req.params.gameId,
 					userId: req.params.userId
@@ -233,6 +244,7 @@ export const getEntry = (req, res) => {
 					$set: {
 						gameId: req.params.gameId,
 						userId: req.params.userId,
+						coin_balance: newCoinBalance,
 						currentChoices: choices,
 						last_updated: Date.now()
 					}
