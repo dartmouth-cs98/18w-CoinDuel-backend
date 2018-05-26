@@ -179,6 +179,37 @@ export const getEntry = (req, res) => {
 			userId: req.params.userId
 		})
 		.then((result) => {
+
+			//get a ticketstring to get current prices for all coins.
+			choices = result.currentChoices
+			var tickerString = "";
+			for (var i = 0; i < choices.length; i++) {
+				if (i != choices.length - 1) {
+					tickerString = tickerString.concat(choices[i].symbol, ",");
+				} else {
+					tickerString = tickerString.concat(choices[i].symbol);
+				}
+			}
+			console.log(tickerString);
+
+			// get current prices of coins
+			getJSON('https://min-api.cryptocompare.com/data/pricemulti?fsyms=' + tickerString + '&tsyms=USD', (subErr, prices) => {
+				if (subErr || !prices) {
+					res.status(422).send('Unable to retrieve price - please check https://min-api.cryptocompare.com. Error: ' + subErr);
+					return;
+				}
+
+				var count = 0
+				console.log(prices)
+				for (var coin in prices) {
+					if (choices[count].allocation > 0){
+						console.log('allocation > 0');
+						choices[count].price = prices[coin]['USD']
+					}
+					count = count + 1
+				}
+			});
+
 			if (result) {
 				res.json(result);
 			} else {
@@ -313,19 +344,17 @@ export const createAndUpdateEntry = (req, res) => {
 
 		// update existing entry
 	} else {
-			var choices = req.body.choices
-			console.log(choices)
+			var newChoices = req.body.choices
 			// ensure below 10 capcoin limit
 			var totalCapcoin = 0;
-			var choices = req.body.choices
-			choices.forEach(choice => totalCapcoin += parseFloat(choice.allocation));
+			newChoices.forEach(choice => totalCapcoin += parseFloat(choice.allocation));
 
 			var tickerString = "";
-			for (var i = 0; i < choices.length; i++) {
-				if (i != choices.length - 1) {
-					tickerString = tickerString.concat(choices[i].symbol, ",");
+			for (var i = 0; i < newChoices.length; i++) {
+				if (i != newChoices.length - 1) {
+					tickerString = tickerString.concat(newChoices[i].symbol, ",");
 				} else {
-					tickerString = tickerString.concat(choices[i].symbol);
+					tickerString = tickerString.concat(newChoices[i].symbol);
 				}
 			}
 			console.log(tickerString);
@@ -345,9 +374,9 @@ export const createAndUpdateEntry = (req, res) => {
 				var count = 0
 				console.log(prices)
 				for (var coin in prices) {
-					if (choices[count].allocation > 0){
+					if (newChoices[count].allocation > 0){
 						console.log('allocation > 0');
-						choices[count].price = prices[coin]['USD']
+						newChoices[count].price = prices[coin]['USD']
 					}
 					count = count + 1
 				}
@@ -355,9 +384,39 @@ export const createAndUpdateEntry = (req, res) => {
 				//choices now contains the updated prices and allocations for any choices any trades made
 				//update the coinballance and unallocated balance appropriaey.
 
-				console.log("herereer")
-				console.log(result);
-
+				// console.log("herereer")
+				// console.log(result);
+				//
+				// var oldChoices = result[0].currentChoices
+				// console.log(newChoices)
+				// console.log(oldChoices)
+				//
+				// var updatedCoinBalance = result[0].coin_balance
+				// oldChoices.forEach(oldChoice => {
+				// 	newChoices.forEach(newChoice => {
+				// 		if (oldChoice.symbol == newChoice.symbol){
+				// 			if (oldChoice.allocation < newChoice.allocation){
+				// 				var diffCC = newChoice.allocation - oldChoice.allocation
+				// 				var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
+				// 				updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
+				// 				newChoice.allocation = diffCC + (percentChange * oldChoice.allocation)
+				// 				newChoice.unallocated_capcoin = newChoice.unallocated_capcoin - diffCC
+				// 			}
+				// 			if (oldChoice.allocation > newChoice.allocation){
+				// 				var diffCC = newChoice.allocation - oldChoice.allocation
+				// 				var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
+				// 				updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
+				// 				newChoice.allocation = diffCC + (percentChange * oldChoice.allocation)
+				// 				newChoice.unallocated_capcoin = newChoice.unallocated_capcoin + (diffCC * percentChange)
+				// 			}
+				// 			if (oldChoice.allocation == newChoice.allocation){
+				// 				var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
+				// 				updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
+				// 				newChoice.allocation = (percentChange * oldChoice.allocation)
+				// 			}
+				// 		}
+				// 	});
+				// });
 
 				GameEntry.findOneAndUpdate({
 					gameId: req.params.gameId,
@@ -366,7 +425,7 @@ export const createAndUpdateEntry = (req, res) => {
 					$set: {
 						gameId: req.params.gameId,
 						userId: req.params.userId,
-						currentChoices: req.body.choices,
+						currentChoices: newChoices,
 						last_updated: Date.now()
 					}
 				}, {
