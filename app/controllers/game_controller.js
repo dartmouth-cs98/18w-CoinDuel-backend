@@ -180,8 +180,9 @@ export const getEntry = (req, res) => {
 		})
 		.then((result) => {
 
+
 			//get a ticketstring to get current prices for all coins.
-			choices = result.currentChoices
+			var choices = result.currentChoices
 			var tickerString = "";
 			for (var i = 0; i < choices.length; i++) {
 				if (i != choices.length - 1) {
@@ -190,7 +191,7 @@ export const getEntry = (req, res) => {
 					tickerString = tickerString.concat(choices[i].symbol);
 				}
 			}
-			console.log(tickerString);
+			// console.log(tickerString);
 
 			// get current prices of coins
 			getJSON('https://min-api.cryptocompare.com/data/pricemulti?fsyms=' + tickerString + '&tsyms=USD', (subErr, prices) => {
@@ -200,23 +201,57 @@ export const getEntry = (req, res) => {
 				}
 
 				var count = 0
-				console.log(prices)
+				// console.log(prices)
 				for (var coin in prices) {
 					if (choices[count].allocation > 0){
-						console.log('allocation > 0');
-						choices[count].price = prices[coin]['USD']
+
+						var oldPrice = choices[count].price
+						var currentPrice = prices[coin]['USD']
+
+
+						var percentChange = 1
+						if (currentPrice == 0){
+							percentChange = 0
+						} else if (currentPrice > oldPrice){
+							percentChange = (1 + ((currentPrice - oldPrice)/(oldPrice)))
+						} else if (currentPrice < oldPrice){
+							percentChange = 1 - (((currentPrice - oldPrice)/(oldPrice)) * -1)
+						}
+
+						var oldAllocation = choices[count].allocation
+						choices[count].price = currentPrice
+						choices[count].allocation = (oldAllocation * percentChange)
 					}
 					count = count + 1
 				}
-			});
 
-			if (result) {
-				res.json(result);
-			} else {
-				res.status(422).send('No entry found for this user');
-			}
+				// create new game entry
+				GameEntry.findOneAndUpdate({
+					gameId: req.params.gameId,
+					userId: req.params.userId
+				}, {
+					$set: {
+						gameId: req.params.gameId,
+						userId: req.params.userId,
+						currentChoices: choices,
+						last_updated: Date.now()
+					}
+				}, {
+					upsert: true,
+					new: true,
+					setDefaultsOnInsert: true
+				}, (newError, newResult) => {
+					if (newError || !newResult) {
+						res.status(500).send('unable to create game entry');
+						return;
+					} else {
+						res.json(result);
+					}
+				});
+			});
 		})
 		.catch((error) => {
+			console.log(error)
 			res.status(422).send('No entry found for this user');
 		});
 };
@@ -230,7 +265,7 @@ export const createAndUpdateEntry = (req, res) => {
 		userId: req.params.userId
 	}, (error, result) => {
 		var choices = req.body.choices
-		console.log(choices)
+		// console.log(choices)
 		// entry does not already exist
 		if (error || !result || result.length == 0) {
 			var totalCapcoin = 0;
@@ -261,7 +296,7 @@ export const createAndUpdateEntry = (req, res) => {
 				}
 
 				var unallocated = 10 - totalCapcoin
-				console.log(choices.length)
+				// console.log(choices.length)
 				var tickerString = "";
 		    for (var i = 0; i < choices.length; i++) {
 		      if (i != choices.length - 1) {
@@ -270,7 +305,7 @@ export const createAndUpdateEntry = (req, res) => {
 		        tickerString = tickerString.concat(choices[i].symbol);
 		      }
 		    }
-				console.log(tickerString);
+				// console.log(tickerString);
 				// get current prices of coins
 		    getJSON('https://min-api.cryptocompare.com/data/pricemulti?fsyms=' + tickerString + '&tsyms=USD', (subErr, prices) => {
 		      if (subErr || !prices) {
@@ -278,10 +313,10 @@ export const createAndUpdateEntry = (req, res) => {
 		        return;
 		      }
 					var count = 0
-					console.log(prices)
+					// console.log(prices)
 		      for (var coin in prices) {
 						if (choices[count].allocation > 0){
-							console.log('allocation > 0');
+							// console.log('allocation > 0');
 							choices[count].price = prices[coin]['USD']
 						}
 						count = count + 1
@@ -357,7 +392,7 @@ export const createAndUpdateEntry = (req, res) => {
 					tickerString = tickerString.concat(newChoices[i].symbol);
 				}
 			}
-			console.log(tickerString);
+			// console.log(tickerString);
 
 			if (totalCapcoin > result.unallocated_capcoin) {
 				res.status(200).json({
@@ -372,10 +407,10 @@ export const createAndUpdateEntry = (req, res) => {
 					return;
 				}
 				var count = 0
-				console.log(prices)
+				// console.log(prices)
 				for (var coin in prices) {
 					if (newChoices[count].allocation > 0){
-						console.log('allocation > 0');
+						// console.log('allocation > 0');
 						newChoices[count].price = prices[coin]['USD']
 					}
 					count = count + 1
