@@ -281,8 +281,8 @@ export const createAndUpdateEntry = (req, res) => {
 			// check user's capcoin balance
 			User.findOne({
 				_id: req.params.userId
-			}, (error, result) => {
-				if (error || !result) {
+			}, (error, user_result) => {
+				if (error || !user_result) {
 					res.status(422).send('user does not exist');
 					return;
 				}
@@ -426,39 +426,39 @@ export const createAndUpdateEntry = (req, res) => {
 				//choices now contains the updated prices and allocations for any choices any trades made
 				//update the coinballance and unallocated balance appropriaey.
 
-				// console.log("herereer")
-				// console.log(result);
-				//
-				// var oldChoices = result[0].currentChoices
-				// console.log(newChoices)
-				// console.log(oldChoices)
-				//
-				// var updatedCoinBalance = result[0].coin_balance
-				// oldChoices.forEach(oldChoice => {
-				// 	newChoices.forEach(newChoice => {
-				// 		if (oldChoice.symbol == newChoice.symbol){
-				// 			if (oldChoice.allocation < newChoice.allocation){
-				// 				var diffCC = newChoice.allocation - oldChoice.allocation
-				// 				var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
-				// 				updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
-				// 				newChoice.allocation = diffCC + (percentChange * oldChoice.allocation)
-				// 				newChoice.unallocated_capcoin = newChoice.unallocated_capcoin - diffCC
-				// 			}
-				// 			if (oldChoice.allocation > newChoice.allocation){
-				// 				var diffCC = newChoice.allocation - oldChoice.allocation
-				// 				var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
-				// 				updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
-				// 				newChoice.allocation = diffCC + (percentChange * oldChoice.allocation)
-				// 				newChoice.unallocated_capcoin = newChoice.unallocated_capcoin + (diffCC * percentChange)
-				// 			}
-				// 			if (oldChoice.allocation == newChoice.allocation){
-				// 				var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
-				// 				updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
-				// 				newChoice.allocation = (percentChange * oldChoice.allocation)
-				// 			}
-				// 		}
-				// 	});
-				// });
+				console.log("herereer")
+				console.log(result);
+
+				var oldChoices = result[0].currentChoices
+				console.log(newChoices)
+				console.log(oldChoices)
+
+				var updatedCoinBalance = result[0].coin_balance
+				oldChoices.forEach(oldChoice => {
+					newChoices.forEach(newChoice => {
+						if (oldChoice.symbol == newChoice.symbol){
+							if (oldChoice.allocation < newChoice.allocation){
+								var diffCC = newChoice.allocation - oldChoice.allocation
+								var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
+								updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
+								newChoice.allocation = diffCC + (percentChange * oldChoice.allocation)
+								newChoice.unallocated_capcoin = newChoice.unallocated_capcoin - diffCC
+							}
+							if (oldChoice.allocation > newChoice.allocation){
+								var diffCC = newChoice.allocation - oldChoice.allocation
+								var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
+								updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
+								newChoice.allocation = diffCC + (percentChange * oldChoice.allocation)
+								newChoice.unallocated_capcoin = newChoice.unallocated_capcoin + (diffCC * percentChange)
+							}
+							if (oldChoice.allocation == newChoice.allocation){
+								var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
+								updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
+								newChoice.allocation = (percentChange * oldChoice.allocation)
+							}
+						}
+					});
+				});
 
 				GameEntry.findOneAndUpdate({
 					gameId: req.params.gameId,
