@@ -227,7 +227,6 @@ export const getEntry = (req, res) => {
 				// //update coinBalance
 				var newCoinBalance = result.unallocated_capcoin
 				choices.forEach(choice => {
-					console.log(choice)
 					newCoinBalance = newCoinBalance + choice.allocation
 				});
 
@@ -387,6 +386,7 @@ export const createAndUpdateEntry = (req, res) => {
 		// update existing entry
 	} else {
 			var newChoices = req.body.choices
+			var unallocatedCapCoinLeft = result[0].unallocated_capcoin
 			// ensure below 10 capcoin limit
 			var totalCapcoin = 0;
 			newChoices.forEach(choice => totalCapcoin += parseFloat(choice.allocation));
@@ -436,10 +436,16 @@ export const createAndUpdateEntry = (req, res) => {
 							//BUY ORDER
 							if (oldChoice.allocation < newChoice.allocation){
 								var diffCC = newChoice.allocation - oldChoice.allocation
-								// var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
-								// updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
-								newChoice.allocation = (oldChoice.allocation) + diffCC
-								updatedALlocatedCoin = updatedALlocatedCoin - diffCC
+								if (diffCC > updatedALlocatedCoin) {
+									res.status(500).send('insufficient funds, not enough unallocated CC left');
+									console.log('insufficient funds, not enough unallocated CC left')
+									return;
+								} else{
+									// var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
+									// updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
+									newChoice.allocation = (oldChoice.allocation) + diffCC
+									updatedALlocatedCoin = updatedALlocatedCoin - diffCC
+								}
 							}
 							//SELL ORDER
 							if (oldChoice.allocation > newChoice.allocation){
