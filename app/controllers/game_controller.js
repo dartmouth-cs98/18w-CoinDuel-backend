@@ -427,7 +427,7 @@ export const createAndUpdateEntry = (req, res) => {
 				//update the coinballance and unallocated balance appropriaey.
 
 				var oldChoices = result[0].currentChoices
-
+				var noFunds = 0;
 				// var updatedCoinBalance = result[0].coin_balance
 				var updatedALlocatedCoin = result[0].unallocated_capcoin
 				oldChoices.forEach(oldChoice => {
@@ -437,8 +437,9 @@ export const createAndUpdateEntry = (req, res) => {
 							if (oldChoice.allocation < newChoice.allocation){
 								var diffCC = newChoice.allocation - oldChoice.allocation
 								if (diffCC > updatedALlocatedCoin) {
-									res.status(500).send('insufficient funds, not enough unallocated CC left');
 									console.log('insufficient funds, not enough unallocated CC left')
+									res.status(422).send('insufficient funds, not enough unallocated CC left');
+									noFunds = 1
 									return;
 								} else{
 									// var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
@@ -459,46 +460,51 @@ export const createAndUpdateEntry = (req, res) => {
 					});
 				});
 
-				GameEntry.findOneAndUpdate({
-					gameId: req.params.gameId,
-					userId: req.params.userId
-				}, {
-					$set: {
+				//only update entry if we had the funds
+				if (noFunds == 0){
+					GameEntry.findOneAndUpdate({
 						gameId: req.params.gameId,
-						userId: req.params.userId,
-						currentChoices: newChoices,
-						unallocated_capcoin: updatedALlocatedCoin,
-						last_updated: Date.now()
-					}
-				}, {
-					upsert: true,
-					new: true,
-					setDefaultsOnInsert: true
-				}, (upError, upResult) => {
-					if (upError || !upResult) {
-						res.status(500).send('unable to update game entry');
-						return;
-
-					// update initial trade for user
-					} else {
-						Trade.findOneAndUpdate({
+						userId: req.params.userId
+					}, {
+						$set: {
 							gameId: req.params.gameId,
-							userId: req.params.userId
-						}, {
-							$set: {
-								choices: newChoices
-							}
-						}, (tradeError, tradeResult) => {
-							if (tradeError || !tradeResult) {
-								res.status(500).send('unable to update initial trade');
-								return;
-							}
+							userId: req.params.userId,
+							currentChoices: newChoices,
+							unallocated_capcoin: updatedALlocatedCoin,
+							last_updated: Date.now()
+						}
+					}, {
+						upsert: true,
+						new: true,
+						setDefaultsOnInsert: true
+					}, (upError, upResult) => {
+						if (upError || !upResult) {
+							console.log("here")
+							res.status(500).send('unable to update game entry');
+							return;
 
-							// we made it
-							res.status(200).send(upResult);
-						});
-					}
-				});
+						// update initial trade for user
+						} else {
+							Trade.findOneAndUpdate({
+								gameId: req.params.gameId,
+								userId: req.params.userId
+							}, {
+								$set: {
+									choices: newChoices
+								}
+							}, (tradeError, tradeResult) => {
+								if (tradeError || !tradeResult) {
+									console.log("asdfasdf")
+									res.status(500).send('unable to update initial trade');
+									return;
+								}
+
+								// we made it
+								res.status(200).send(upResult);
+							});
+						}
+					});
+				}
 			});
 		}
 	});
