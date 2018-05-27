@@ -29,8 +29,8 @@ const port = process.env.PORT || 9000;
 app.listen(port);
 
 // database setup
-// const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/coinduel';
-const mongoURI = 'mongodb://localhost/coinduel';
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/coinduel';
+// const mongoURI = 'mongodb://localhost/coinduel';
 
 mongoose.connect(mongoURI);
 mongoose.Promise = global.Promise;
