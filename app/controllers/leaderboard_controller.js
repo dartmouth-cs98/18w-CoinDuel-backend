@@ -89,6 +89,9 @@ export const setRankings = (req, res) => {
             }
           });
 
+          coinBalance += entry.unallocated_capcoin
+
+
           // update entry with new balance
           entry.update({
             $set: {
@@ -178,6 +181,7 @@ export const getRankings = (req, res) => {
               coin_balance += choice.allocation;
             }
           });
+          coin_balance += entry.unallocated_capcoin
 
           // save updated coin_balance in entry document if game is in progress
           var date = Date.now();
@@ -314,6 +318,7 @@ export const getAllTimeRankings = (req, res) => {
                   coin_balance += choice.allocation;
                 }
               });
+              coin_balance += entry.unallocated_capcoin
               balances[entry.userId] = coin_balance;
 
               // save updated coin_balance in entry document
