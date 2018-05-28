@@ -72,25 +72,56 @@ export const setRankings = (req, res) => {
       }, (error, result) => {
         result.forEach(entry => {
 
-          // calculate and update user's capcoin balance if game in progress OR end of game
-          var coinBalance = 0;
-          entry.currentChoices.forEach((choice) => {
-            console.log("Initial price:");
-            console.log(initialPrices[choice.symbol]);
-            if (initialPrices[choice.symbol] != null) {
-              console.log("Got here");
-              let percent_change = 1 - (initialPrices[choice.symbol] / parseFloat(prices[choice.symbol]['USD']));
+          var choices = entry.currentChoices
 
-              // magnify returns
-              percent_change *= returnMagnifier;
-              coinBalance += (1 + percent_change) * choice.allocation;
-            } else {
-              coinBalance += choice.allocation;
-            }
-          });
+          for (var coin in prices) {
+            var indexOfCoinInEntry = -1
+            var x = 0
+            console.log(choices[0])
+            choices.forEach(coinChoice => {
+              // console.log(coinChoice)
+              // console.log(coinChoice.symbol + " vs. " + coin)
+              if (coinChoice.symbol == coin) {
+                // console.log("Match")
+                indexOfCoinInEntry = x
+              }
+              x += 1
+    				});
 
-          coinBalance += entry.unallocated_capcoin
+            console.log(indexOfCoinInEntry)
+  					if (choices[indexOfCoinInEntry].allocation > 0){
+  						var oldPrice = choices[indexOfCoinInEntry].price
 
+              console.log(coin)
+
+  						var currentPrice = prices[coin]['USD']
+
+
+              console.log("Old price is " + oldPrice)
+              console.log("Current price is " + currentPrice)
+
+
+  						var percentChange = 1
+  						if (currentPrice == 0){
+  							percentChange = 0
+  						} else if (currentPrice > oldPrice){
+  							percentChange = (1 + ((currentPrice - oldPrice)/(oldPrice)))
+  						} else if (currentPrice < oldPrice){
+  							percentChange = 1 - (((currentPrice - oldPrice)/(oldPrice)) * -1)
+  						}
+
+  						var oldAllocation = choices[indexOfCoinInEntry].allocation
+  						choices[indexOfCoinInEntry].price = currentPrice
+  						choices[indexOfCoinInEntry].allocation = (oldAllocation * percentChange)
+  					}
+  				}
+  				// //update coinBalance
+  				var newCoinBalance = entry.unallocated_capcoin
+  				choices.forEach(choice => {
+  					newCoinBalance = newCoinBalance + choice.allocation
+  				});
+
+          let coinBalance = newCoinBalance
 
           // update entry with new balance
           entry.update({
@@ -167,21 +198,58 @@ export const getRankings = (req, res) => {
       }, (err3, result3) => {
         result3.forEach((entry) => {
 
-          // calculate entry's current capcoin balance
-          let initial_coin_balance = entry.coin_balance
-          let coin_balance = 0;
-          entry.currentChoices.forEach((choice) => {
-            if (initialPrices[choice.symbol] != null) {
-              let percent_change = 1 - (initialPrices[choice.symbol] / parseFloat(prices[choice.symbol]['USD']));
+          // START
 
-              // magnify returns
-              percent_change *= returnMagnifier;
-              coin_balance += (1 + percent_change) * choice.allocation;
-            } else {
-              coin_balance += choice.allocation;
-            }
-          });
-          coin_balance += entry.unallocated_capcoin
+          var choices = entry.currentChoices
+
+          for (var coin in prices) {
+            var indexOfCoinInEntry = -1
+            var x = 0
+            console.log(choices[0])
+            choices.forEach(coinChoice => {
+              // console.log(coinChoice)
+              // console.log(coinChoice.symbol + " vs. " + coin)
+              if (coinChoice.symbol == coin) {
+                // console.log("Match")
+                indexOfCoinInEntry = x
+              }
+              x += 1
+    				});
+
+            console.log(indexOfCoinInEntry)
+  					if (choices[indexOfCoinInEntry].allocation > 0){
+  						var oldPrice = choices[indexOfCoinInEntry].price
+
+              console.log(coin)
+
+  						var currentPrice = prices[coin]['USD']
+
+
+              console.log("Old price is " + oldPrice)
+              console.log("Current price is " + currentPrice)
+
+
+  						var percentChange = 1
+  						if (currentPrice == 0){
+  							percentChange = 0
+  						} else if (currentPrice > oldPrice){
+  							percentChange = (1 + ((currentPrice - oldPrice)/(oldPrice)))
+  						} else if (currentPrice < oldPrice){
+  							percentChange = 1 - (((currentPrice - oldPrice)/(oldPrice)) * -1)
+  						}
+
+  						var oldAllocation = choices[indexOfCoinInEntry].allocation
+  						choices[indexOfCoinInEntry].price = currentPrice
+  						choices[indexOfCoinInEntry].allocation = (oldAllocation * percentChange)
+  					}
+  				}
+  				// //update coinBalance
+  				var newCoinBalance = entry.unallocated_capcoin
+  				choices.forEach(choice => {
+  					newCoinBalance = newCoinBalance + choice.allocation
+  				});
+
+          let coin_balance = newCoinBalance
 
           // save updated coin_balance in entry document if game is in progress
           var date = Date.now();
@@ -305,21 +373,56 @@ export const getAllTimeRankings = (req, res) => {
           }, (err3, result3) => {
             result3.forEach(entry => {
 
-              // calculate entry's current capcoin balance
-              let initial_coin_balance = entry.coin_balance
-              let coin_balance = 0;
-              entry.currentChoices.forEach(choice => {
-                if (initialPrices[choice.symbol] != null) {
-                  let percent_change = 1 - (initialPrices[choice.symbol] / parseFloat(prices[choice.symbol]['USD']));
-                  // magnify returns
-                  percent_change *= returnMagnifier;
-                  coin_balance += (1 + percent_change) * choice.allocation;
-                } else {
-                  coin_balance += choice.allocation;
-                }
-              });
-              coin_balance += entry.unallocated_capcoin
-              balances[entry.userId] = coin_balance;
+              var choices = entry.currentChoices
+
+              for (var coin in prices) {
+                var indexOfCoinInEntry = -1
+                var x = 0
+                console.log(choices[0])
+                choices.forEach(coinChoice => {
+                  // console.log(coinChoice)
+                  // console.log(coinChoice.symbol + " vs. " + coin)
+                  if (coinChoice.symbol == coin) {
+                    // console.log("Match")
+                    indexOfCoinInEntry = x
+                  }
+                  x += 1
+        				});
+
+                console.log(indexOfCoinInEntry)
+      					if (choices[indexOfCoinInEntry].allocation > 0){
+      						var oldPrice = choices[indexOfCoinInEntry].price
+
+                  console.log(coin)
+
+      						var currentPrice = prices[coin]['USD']
+
+
+                  console.log("Old price is " + oldPrice)
+                  console.log("Current price is " + currentPrice)
+
+
+      						var percentChange = 1
+      						if (currentPrice == 0){
+      							percentChange = 0
+      						} else if (currentPrice > oldPrice){
+      							percentChange = (1 + ((currentPrice - oldPrice)/(oldPrice)))
+      						} else if (currentPrice < oldPrice){
+      							percentChange = 1 - (((currentPrice - oldPrice)/(oldPrice)) * -1)
+      						}
+
+      						var oldAllocation = choices[indexOfCoinInEntry].allocation
+      						choices[indexOfCoinInEntry].price = currentPrice
+      						choices[indexOfCoinInEntry].allocation = (oldAllocation * percentChange)
+      					}
+      				}
+      				// //update coinBalance
+      				var newCoinBalance = entry.unallocated_capcoin
+      				choices.forEach(choice => {
+      					newCoinBalance = newCoinBalance + choice.allocation
+      				});
+
+              let coin_balance = newCoinBalance
 
               // save updated coin_balance in entry document
               entry.update({

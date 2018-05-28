@@ -272,6 +272,7 @@ export const createAndUpdateEntry = (req, res) => {
 	}, (error, result) => {
 		var choices = req.body.choices
 		// console.log(choices)
+
 		// entry does not already exist
 		if (error || !result || result.length == 0) {
 			var totalCapcoin = 0;
@@ -355,7 +356,7 @@ export const createAndUpdateEntry = (req, res) => {
 								_id: req.params.userId
 							}, {
 								$inc: {
-									coinBalance: totalCapcoin
+									coinBalance: -10,
 								}
 							}, (userError, userResult) => {
 								if (userError || !userResult) {
