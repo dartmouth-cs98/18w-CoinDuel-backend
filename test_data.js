@@ -11,7 +11,7 @@ db.getCollectionNames().forEach(
 );
 
 db.users.insertMany([
-	{ _id: new ObjectId("5a8607d4971c50fbf29726a2"), email: '1@gmail.com', username: 'p1', password: '$2a$10$PDe3pgi69xj.sTE8Xmhjv.p48qdQKutlV8qONaJqiEoDN75TyJbxG', coinBalance: 10, verified: false, profile_url: 'profile3' },
+	{ _id: new ObjectId("5a8607d4971c50fbf29726a2"), email: '1@gmail.com', username: 'p1', password: '$2a$10$PDe3pgi69xj.sTE8Xmhjv.p48qdQKutlV8qONaJqiEoDN75TyJbxG', coinBalance: 10, verified: true, profile_url: 'profile3' },
 	// { _id: new ObjectId("5a8607d5971c50fbf29726a3"), email: '2@gmail.com', username: 'p2', password: '2', coinBalance: 20 },
 	// { _id: new ObjectId("5a8607d6971c50fbf29726a4"), email: '3@gmail.com', username: 'p3', password: '3', coinBalance: 30 },
 	{ _id: new ObjectId("5a8607d6971c50fbf29726a5"), email: '4@gmail.com', username: 'p4', password: '$2a$10$PDe3pgi69xj.sTE8Xmhjv.p48qdQKutlV8qONaJqiEoDN75TyJbxG', coinBalance: 40, verified: true, profile_url: 'profile6' }])
