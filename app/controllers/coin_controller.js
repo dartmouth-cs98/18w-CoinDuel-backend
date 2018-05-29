@@ -28,7 +28,7 @@ export const getCoinLogo = (req, res) => {
   }
 
   // map ticker to CryptoCompare id
-  let coinId = tickerDict[symbol]['id'];
+  let coinId = tickerDict[symbol] ? tickerDict[symbol]['id'] : null;
   if (!coinId) {
     res.status(422).send('Invalid ticker.');
     return;
@@ -57,6 +57,7 @@ export const getCoinLogo = (req, res) => {
 export const getCoin = (req, res) => {
   const symbol = req.params.symbol;
   const tickerDict = req.app.locals.resources.tickers; // global id dict
+  const numArticles = 3;
 
   // check if request has ticker
   if (!symbol) {
@@ -64,17 +65,48 @@ export const getCoin = (req, res) => {
     return;
   }
 
-  // get coin data from CryptoCompare
-  getJSON('https://min-api.cryptocompare.com/data/price?fsym=' + symbol + '&tsyms=USD', (err, crypto) => {
-    if (err) {
+  // get coin id from dict
+  const coinId = tickerDict[symbol] ? tickerDict[symbol]['id'] : null;
+  if (!coinId) {
+    res.status(422).send('Ticker not found in local app resources.');
+    return;
+  }
+
+  // get coin price
+  getJSON('https://min-api.cryptocompare.com/data/price?fsym=' + symbol + '&tsyms=USD', (resErr, crypto) => {
+    if (resErr || !crypto) {
       res.status(422).send('Unable to retrieve price - please check https://min-api.cryptocompare.com. Error: ' + err);
       return;
     }
 
-    // send back data as object
-    const coinName = tickerDict[symbol] ? tickerDict[symbol]['name'] : 'N/A';
-    const coinData = {'name':coinName, 'price':crypto['USD']};
-    res.send(200, coinData);
+    // get coin snapshot
+    getJSON('https://min-api.cryptocompare.com/data/v2/news/?categories=' + symbol + '&excludeCategories=Sponsored', (newsErr, news) => {
+      if (newsErr || !news) {
+        res.status(422).send('Unable to news - please check https://min-api.cryptocompare.com. Error: ' + err);
+        return;
+      }
+
+      // get coin snapshot
+      getJSON('https://www.cryptocompare.com/api/data/coinsnapshotfullbyid/?id=' + coinId, (snapErr, snapshot) => {
+        if (snapErr || snapshot['Response'] == 'Error') {
+          res.status(422).send('Unable to retrieve snapshot - please check https://min-api.cryptocompare.com. Error: ' + err);
+          return;
+        }
+
+        // send back data as object
+        const coinName = tickerDict[symbol] ? tickerDict[symbol]['name'] : null;
+        const coinInfo = snapshot['Data']['General'];
+        const coinData = {
+          'name':coinName,
+          'price':crypto['USD'],
+          'logo':'http://www.cryptocompare.com' + coinInfo['ImageUrl'],
+          'description':coinInfo['Description'],
+          'url':coinInfo['WebsiteUrl'],
+          'articles':news['Data'].slice(0, numArticles)
+        };
+        res.send(200, coinData);
+      });
+    });
   });
 };
 
