@@ -9,6 +9,7 @@
 import User from '../models/user.js';
 import dotenv from 'dotenv';
 import jwt from 'jwt-simple';
+import request from 'request';
 
 // password encryption
 dotenv.config({ silent: true });
@@ -82,6 +83,12 @@ export const signup = (req, res, next) => {
           mailgun.messages().send(data, function (error, body) {
             if (!error) {
               console.log("Verification email sent");
+
+              // register user on OneSignal for push notifications
+              var reqBody = { app_id: process.env.ONESIGNAL_APP_ID };
+  						var params = { method: 'POST', body: reqBody, json: true, url: 'https://onesignal.com/api/v1/players' };
+  						request.post(params, (error, response, body) => {});
+
               res.status(200).send({ token: tokenForUser(newUser), user: newUser });
 
             // unable to send user a verification email
@@ -109,7 +116,6 @@ export const signup = (req, res, next) => {
       }
     })
     .catch(err => {
-
       // error querying database for username
       res.status(422).json({'errTitle': 'Oops! Our server seems to running into some trouble.--', 'errBody': 'Please wait a moment and try again.'});
     });
