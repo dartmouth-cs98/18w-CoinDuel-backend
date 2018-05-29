@@ -312,7 +312,7 @@ export const getAllTimeRankings = (req, res) => {
 
     // no current game
     if (!result[0] || result[0].start_date > Date.now()) {
-      User.find({}, (err, result2) => {
+      User.find({ verified: true }, (err, result2) => {
         var user_data = []
 
         // create array of all users
