@@ -85,9 +85,15 @@ export const signup = (req, res, next) => {
               console.log("Verification email sent");
 
               // register user on OneSignal for push notifications
-              var reqBody = { app_id: process.env.ONESIGNAL_APP_ID };
+              var reqBody = { app_id: process.env.ONESIGNAL_APP_ID, device_type: 0, language: 'en',  };
   						var params = { method: 'POST', body: reqBody, json: true, url: 'https://onesignal.com/api/v1/players' };
-  						request.post(params, (error, response, body) => {});
+  						request.post(params, (oneSignal_error, oneSignal_response, oneSignal_body) => {
+                  if (oneSignal_error) {
+                    console.log("Error registering user on OneSignal – ${" + oneSignal_error + "}");
+                  } else {
+                    User.findOneAndUpdate({email: email}, { $set: { oneSignalId: oneSignal_response['id'] }, (err, doc) => {});
+                  }
+              });
 
               res.status(200).send({ token: tokenForUser(newUser), user: newUser });
 
@@ -159,7 +165,7 @@ export const deleteUser = (req, res) => {
     })
     .then(() => {
       res.json({
-        message: 'Usage successfully deleted!'
+        message: 'User successfully deleted!'
       });
     }).catch(error => {
       res.json({
@@ -172,15 +178,11 @@ export const deleteUser = (req, res) => {
 export const verifyUser = (req, res) => {
   User.findOne({ verificationId: req.params.verificationId })
     .then((result) => {
-      result.update({
-        $set: {
-          verified: true,
+      result.update({ $set: { verified: true } }, (updateErr, updateRes) => {
+        if (updateErr || !updateRes) {
+          res.status(400).send('Error verifying account.');
+          return;
         }
-      }, (updateErr, updateRes) => {
-          if (updateErr || !updateRes) {
-              res.status(400).send('Error verifying account.');
-              return;
-          }
       });
       res.status(200).send('Email verification successful! You will now be able to login.');
     }).catch(error => {
