@@ -1,4 +1,10 @@
-// From http://cs52.me/assignments/sa/server-side/
+/*
+ * user.js
+ *
+ * Schema for storing a user's information
+ * May 29 2018
+ * Kooshul Jhaveri
+ */
 
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt-nodejs';
@@ -10,7 +16,8 @@ const UserSchema = new Schema({
   verified: { type: Boolean, default: false },
   verificationId: { type: String },
   profile_url: { type: String, default: 'profile' },
-  coinBalance: { type: Number, default: 0 }
+  coinBalance: { type: Number, default: 0 },
+  onesignalId: { type: String }
 });
 
 UserSchema.set('toJSON', {
@@ -18,7 +25,7 @@ UserSchema.set('toJSON', {
 });
 
 // encrypt passwords before saving – based on http://cs52.me/assignments/hw5p2/
-UserSchema.pre('save', function beforeyYourModelSave(callback) {
+UserSchema.pre('save', function beforeYourModelSave(callback) {
   const user = this;
 
   // don't hash preexisting passwords

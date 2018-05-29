@@ -752,7 +752,7 @@ export const endGame = (req, res) => {
 
 						// add winnings to capcoin blockchain
 						var reqBody = { 'balances': userBalances };
-						var params = { method: 'post', body: reqBody, json: true, url: blockchainNode + '/add' };
+						var params = { method: 'POST', body: reqBody, json: true, url: blockchainNode + '/add' };
 						request.post(params, (error, response, body) => {});
 
 						// manually add winnings for error checking
