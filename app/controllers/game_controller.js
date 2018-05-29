@@ -181,6 +181,10 @@ export const getEntry = (req, res) => {
 		})
 		.then((result) => {
 
+			if (!result) {
+				res.status(422).send('No entry found for this user');
+				return;
+			}
 
 			//get a ticketstring to get current prices for all coins.
 			var choices = result.currentChoices
