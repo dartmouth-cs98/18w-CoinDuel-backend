@@ -29,12 +29,12 @@
     "jwt-simple": "^0.5.1",
     "mailgun-js": "^0.17.0",
     "mongoose": "^5.0.3",
-    "xmlhttprequest": "^1.8.0",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "request": "^2.85.0",
-    "sms-sending": "0.0.5"
+    "request": "^2.87.0",
+    "sms-sending": "0.0.5",
+    "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"
