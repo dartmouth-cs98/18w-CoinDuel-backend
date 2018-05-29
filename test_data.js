@@ -20,7 +20,7 @@ db.users.insertMany([
 //   { _id: new ObjectId("5a99b4944ca7a11092a9e971"), start_date: new Date(1519048800000), finish_date: new Date(1619048800001), "coins": [ {"name":"SFC", "startPrice": null, "endPrice": null}, {"name": "PRE", "startPrice": null, "endPrice": null}, {"name": "POLIS", "startPrice": null, "endPrice": null}, {"name": "WETH", "startPrice": null, "endPrice": null}, {"name": "GLS", "startPrice": null, "endPrice": null} ] } ])
 
   db.games.insertMany([
-    { _id: new ObjectId("5a99b4944ca7a11092a9e971"), start_date: new Date(1519048800000), finish_date: new Date(1619048800001), "coins": [ {"name":"BTC", "startPrice": 100, "endPrice": null}, {"name": "LTC", "startPrice": 100, "endPrice": null}, {"name": "BCH", "startPrice": 100, "endPrice": null}, {"name": "XRP", "startPrice": 100, "endPrice": null}, {"name": "ETH", "startPrice": 100, "endPrice": null} ] } ])
+    { _id: new ObjectId("5a99b4944ca7a11092a9e971"), has_ended: false, start_date: new Date(1519048800000), finish_date: new Date(1519048800001), "coins": [ {"name":"BTC", "startPrice": 100, "endPrice": null}, {"name": "LTC", "startPrice": 100, "endPrice": null}, {"name": "BCH", "startPrice": 100, "endPrice": null}, {"name": "XRP", "startPrice": 100, "endPrice": null}, {"name": "ETH", "startPrice": 100, "endPrice": null} ] } ])
 
 db.entries.insertMany([
   { _id: new ObjectId("5a8ace5a53bb81002573c1f0"), gameId: new ObjectId("5a99b4944ca7a11092a9e971"), userId: new ObjectId("5a8607d6971c50fbf29726a4"), coin_balance: -3.3, currentChoices: [ {"symbol": "SFC", "allocation": 1.0}, {"symbol": "PRE", "allocation": 1.0}, {"symbol": "POLIS", "allocation": 2.0}, {"symbol": "WETH", "allocation": 2.0}, {"symbol": "GLS", "allocation": 4.0} ], last_updated: Date.now() },

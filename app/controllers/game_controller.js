@@ -10,6 +10,7 @@ import User from '../models/user.js';
 import Game from '../models/game.js';
 import Trade from '../models/trade.js';
 import GameEntry from '../models/gameentry.js';
+import request from 'request';
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var xhr = new XMLHttpRequest();
 
@@ -647,6 +648,7 @@ export const createNextGame = (req, res) => {
  */
 export const endGame = (req, res) => {
 	const schedulerTokenHash = req.body.schedulerTokenHash;
+	const blockchainNode = req.app.locals.resources.blockchainNode;
 
 	// compare schedular token hash with stored token
 	var isErr = false;
@@ -657,7 +659,7 @@ export const endGame = (req, res) => {
 		}
 
 		// raise error if no match
-		if (!isMatch) {
+		else if (!isMatch) {
 			res.status(422).send('Invalid token.');
 			isErr = true;
 		}
@@ -688,7 +690,8 @@ export const endGame = (req, res) => {
 			},
 			has_ended: false
 		})
-		.sort('-finish_date').exec((error, result) => {
+		.sort('-finish_date')
+		.exec((error, result) => {
 			if (error || !result || result.length == 0) {
 				res.status(422).send('No game currently available');
 				return;
@@ -736,21 +739,37 @@ export const endGame = (req, res) => {
 
 					// give capcoin winnings back to all users
 					var updateError = 'none';
+					var userBalances = [];
 					GameEntry.find({
 						gameId: game._id
 					}, (entryErr, entryRes) => {
+
+						// collect user end game balances
 						entryRes.forEach(entry => {
 							var winnings = entry.coin_balance > 0 ? entry.coin_balance : 0;
-							User.findOneAndUpdate({ _id: entry.userId }, { $inc: { coinBalance: winnings }}, (winningsErr, winningsRes) => {
-									updateError = winningsErr ? 'unable to update capcoin balance for user \'' + entry.userId + '\'. ERROR: ' + err : 'none';
-							});
+							userBalances.push({ 'user':entry.userId, 'capcoin':winnings });
 						});
-					})
+
+						// add winnings to capcoin blockchain
+						var reqBody = { 'balances': userBalances };
+						var params = { method: 'post', body: reqBody, json: true, url: blockchainNode + '/add' };
+						request.post(params, (error, response, body) => {
+
+							// manually add winings if blockchain error
+							if (error || !response || !response.body || !response.body.success) {
+								userBalances.forEach(balance => {
+									User.findOneAndUpdate({ _id: balance['user'] }, { $inc: { coinBalance: balance['capcoin'] }}, (winningsErr, winningsRes) => {
+										updateError = winningsErr ? 'unable to update capcoin balance for user \'' + balance['user'] + '\'. ERROR: ' + err : 'none';
+									});
+								});
+							} else return;
+						});
+					});
 
 					// send back errors if any
 					if (updateError != 'none') {
 						res.status(500).send(updateError);
-						return
+						return;
 					}
 
 					// we made it
