@@ -753,16 +753,14 @@ export const endGame = (req, res) => {
 						// add winnings to capcoin blockchain
 						var reqBody = { 'balances': userBalances };
 						var params = { method: 'post', body: reqBody, json: true, url: blockchainNode + '/add' };
-						request.post(params, (error, response, body) => {
+						request.post(params, (error, response, body) => {});
 
-							// manually add winings if blockchain error
-							if (error || !response || !response.body || !response.body.success) {
-								userBalances.forEach(balance => {
-									User.findOneAndUpdate({ _id: balance['user'] }, { $inc: { coinBalance: balance['capcoin'] }}, (winningsErr, winningsRes) => {
-										updateError = winningsErr ? 'unable to update capcoin balance for user \'' + balance['user'] + '\'. ERROR: ' + err : 'none';
-									});
-								});
-							} else return;
+						// manually add winnings for error checking
+						userBalances.forEach(balance => {
+							console.log(balance);
+							User.findOneAndUpdate({ _id: balance['user'] }, { $inc: { coinBalance: balance['capcoin'] }}, (winningsErr, winningsRes) => {
+								updateError = winningsErr ? 'unable to update capcoin balance for user \'' + balance['user'] + '\'. ERROR: ' + err : 'none';
+							});
 						});
 					});
 
