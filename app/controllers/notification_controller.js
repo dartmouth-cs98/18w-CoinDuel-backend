@@ -49,7 +49,7 @@ export const preGameNotify = (req, res) => {
   start_date.setMinutes(start_date.getMinutes() + 60);
   Game.find({
     start_date: {
-      $gt: current_date,
+      $lt: current_date,
       $lt: start_date,
     }
   })
@@ -58,7 +58,7 @@ export const preGameNotify = (req, res) => {
     console.log('logging outside');
     console.log(result);
     // if such a game exists, schedule a pre-game notification through OneSignal
-    if (result != null) {
+    if (result) {
       // time_str = (new Date(result.start_date)).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       // message = 'There\'s a new CoinDuel game starting at ' + time_str + ' – get ready to start trading!';
       message = 'There\'s a new CoinDuel game starting – get ready to start trading!';
