@@ -45,19 +45,19 @@ export const preGameNotify = (req, res) => {
 
   // query for a game starting in the next hour
   var current_date = new Date();
-  var start_date = new Date();
-  start_date.setMinutes(start_date.getMinutes() + 60);
+  var start_max = new Date();
+  start_max.setMinutes(start_max.getMinutes() + 60);
   Game.find({
     start_date: {
       $gt: current_date,
-      $lt: start_date
+      $lt: start_max
     }
   })
   .sort('start_date').limit(1)
   .then((result) => {
     // if such a game exists, schedule a pre-game notification through OneSignal
     if (result.length > 0) {
-      start_date = new Date(result[0]['start_date']);  // .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      var start_date = new Date(result[0]['start_date']);
       var hours = start_date.getHours() % 12 || 0;
       var minutes = start_date.getMinutes();
       var padding = minutes < 10 ? '0' : '';
@@ -77,11 +77,12 @@ export const preGameNotify = (req, res) => {
       var notifStr = notifDate.toUTCString().split(' ');
       notifStr = notifStr[2] + ' ' + notifStr[1] + ' ' + notifStr[3] + ' ' + notifStr[4] + ' ' + notifStr[5];
 
+      // schedule for delivery
       preGameNotif.setParameter('send_after', notifStr);
 
       // OneSignal API call to send notification
-      OneSignalClient.sendNotification(preGameNotif, function (err2, httpResponse, data) {
-        if (err2) {
+      OneSignalClient.sendNotification(preGameNotif, function (err, httpResponse, data) {
+        if (err) {
           res.status(422).send('Error sending pre-game notification:', err);
           return;
         } else {
@@ -125,43 +126,49 @@ export const postGameNotify = (req, res) => {
 
   // query for a game ending in the next hour
   var current_date = new Date();
-  var finish_date = new Date();
-  start_date.setMinutes(start_date.getMinutes() + 60);
+  var finish_max = new Date();
+  finish_max.setMinutes(finish_max.getMinutes() + 60);
   Game.find({
     finish_date: {
       $gte: current_date,
-      $lte: finish_date,
+      $lte: finish_max,
     }
   })
   .sort('finish_date')
   .limit(1)
   .then((result) => {
-    // if such a game exists, schedule a pre-game notification through OneSignal
-    if (result) {
-      message = 'A CoinDuel game just ended – come see how you stacked up against the competition!';
-      var preGameNotif = new OneSignal.Notification({ contents: { en: message } });
+    // if such a game exists, schedule a post-game notification through OneSignal
+    if (result.length > 0) {
+      var message = 'A CoinDuel game just ended – come check out how you stacked up against the competition!';
+      var postGameNotif = new OneSignal.Notification({ contents: { en: message } });
 
       // push notification for all users
-      preGameNotif.setIncludedSegments(['All']);
+      postGameNotif.setIncludedSegments(['All']);
 
-      // want to send notification 1 min after game end
-      var notifDate = new Date(result.finish_date);
+      // want to send notification 1 min after game ends
+      var notifDate = new Date(result[0]['finish_date']);
       notifDate.setMinutes(notifDate.getMinutes() + 1);
-      time_str = notifDate.toUTCString().split(' ');
-      time_str = time_str[2] + ' ' + time_str[1] + ' ' + time_str[3] + ' ' + time_str[4] + ' ' + time_str[5];
-      preGameNotif.setParameter('send_after', time_str);
+
+      // format like "Sept 24 2015 14:00:00 GMT-0700"
+      var notifStr = notifDate.toUTCString().split(' ');
+      notifStr = notifStr[2] + ' ' + notifStr[1] + ' ' + notifStr[3] + ' ' + notifStr[4] + ' ' + notifStr[5];
+
+      // schedule for delivery
+      postGameNotif.setParameter('send_after', notifStr);
 
       // OneSignal API call to send notification
-      OneSignalClient.sendNotification(preGameNotif, function (err, httpResponse, data) {
+      OneSignalClient.sendNotification(postGameNotif, function (err, httpResponse, data) {
         if (err) {
           res.status(422).send('Error sending post-game notification:', err);
           return;
         } else {
           console.log('Post-game notification successfully sent;', data, httpResponse.statusCode);
+          res.status(httpResponse.statusCode).send(data);
+          return;
         }
       });
     } else {
-      res.status(204).send('No game finishing soon to send notifications for.');
+      res.status(204).send('No game finishing soon enough to send notifications for.');
       return;
     }
   })
