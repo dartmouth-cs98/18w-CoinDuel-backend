@@ -91,7 +91,20 @@ export const signup = (req, res, next) => {
                   if (oneSignal_error) {
                     console.log("Error registering user on OneSignal – ${" + oneSignal_error + "}");
                   } else {
-                    User.findOneAndUpdate({email: email}, { $set: { oneSignalId: oneSignal_response['id'] } }, (err, doc) => {});
+                    if (oneSignal_response) {
+                      console.log(oneSignal_response);
+                    }
+                    if (oneSignal_body) {
+                      console.log(oneSignal_body);
+                    }
+                    User.findOneAndUpdate({email: email}, { $set: { oneSignalId: oneSignal_response['id'] } }, (err, doc) => {
+                      if (err) {
+                        console.log(err);
+                      }
+                      if (doc) {
+                        console.log(doc);
+                      }
+                    });
                   }
               });
 
