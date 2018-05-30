@@ -68,7 +68,7 @@ export const preGameNotify = (req, res) => {
       preGameNotif.setIncludedSegments(['All']);
 
       // want to send notification 5 min before game start
-      var notifDate = (new Date(result['start_date'])).getTime());
+      var notifDate = new Date(result['start_date']);
       notifDate.setMinutes(notifDate.getMinutes() - 5);
       time_str = notifDate.toUTCString().split(' ');
       time_str = time_str[2] + ' ' + time_str[1] + ' ' + time_str[3] + ' ' + time_str[4] + ' ' + time_str[5];
@@ -141,7 +141,7 @@ export const postGameNotify = (req, res) => {
       preGameNotif.setIncludedSegments(['All']);
 
       // want to send notification 1 min after game end
-      var notifDate = (new Date(result['finish_date']).getTime());
+      var notifDate = new Date(result['finish_date']);
       notifDate.setMinutes(notifDate.getMinutes() + 1);
       time_str = notifDate.toUTCString().split(' ');
       time_str = time_str[2] + ' ' + time_str[1] + ' ' + time_str[3] + ' ' + time_str[4] + ' ' + time_str[5];
