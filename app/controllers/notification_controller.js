@@ -47,6 +47,7 @@ export const preGameNotify = (req, res) => {
   var current_date = new Date();
   var start_date = new Date();
   start_date.setMinutes(start_date.getMinutes() + 60);
+  console.log(current_date, start_date);
   Game.find({
     start_date: {
       $gte: current_date,
