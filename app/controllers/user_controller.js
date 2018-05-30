@@ -83,17 +83,15 @@ export const signup = (req, res, next) => {
           mailgun.messages().send(data, function (error, body) {
             if (!error) {
               console.log("Verification email sent");
+              console.log(process.env.ONESIGNAL_APP_ID);
 
               // register user on OneSignal for push notifications
               var reqBody = { app_id: process.env.ONESIGNAL_APP_ID, device_type: 0, language: 'en',  };
-  						var params = { method: 'POST', body: reqBody, json: true, url: 'https://onesignal.com/api/v1/players' };
+  						var params = { body: reqBody, json: true, url: 'https://onesignal.com/api/v1/players' };
   						request.post(params, (oneSignal_error, oneSignal_response, oneSignal_body) => {
                   if (oneSignal_error) {
                     console.log("Error registering user on OneSignal – ${" + oneSignal_error + "}");
                   } else {
-                    if (oneSignal_response) {
-                      console.log(oneSignal_response);
-                    }
                     if (oneSignal_body) {
                       console.log(oneSignal_body);
                     }
