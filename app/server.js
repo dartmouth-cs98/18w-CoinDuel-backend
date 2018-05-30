@@ -9,6 +9,7 @@ import bodyParser from 'body-parser';
 
 // instantiate app
 const app = express();
+const path = require('path');
 
 // cross origin resource sharing
 app.use(cors());
@@ -20,6 +21,9 @@ app.locals.resources = resources;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: '8mb' }));
 app.use('/api', apiRouter);
+
+// allow static files
+app.use(express.static(path.join(__dirname, 'public')));
 
 // display hello world
 app.get('/', (req, res) => res.send('Hello, cryptocurrency world!'));
