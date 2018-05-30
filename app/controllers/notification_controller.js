@@ -61,6 +61,7 @@ export const preGameNotify = (req, res) => {
       // time_str = (new Date(result.start_date)).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       // message = 'There\'s a new CoinDuel game starting at ' + time_str + ' – get ready to start trading!';
       message = 'There\'s a new CoinDuel game starting – get ready to start trading!';
+      console.log('1');
       var preGameNotif = new OneSignal.Notification({ contents: { en: message } });
 
       // push notification for all users
@@ -72,9 +73,10 @@ export const preGameNotify = (req, res) => {
       // time_str = notifDate.toUTCString().split(' ');
       // time_str = time_str[2] + ' ' + time_str[1] + ' ' + time_str[3] + ' ' + time_str[4] + ' ' + time_str[5];
       // preGameNotif.setParameter('send_after', time_str);
-
+      console.log('2');
       // OneSignal API call to send notification
       OneSignalClient.sendNotification(preGameNotif, function (err, httpResponse, data) {
+        console.log('3');
         if (err) {
           res.status(422).send('Error sending pre-game notification:', err);
           return;
