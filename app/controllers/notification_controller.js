@@ -55,7 +55,7 @@ export const preGameNotify = (req, res) => {
   })
   .sort('start_date').limit(1)
   .then((result) => {
-    console.log('logging outside');
+    console.log('outside');
     console.log(result);
     // if such a game exists, schedule a pre-game notification through OneSignal
     if (result) {
