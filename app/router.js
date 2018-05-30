@@ -6,6 +6,7 @@ import * as Coin from './controllers/coin_controller.js';
 import * as Test from './controllers/test_controller.js';
 import * as Trade from './controllers/trade_controller.js';
 import * as Leaderboard from './controllers/leaderboard_controller.js';
+import * as Notification from './controllers/notification_controller.js';
 
 const router = Router();
 
@@ -77,5 +78,8 @@ router.route('/leaderboard/')
 // in-game trades
 router.route('/trade/:gameId/:userId')
   .post(requireAuth, Trade.submitTrade);
+
+router.post('/notifications/pre', Notification.preGameNotify);
+router.post('/notifications/post', Notification.postGameNotify);
 
 export default router;
