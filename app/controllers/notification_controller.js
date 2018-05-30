@@ -57,13 +57,8 @@ export const preGameNotify = (req, res) => {
   .then((result) => {
     // if such a game exists, schedule a pre-game notification through OneSignal
     if (result) {
-      console.log('a');
-      var time_str = (new Date(result.start_date)).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      var time_str = (new Date(result.start_date))  // .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       console.log(time_str);
-      console.log('x');
-      var time_str2 = result.start_date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-      console.log(time_str2);
-      console.log('z');
       // message = 'There\'s a new CoinDuel game starting at ' + time_str + ' – get ready to start trading!';
       var message = 'There\'s a new CoinDuel game starting – get ready to start trading!';
       var preGameNotif = new OneSignal.Notification({ contents: { en: message } });
