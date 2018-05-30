@@ -51,7 +51,7 @@ export const preGameNotify = (req, res) => {
       $lte: start_date,
     }
   })
-  .sort({'start_date': -1})
+  .sort({start_date: -1})
   .limit(1)
   .then((result) => {
     // if such a game exists, schedule a pre-game notification through OneSignal
@@ -113,7 +113,7 @@ export const postGameNotify = (req, res) => {
       $lte: finish_date,
     }
   })
-  .sort({'finish_date': -1})
+  .sort({finish_date: -1})
   .limit(1)
   .then((result) => {
     // if such a game exists, schedule a post-game notification through OneSignal
