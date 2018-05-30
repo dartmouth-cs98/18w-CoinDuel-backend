@@ -14,10 +14,6 @@ router.get('/', (req, res) => {
   res.send('cryptos always, in all ways');
 });
 
-// for testing
-router.route('/test')
-  .get(requireAuth, Test.test)
-
 // user auth
 router.post('/signup', User.signup);
 router.post('/signin', requireSignin, User.signin);
