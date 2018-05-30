@@ -77,29 +77,16 @@ export const setRankings = (req, res) => {
           for (var coin in prices) {
             var indexOfCoinInEntry = -1
             var x = 0
-            console.log(choices[0])
             choices.forEach(coinChoice => {
-              // console.log(coinChoice)
-              // console.log(coinChoice.symbol + " vs. " + coin)
               if (coinChoice.symbol == coin) {
-                // console.log("Match")
                 indexOfCoinInEntry = x
               }
               x += 1
     				});
 
-            console.log(indexOfCoinInEntry)
   					if (choices[indexOfCoinInEntry].allocation > 0){
   						var oldPrice = choices[indexOfCoinInEntry].price
-
-              console.log(coin)
-
   						var currentPrice = prices[coin]['USD']
-
-
-              console.log("Old price is " + oldPrice)
-              console.log("Current price is " + currentPrice)
-
 
   						var percentChange = 1
   						if (currentPrice == 0){
@@ -115,7 +102,7 @@ export const setRankings = (req, res) => {
   						choices[indexOfCoinInEntry].allocation = (oldAllocation * percentChange)
   					}
   				}
-  				// //update coinBalance
+  				// update coinBalance
   				var newCoinBalance = entry.unallocated_capcoin
   				choices.forEach(choice => {
   					newCoinBalance = newCoinBalance + choice.allocation
@@ -135,20 +122,6 @@ export const setRankings = (req, res) => {
               return;
             }
           });
-          
-          // // add entry to history collection
-          // CapcoinHistory.create({
-          //   gameId: game.gameId,
-          //   userId: entry.userId,
-          //   date: Date.now(),
-          //   balance: coinBalance
-          // }, (updateErr, updateRes) => {
-          //   if (updateErr) {
-          //     updateError = 'Unable to add entry to collection for user \'' + entry.userId + '\'. ERROR: ' + updateErr;
-          //     return;
-          //   }
-          // });
-
         });
         if (updateError != '') res.status(500).send(updateError);
         else res.status(200).send('succesful');
@@ -207,28 +180,16 @@ export const getRankings = (req, res) => {
           for (var coin in prices) {
             var indexOfCoinInEntry = -1
             var x = 0
-            console.log(choices[0])
             choices.forEach(coinChoice => {
-              // console.log(coinChoice)
-              // console.log(coinChoice.symbol + " vs. " + coin)
               if (coinChoice.symbol == coin) {
-                // console.log("Match")
                 indexOfCoinInEntry = x
               }
               x += 1
     				});
 
-            console.log(indexOfCoinInEntry)
   					if (choices[indexOfCoinInEntry].allocation > 0){
   						var oldPrice = choices[indexOfCoinInEntry].price
-
-              console.log(coin)
-
   						var currentPrice = prices[coin]['USD']
-
-
-              console.log("Old price is " + oldPrice)
-              console.log("Current price is " + currentPrice)
 
 
   						var percentChange = 1
@@ -380,29 +341,16 @@ export const getAllTimeRankings = (req, res) => {
               for (var coin in prices) {
                 var indexOfCoinInEntry = -1
                 var x = 0
-                console.log(choices[0])
                 choices.forEach(coinChoice => {
-                  // console.log(coinChoice)
-                  // console.log(coinChoice.symbol + " vs. " + coin)
                   if (coinChoice.symbol == coin) {
-                    // console.log("Match")
                     indexOfCoinInEntry = x
                   }
                   x += 1
         				});
 
-                console.log(indexOfCoinInEntry)
       					if (choices[indexOfCoinInEntry].allocation > 0){
       						var oldPrice = choices[indexOfCoinInEntry].price
-
-                  console.log(coin)
-
       						var currentPrice = prices[coin]['USD']
-
-
-                  console.log("Old price is " + oldPrice)
-                  console.log("Current price is " + currentPrice)
-
 
       						var percentChange = 1
       						if (currentPrice == 0){
