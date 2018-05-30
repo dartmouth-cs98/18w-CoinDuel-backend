@@ -47,18 +47,15 @@ export const preGameNotify = (req, res) => {
   var current_date = new Date();
   var start_date = new Date();
   start_date.setMinutes(start_date.getMinutes() + 60);
-  console.log(current_date);
-  console.log(start_date);
   Game.find({
     start_date: {
-      $gte: current_date,
-      $lte: start_date,
+      $gt: current_date,
+      $lt: start_date,
     }
   })
-  .sort('start_date')
-  .limit(1)
+  .sort('start_date').limit(1)
   .then((result) => {
-    console.log('0');
+    console.log(result);
     // if such a game exists, schedule a pre-game notification through OneSignal
     if (result) {
       // time_str = (new Date(result.start_date)).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
@@ -91,6 +88,7 @@ export const preGameNotify = (req, res) => {
       res.status(204).send('No upcoming game to send notifications for.');
       return;
     }
+    console.log('end');
   })
   .catch((error) => {
     res.status(500).json({ error });
