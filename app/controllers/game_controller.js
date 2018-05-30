@@ -765,11 +765,9 @@ export const endGame = (req, res) => {
 						var reqBody = { 'balances': userBalances };
 						var params = { method: 'POST', body: reqBody, json: true, url: blockchainNode + '/add' };
 						request.post(params, (error, response, body) => {});
-						console.log('*** pushed capcoin winnings to blockchain');
 
 						// manually add winnings for error checking
 						userBalances.forEach(balance => {
-							console.log(balance);
 							User.findOneAndUpdate({ _id: balance['user'] }, { $inc: { coinBalance: balance['capcoin'] }}, (winningsErr, winningsRes) => {
 								updateError = winningsErr ? 'unable to update capcoin balance for user \'' + balance['user'] + '\'. ERROR: ' + err : 'none';
 							});
