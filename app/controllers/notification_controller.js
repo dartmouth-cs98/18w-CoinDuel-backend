@@ -57,21 +57,27 @@ export const preGameNotify = (req, res) => {
   .then((result) => {
     // if such a game exists, schedule a pre-game notification through OneSignal
     if (result.length > 0) {
-      var time_str = new Date(result[0]['start_date']);  // .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-      time_str = time_str.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      start_date = new Date(result[0]['start_date']);  // .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      var hours = start_date.getHours() % 12 || 0;
+      var minutes = start_date.getMinutes();
+      var period = start_date.getHours() < 12 ? 'am' : 'pm';
 
-      var message = 'There\'s a new CoinDuel game starting at ' + time_str + ' – get ready to start trading!';
+      var message = 'There\'s a new CoinDuel game starting at ' + hours + ':' + minutes + period + ' – get ready to start trading!';
       var preGameNotif = new OneSignal.Notification({ contents: { en: message } });
 
       // push notification for all users
       preGameNotif.setIncludedSegments(['All']);
 
       // want to send notification 5 min before game start
-      // var notifDate = new Date(result[0]['start_date']);
-      // notifDate.setMinutes(notifDate.getMinutes() - 5);
-      // time_str = notifDate.toUTCString().split(' ');
-      // time_str = time_str[2] + ' ' + time_str[1] + ' ' + time_str[3] + ' ' + time_str[4] + ' ' + time_str[5];
-      // preGameNotif.setParameter('send_after', time_str);
+      var notifDate = new Date(result[0]['start_date']);
+      notifDate.setMinutes(notifDate.getMinutes() - 5);
+
+      // format like "Sept 24 2015 14:00:00 GMT-0700"
+      var notifStr = notifDate.toUTCString().split(' ');
+      notifStr = notifStr[2] + ' ' + notifStr[1] + ' ' + notifStr[3] + ' ' + notifStr[4] + ' ' + notifStr[5];
+
+      preGameNotif.setParameter('send_after', notifStr);
+
       // OneSignal API call to send notification
       OneSignalClient.sendNotification(preGameNotif, function (err2, httpResponse, data) {
         if (err2) {
@@ -80,13 +86,13 @@ export const preGameNotify = (req, res) => {
         } else {
           console.log('Pre-game notification successfully sent;', data, httpResponse.statusCode);
           res.status(httpResponse.statusCode).send(data);
+          return;
         }
       });
     } else {
       res.status(204).send('No upcoming game to send notifications for.');
       return;
     }
-    console.log('end');
   })
   .catch((error) => {
     res.status(500).json({ error });
