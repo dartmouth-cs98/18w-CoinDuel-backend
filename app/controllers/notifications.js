@@ -13,7 +13,7 @@ import Game from '../models/game.js';
 export const preGameNotifications = (req, res) => {
   const schedulerTokenHash = req.body.schedulerTokenHash;
 
-	// compare schedular token hash with stored token
+	// compare scheduler token hash with stored token
 	var isErr = false;
 	bcrypt.compare(process.env.SCHEDULER_TOKEN, schedulerTokenHash, (err, isMatch) => {
 		if (err) {
@@ -28,21 +28,39 @@ export const preGameNotifications = (req, res) => {
 		}
 	});
 
-	// bail if error was raised
+	// exit if error was raised
 	if (isErr) {
 		return;
 	}
 
+  var current_date = new Date();
+  var start_date = new Date();
+	start_date.setMinutes(start_date.getMinutes() + 15);
+  Game.find({
+			start_date: {
+				$gte: current_date,
+        $lte: start_date,
+			}
+		})
+		.sort('start_date')
+		.limit(1)
+		.then((result) => {
+      if (result) {
 
-
-
-
+      } else {
+        res.status(204).send('No game to send notifications for.');
+        return;
+      }
+		})
+		.catch((error) => {
+			res.status(500).json({ error });
+		});
 };
 
 export const postGameNotifications = (req, res) => {
   const schedulerTokenHash = req.body.schedulerTokenHash;
 
-	// compare schedular token hash with stored token
+	// compare scheduler token hash with stored token
 	var isErr = false;
 	bcrypt.compare(process.env.SCHEDULER_TOKEN, schedulerTokenHash, (err, isMatch) => {
 		if (err) {
@@ -57,7 +75,7 @@ export const postGameNotifications = (req, res) => {
 		}
 	});
 
-	// bail if error was raised
+	// exit if error was raised
 	if (isErr) {
 		return;
 	}
