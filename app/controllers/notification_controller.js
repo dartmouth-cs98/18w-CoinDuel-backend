@@ -59,7 +59,7 @@ export const preGameNotify = (req, res) => {
     // if such a game exists, schedule a pre-game notification through OneSignal
     if (result) {
       console.log(result);
-      console.log(result.start_date.toJSON());
+      console.log(result.start_date.toString());
       console.log('got here');
       time_str = (new Date(result.start_date)).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       console.log(time_str);
