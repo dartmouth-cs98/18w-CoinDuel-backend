@@ -50,7 +50,7 @@ export const preGameNotify = (req, res) => {
   Game.find({
     start_date: {
       $gt: current_date,
-      $lt: start_date,
+      $lt: start_date
     }
   })
   .sort('start_date').limit(1)
@@ -58,8 +58,8 @@ export const preGameNotify = (req, res) => {
     // if such a game exists, schedule a pre-game notification through OneSignal
     if (result) {
       console.log(result.length);
-      console.log(typeof result.start_date);
-      var time_str = new Date(result.start_date);  // .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      console.log(typeof result['start_date']);
+      var time_str = new Date(result['start_date']);  // .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       console.log(time_str);
       // message = 'There\'s a new CoinDuel game starting at ' + time_str + ' – get ready to start trading!';
       var message = 'There\'s a new CoinDuel game starting – get ready to start trading!';
