@@ -55,16 +55,13 @@ export const preGameNotify = (req, res) => {
   })
   .sort('start_date').limit(1)
   .then((result) => {
-    console.log(result != []);
     // if such a game exists, schedule a pre-game notification through OneSignal
-    if (result != []) {
-      console.log('1');
+    if (result) {
       // time_str = (new Date(result.start_date)).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       // message = 'There\'s a new CoinDuel game starting at ' + time_str + ' – get ready to start trading!';
       var message = 'There\'s a new CoinDuel game starting – get ready to start trading!';
-      console.log('2');
       var preGameNotif = new OneSignal.Notification({ contents: { en: message } });
-      console.log('3');
+
       // push notification for all users
       preGameNotif.setIncludedSegments(['All']);
 
@@ -74,15 +71,14 @@ export const preGameNotify = (req, res) => {
       // time_str = notifDate.toUTCString().split(' ');
       // time_str = time_str[2] + ' ' + time_str[1] + ' ' + time_str[3] + ' ' + time_str[4] + ' ' + time_str[5];
       // preGameNotif.setParameter('send_after', time_str);
-      console.log('4');
       // OneSignal API call to send notification
       OneSignalClient.sendNotification(preGameNotif, function (err2, httpResponse, data) {
-        console.log('5');
         if (err2) {
           res.status(422).send('Error sending pre-game notification:', err);
           return;
         } else {
           console.log('Pre-game notification successfully sent;', data, httpResponse.statusCode);
+          res.status(httpResponse.statusCode).send(data);
         }
       });
     } else {
