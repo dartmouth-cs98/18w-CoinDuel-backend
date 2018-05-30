@@ -184,9 +184,7 @@ export const verifyUser = (req, res) => {
           return;
         }
       });
-      console.log(__dirname);
-      console.log(path.join(__dirname, '../public'));
-      res.status(200).sendFile('verified.html',  {'root': path.join(__dirname, '../public')});
+      res.status(200).send(req.app.locals.resources.verified_email));
     }).catch(error => {
       res.status(400).send('Email verification failed.');
     });

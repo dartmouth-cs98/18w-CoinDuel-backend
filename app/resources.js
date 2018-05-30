@@ -28,5 +28,7 @@ resources['mailgun_email1'] = `<!DOCTYPE html><html><head> <meta name="viewport"
 resources['mailgun_email2'] = `,</p><p>Thank you for signing up for CoinDuel! To get started, please verify your email using the link below:<br></p><p><a class='button' href='https://coinduel-cs98.herokuapp.com/api/verify/`
 resources['mailgun_email3'] = `'>Verify email address</a></p><p>See you on the app!<br>CoinDuel Team</p><img src='http://oi66.tinypic.com/1iz6lf.jpg' width='120' height='84' /></body></html>`
 
+resources['verified_email'] = `<!DOCTYPE html><html> <head> <meta name="viewport" content="width=device-width"/> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <title>CoinDuel – Verify Your Email</title> <style>body{font-family: Verdana, Geneva, sans-serif;}div{text-align: center;}</style> </head> <body> <div> <br/><img src='http://oi66.tinypic.com/1iz6lf.jpg' width='200' height='140'/> <h1>Email verification successful!</h1> <p>Your account is now verified. Go back to the CoinDuel app and login!</p></div></body></html>`
+
 // export all resources
 export default resources;
