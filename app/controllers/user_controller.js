@@ -184,7 +184,7 @@ export const verifyUser = (req, res) => {
           return;
         }
       });
-      res.status(200).send(req.app.locals.resources.verified_email));
+      res.status(200).send(req.app.locals.resources.verified_email);
     }).catch(error => {
       res.status(400).send('Email verification failed.');
     });
