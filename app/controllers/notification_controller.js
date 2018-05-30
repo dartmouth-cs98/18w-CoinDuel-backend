@@ -60,9 +60,10 @@ export const preGameNotify = (req, res) => {
       start_date = new Date(result[0]['start_date']);  // .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       var hours = start_date.getHours() % 12 || 0;
       var minutes = start_date.getMinutes();
+      var padding = minutes < 10 ? '0' : '';
       var period = start_date.getHours() < 12 ? 'am' : 'pm';
 
-      var message = 'There\'s a new CoinDuel game starting at ' + hours + ':' + minutes + period + ' – get ready to start trading!';
+      var message = 'There\'s a new CoinDuel game starting at ' + hours + ':' + padding + minutes + period + ' – get ready to start trading!';
       var preGameNotif = new OneSignal.Notification({ contents: { en: message } });
 
       // push notification for all users
