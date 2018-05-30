@@ -61,7 +61,7 @@ export const preGameNotify = (req, res) => {
       console.log('1');
       // time_str = (new Date(result.start_date)).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       // message = 'There\'s a new CoinDuel game starting at ' + time_str + ' – get ready to start trading!';
-      message = 'There\'s a new CoinDuel game starting – get ready to start trading!';
+      var message = 'There\'s a new CoinDuel game starting – get ready to start trading!';
       console.log('2');
       var preGameNotif = new OneSignal.Notification({ contents: { en: message } });
       console.log('3');
