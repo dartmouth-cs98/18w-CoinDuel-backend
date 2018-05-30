@@ -46,10 +46,10 @@ export const preGameNotify = (req, res) => {
   // query for a game starting in the next hour
   var current_date = new Date();
   var start_date = new Date();
-  start_date.setMinutes(start_date.getMinutes() + 60);
+  start_date.setMinutes(start_date.getMinutes() + 0);
   Game.find({
     start_date: {
-      $lt: current_date,
+      $gt: current_date,
       $lt: start_date,
     }
   })
