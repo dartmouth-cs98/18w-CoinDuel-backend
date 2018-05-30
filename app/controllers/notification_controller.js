@@ -56,7 +56,7 @@ export const preGameNotify = (req, res) => {
   .then((result) => {
     // if such a game exists, schedule a pre-game notification through OneSignal
     if (result.length > 0) {
-      var message = 'There\'s a new CoinDuel game starting NOW – open the app & start trading!';
+      var message = 'There\'s a new CoinDuel game starting NOW. Open the app & start trading!';
       var preGameNotif = new OneSignal.Notification({ contents: { en: message } });
 
       // push notification for all users
