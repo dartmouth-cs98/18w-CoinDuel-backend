@@ -126,7 +126,8 @@ export const setRankings = (req, res) => {
           // update entry with new balance
           entry.update({
             $set: {
-              coin_balance: coinBalance
+              coin_balance: coinBalance,
+              currentChoices: choices
             }
           }, (updateErr, updateRes) => {
             if (updateErr) {
@@ -134,19 +135,20 @@ export const setRankings = (req, res) => {
               return;
             }
           });
+          
+          // // add entry to history collection
+          // CapcoinHistory.create({
+          //   gameId: game.gameId,
+          //   userId: entry.userId,
+          //   date: Date.now(),
+          //   balance: coinBalance
+          // }, (updateErr, updateRes) => {
+          //   if (updateErr) {
+          //     updateError = 'Unable to add entry to collection for user \'' + entry.userId + '\'. ERROR: ' + updateErr;
+          //     return;
+          //   }
+          // });
 
-          // add entry to history collection
-          CapcoinHistory.create({
-            gameId: game.gameId,
-            userId: entry.userId,
-            date: Date.now(),
-            balance: coinBalance
-          }, (updateErr, updateRes) => {
-            if (updateErr) {
-              updateError = 'Unable to add entry to collection for user \'' + entry.userId + '\'. ERROR: ' + updateErr;
-              return;
-            }
-          });
         });
         if (updateError != '') res.status(500).send(updateError);
         else res.status(200).send('succesful');

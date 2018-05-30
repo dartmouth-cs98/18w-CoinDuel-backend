@@ -276,7 +276,8 @@ export const createAndUpdateEntry = (req, res) => {
 		userId: req.params.userId
 	}, (error, result) => {
 		var choices = req.body.choices
-		// console.log(choices)
+		console.log("choices from frontend!!!")
+		console.log(choices)
 
 		// entry does not already exist
 		if (error || !result || result.length == 0) {
@@ -457,6 +458,12 @@ export const createAndUpdateEntry = (req, res) => {
 							//SELL ORDER
 							if (oldChoice.allocation > newChoice.allocation){
 								var diffCC = oldChoice.allocation - newChoice.allocation
+
+								if (diffCC < 0){
+									console.log('insufficient funds, not enough unallocated CC left')
+									res.status(422).send('insufficient funds, not enough unallocated CC left to sell' );
+									noFunds = 1
+								}
 								// var percentChange = 1 - (((currentPrice - oldPrice)/(oldPrice)) * -1)
 								// updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
 								newChoice.allocation = (oldChoice.allocation) - diffCC
@@ -761,7 +768,6 @@ export const endGame = (req, res) => {
 
 						// manually add winnings for error checking
 						userBalances.forEach(balance => {
-							console.log(balance);
 							User.findOneAndUpdate({ _id: balance['user'] }, { $inc: { coinBalance: balance['capcoin'] }}, (winningsErr, winningsRes) => {
 								updateError = winningsErr ? 'unable to update capcoin balance for user \'' + balance['user'] + '\'. ERROR: ' + err : 'none';
 							});

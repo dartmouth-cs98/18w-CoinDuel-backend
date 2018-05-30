@@ -83,6 +83,7 @@ export const signup = (req, res, next) => {
           mailgun.messages().send(data, function (error, body) {
             if (!error) {
               console.log("Verification email sent");
+              console.log(process.env.ONESIGNAL_APP_ID);
 
               // register user on OneSignal for push notifications
               var reqBody = { app_id: process.env.ONESIGNAL_APP_ID, device_type: 0, language: 'en',  };
