@@ -9,6 +9,7 @@
 import User from '../models/user.js';
 import Game from '../models/game.js';
 import dotenv from 'dotenv';
+import bcrypt from 'bcrypt-nodejs';
 
 dotenv.config({ silent: true });
 
