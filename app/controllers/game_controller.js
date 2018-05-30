@@ -754,6 +754,7 @@ export const endGame = (req, res) => {
 						var reqBody = { 'balances': userBalances };
 						var params = { method: 'post', body: reqBody, json: true, url: blockchainNode + '/add' };
 						request.post(params, (error, response, body) => {});
+						console.log('*** pushed capcoin winnings to blockchain');
 
 						// manually add winnings for error checking
 						userBalances.forEach(balance => {
