@@ -18,7 +18,7 @@ const UserSchema = new Schema({
   profile_url: { type: String, default: 'profile' },
   coinBalance: { type: Number, default: 0 },
   oneSignalId: { type: String },
-  lastGameId : {type: String}
+  lastGameId : {type: String, default: ' '}
 });
 
 UserSchema.set('toJSON', {
