@@ -67,6 +67,7 @@ export const signup = (req, res, next) => {
         newUser.coinBalance = 30;
         newUser.verified = false;
         newUser.verificationId = uuidv4();
+        newUser.lastGameId = ""
 
         // proceed with verification email
         newUser.save()
@@ -173,6 +174,43 @@ export const deleteUser = (req, res) => {
       });
     });
 };
+
+export const updateGameId = (req, res) => {
+  console.log(req.params.userId)
+  console.log(req.params.gameId)
+
+  User.findOneAndUpdate(
+    { _id: req.params.userId },
+    { $set: {lastGameId: req.params.gameId} },
+    { new: true }, (updateErr, updateResult) => {
+      if (updateErr || !updateResult) {
+        console.log("ERRRROROROROROROR")
+        res.status(400).send('Error updating gameID');
+        return;
+      } else {
+        console.log("SUCUCUCUCUUEEEESSSSS")
+        res.status(200).send(updateResult);
+        return;
+      }
+    });
+
+  // User.findOne({ _id: req.params.userId })
+  //   .then((result) => {
+  //     console.log(result)
+  //     result.update({ $set: { lastGameId: req.params.gameId } }, (updateErr, updateRes) => {
+  //       if (updateErr || !updateRes) {
+  //         res.status(400).send('Error updating gameID');
+  //         return;
+  //       } else {
+  //         res.status(200).send(updateRes);
+  //         return;
+  //       }
+  //     });
+  //   }).catch(error => {
+  //     res.status(400).send('Error updating gameID');
+  //   });
+
+}
 
 // verify a user
 export const verifyUser = (req, res) => {
