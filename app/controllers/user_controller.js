@@ -67,6 +67,7 @@ export const signup = (req, res, next) => {
         newUser.coinBalance = 30;
         newUser.verified = false;
         newUser.verificationId = uuidv4();
+        newUser.
 
         // proceed with verification email
         newUser.save()
@@ -175,8 +176,9 @@ export const deleteUser = (req, res) => {
 };
 
 export const updateGameId = (req, res) => {
-  User.findOne({ "username": req.params.username })
+  User.findOne({ _id: req.params.userId })
     .then((result) => {
+      console.log(req.params.gameId)
       result.update({ $set: { gameId: req.params.gameId } }, (updateErr, updateRes) => {
         if (updateErr || !updateRes) {
           res.status(400).send('Error updating users last game id.');

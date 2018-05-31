@@ -456,7 +456,7 @@ export const createAndUpdateEntry = (req, res) => {
 								}
 							}
 							//SELL ORDER
-							else if (oldChoice.allocation > newChoice.allocation){
+							if (oldChoice.allocation > newChoice.allocation){
 								var diffCC = oldChoice.allocation - newChoice.allocation
 
 								if (diffCC < 0){
