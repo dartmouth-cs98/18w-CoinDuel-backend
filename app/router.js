@@ -23,6 +23,9 @@ router.route('/user')
   .post(User.findUser)
   .delete(User.deleteUser);
 
+router.route('/user/:gameId/:username')
+  .get(User.updateGameId)
+
 // user verification
 router.route('/verify/:verificationId')
   .get(User.verifyUser);

@@ -174,6 +174,22 @@ export const deleteUser = (req, res) => {
     });
 };
 
+export const updateGameId = (req, res) => {
+  User.findOne({ "username": req.params.username })
+    .then((result) => {
+      result.update({ $set: { gameId: req.params.gameId } }, (updateErr, updateRes) => {
+        if (updateErr || !updateRes) {
+          res.status(400).send('Error updating users last game id.');
+          return;
+        } else{
+            res.status(200).send(updateRes);
+        }
+      });
+    }).catch(error => {
+      res.status(400).send('Update User failed.');
+    });
+}
+
 // verify a user
 export const verifyUser = (req, res) => {
   User.findOne({ verificationId: req.params.verificationId })
