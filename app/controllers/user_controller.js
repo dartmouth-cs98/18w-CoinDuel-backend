@@ -67,7 +67,7 @@ export const signup = (req, res, next) => {
         newUser.coinBalance = 30;
         newUser.verified = false;
         newUser.verificationId = uuidv4();
-        newUser.
+        newUser.lastGameId = ""
 
         // proceed with verification email
         newUser.save()
@@ -176,20 +176,28 @@ export const deleteUser = (req, res) => {
 };
 
 export const updateGameId = (req, res) => {
-  User.findOne({ _id: req.params.userId })
-    .then((result) => {
-      console.log(req.params.gameId)
-      result.update({ $set: { gameId: req.params.gameId } }, (updateErr, updateRes) => {
-        if (updateErr || !updateRes) {
-          res.status(400).send('Error updating users last game id.');
-          return;
-        } else{
-            res.status(200).send(updateRes);
-        }
-      });
-    }).catch(error => {
-      res.status(400).send('Update User failed.');
-    });
+
+  GameEntry.findOneAndUpdate({
+			 _id: req.params.userId
+		}, {
+			$set: {
+				lastGameId: req.params.gameId
+			}
+		}, {
+			upsert: true,
+			new: true,
+			setDefaultsOnInsert: true
+		})
+		.then((result) => {
+			if (result) {
+				res.status(200).send(result);
+			} else {
+				res.send(422, 'Unsuccessful create/update');
+			}
+		})
+		.catch((error) => {
+			res.send(422, 'Unsuccessful create/update');
+		});
 }
 
 // verify a user
