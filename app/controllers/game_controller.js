@@ -579,13 +579,13 @@ export const createNextGame = (req, res) => {
 	// 	return;
 	// }
 
-	// start datetime in 30 mins
+	// start datetime in 12 hours
 	var startDate = new Date();
-	startDate.setMinutes(startDate.getMinutes() + 30);
+	startDate.setHours(startDate.getHours() + 12);
 
-	// end datetime in 90 mins
+	// end datetime in 24 hours
 	var endDate = new Date();
-	endDate.setMinutes(endDate.getMinutes() + 90);
+	endDate.setHours(endDate.getHours() + 24);
 
 	// contact CoinMarketCap for top 50 coins by market cap
 	var flags = {};
