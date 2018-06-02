@@ -442,6 +442,7 @@ export const createAndUpdateEntry = (req, res) => {
 						if (oldChoice.symbol == newChoice.symbol){
 							//BUY ORDER
 							if (oldChoice.allocation < newChoice.allocation){
+								console.log("new more than old")
 								var diffCC = newChoice.allocation - oldChoice.allocation
 								if (diffCC > updatedALlocatedCoin) {
 									console.log('insufficient funds, not enough unallocated CC left')
@@ -456,6 +457,7 @@ export const createAndUpdateEntry = (req, res) => {
 							}
 							//SELL ORDER
 							else if (oldChoice.allocation > newChoice.allocation){
+								console.log("new less than old")
 								var diffCC = oldChoice.allocation - newChoice.allocation
 
 								if (diffCC < 0){
