@@ -443,6 +443,9 @@ export const createAndUpdateEntry = (req, res) => {
 							//BUY ORDER
 							if (oldChoice.allocation < newChoice.allocation){
 								console.log("new more than old")
+								console.log(oldChoice.allocation)
+								console.log(newChoice.allocation)
+								console.log(oldChoice.symbol)
 								var diffCC = newChoice.allocation - oldChoice.allocation
 								if (diffCC > updatedALlocatedCoin) {
 									console.log('insufficient funds, not enough unallocated CC left')
