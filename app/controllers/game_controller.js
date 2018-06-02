@@ -579,9 +579,9 @@ export const createNextGame = (req, res) => {
 	// 	return;
 	// }
 
-	// start datetime in 12 hours
+	// start datetime in 1 hour
 	var startDate = new Date();
-	startDate.setHours(startDate.getHours() + 12);
+	startDate.setHours(startDate.getHours() + 1);
 
 	// end datetime in 24 hours
 	var endDate = new Date();
