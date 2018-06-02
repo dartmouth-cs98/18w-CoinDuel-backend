@@ -456,6 +456,8 @@ export const createAndUpdateEntry = (req, res) => {
 					});
 				});
 
+				console.log("residuals")
+				console.log(residualFundsToAdd)
 
 				// var updatedCoinBalance = result[0].coin_balance
 				var updatedALlocatedCoin = result[0].unallocated_capcoin + residualFundsToAdd
@@ -463,12 +465,12 @@ export const createAndUpdateEntry = (req, res) => {
 					newChoices.forEach(newChoice => {
 
 						if (oldChoice.symbol == newChoice.symbol){
-							// console.log("old alc and price, new alc and price, symbol")
-							// console.log(oldChoice.allocation)
-							// console.log(oldChoice.price)
-							// console.log(newChoice.allocation)
-							// console.log(newChoice.price)
-							// console.log(oldChoice.symbol)
+							console.log("old alc and price, new alc and price, symbol")
+							console.log(oldChoice.allocation)
+							console.log(oldChoice.price)
+							console.log(newChoice.allocation)
+							console.log(newChoice.price)
+							console.log(oldChoice.symbol)
 
 
 
