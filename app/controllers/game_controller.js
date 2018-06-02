@@ -441,9 +441,11 @@ export const createAndUpdateEntry = (req, res) => {
 					newChoices.forEach(newChoice => {
 
 						if (oldChoice.symbol == newChoice.symbol){
-							console.log("old alc, new alc, symbol")
+							console.log("old alc and price, new alc and price, symbol")
 							console.log(oldChoice.allocation)
+							console.log(oldChoice.price)
 							console.log(newChoice.allocation)
+							console.log(newChoice.price)
 							console.log(oldChoice.symbol)
 							//BUY ORDER
 							if (oldChoice.allocation < newChoice.allocation){
