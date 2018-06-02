@@ -581,11 +581,17 @@ export const createNextGame = (req, res) => {
 
 	// start datetime in 1 hour
 	var startDate = new Date();
+	startDate.setMinutes(0);
+	startDate.setSeconds(0);
+	startDate.setMilliseconds(0);
 	startDate.setHours(startDate.getHours() + 1);
 
 	// end datetime in 24 hours
 	var endDate = new Date();
-	endDate.setHours(endDate.getHours() + 24);
+	endDate.setMinutes(0);
+	endDate.setSeconds(0);
+	endDate.setMilliseconds(0);
+	endDate.setDate(endDate.getDate() + 1);
 
 	// contact CoinMarketCap for top 50 coins by market cap
 	var flags = {};
