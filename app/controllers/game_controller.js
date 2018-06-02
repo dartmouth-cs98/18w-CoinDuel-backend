@@ -447,7 +447,7 @@ export const createAndUpdateEntry = (req, res) => {
 				oldChoices.forEach(oldChoice => {
 					newChoices.forEach(newChoice => {
 						if (oldChoice.symbol == newChoice.symbol){
-							if (oldChoice.allocation < 0.005 && newChoice.allocation < 0.005){
+							if (oldChoice.allocation < 0.05 && newChoice.allocation < 0.05){
 								oldChoice.allocation = 0
 								residualFundsToAdd = residualFundsToAdd + parseFloat(newChoice.allocation)
 								newChoice.allocation = 0
