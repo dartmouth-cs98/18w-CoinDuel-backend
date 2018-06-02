@@ -449,7 +449,7 @@ export const createAndUpdateEntry = (req, res) => {
 						if (oldChoice.symbol == newChoice.symbol){
 							if (oldChoice.allocation < 0.005 && newChoice.allocation < 0.005){
 								oldChoice.allocation = 0
-								residualFundsToAdd = residualFundsToAdd + newChoice.allocation
+								residualFundsToAdd = residualFundsToAdd + parseFloat(newChoice.allocation)
 								newChoice.allocation = 0
 							}
 						}
@@ -492,7 +492,8 @@ export const createAndUpdateEntry = (req, res) => {
 							//SELL ORDER
 							else if (oldChoice.allocation > newChoice.allocation){
 								var diffCC = oldChoice.allocation - newChoice.allocation
-
+								console.log("Sell order")
+								console.log(diffCC)
 								if (diffCC < 0){
 									console.log('insufficient funds, not enough unallocated CC left')
 									res.status(422).send('insufficient funds, not enough unallocated CC left to sell' );
