@@ -447,7 +447,6 @@ export const createAndUpdateEntry = (req, res) => {
 									console.log('insufficient funds, not enough unallocated CC left')
 									res.status(422).send('insufficient funds, not enough unallocated CC left');
 									noFunds = 1
-									return;
 								} else{
 									// var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
 									// updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
