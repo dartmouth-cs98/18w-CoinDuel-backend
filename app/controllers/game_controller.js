@@ -439,7 +439,12 @@ export const createAndUpdateEntry = (req, res) => {
 				var updatedALlocatedCoin = result[0].unallocated_capcoin
 				oldChoices.forEach(oldChoice => {
 					newChoices.forEach(newChoice => {
+
 						if (oldChoice.symbol == newChoice.symbol){
+							console.log("old alc, new alc, symbol")
+							console.log(oldChoice.allocation)
+							console.log(newChoice.allocation)
+							console.log(oldChoice.symbol)
 							//BUY ORDER
 							if (oldChoice.allocation < newChoice.allocation){
 								var diffCC = newChoice.allocation - oldChoice.allocation
