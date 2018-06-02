@@ -392,136 +392,212 @@ export const createAndUpdateEntry = (req, res) => {
 
 		// update existing entry
 	} else {
-			var newChoices = req.body.choices
-			var unallocatedCapCoinLeft = result[0].unallocated_capcoin
-			// ensure below 10 capcoin limit
-			var totalCapcoin = 0;
-			newChoices.forEach(choice => totalCapcoin += parseFloat(choice.allocation));
 
+
+			//get a ticketstring to get current prices for all coins.
+			var choices = result.currentChoices
 			var tickerString = "";
-			for (var i = 0; i < newChoices.length; i++) {
-				if (i != newChoices.length - 1) {
-					tickerString = tickerString.concat(newChoices[i].symbol, ",");
+			for (var i = 0; i < choices.length; i++) {
+				if (i != choices.length - 1) {
+					tickerString = tickerString.concat(choices[i].symbol, ",");
 				} else {
-					tickerString = tickerString.concat(newChoices[i].symbol);
+					tickerString = tickerString.concat(choices[i].symbol);
 				}
 			}
 			// console.log(tickerString);
 
-			if (totalCapcoin > result.unallocated_capcoin) {
-				res.status(200).json({
-					'error': 'over capcoin limit for game, i.e. exceeds available unallocated capcoin limit'
-				});
-				return;
-			}
-
+			// get current prices of coins
 			getJSON('https://min-api.cryptocompare.com/data/pricemulti?fsyms=' + tickerString + '&tsyms=USD', (subErr, prices) => {
 				if (subErr || !prices) {
 					res.status(422).send('Unable to retrieve price - please check https://min-api.cryptocompare.com. Error: ' + subErr);
 					return;
 				}
+
 				var count = 0
 				// console.log(prices)
 				for (var coin in prices) {
-					if (newChoices[count].allocation > 0){
-						// console.log('allocation > 0');
-						newChoices[count].price = prices[coin]['USD']
+					if (choices[count].allocation > 0){
+
+						var oldPrice = choices[count].price
+						var currentPrice = prices[coin]['USD']
+
+
+						var percentChange = 1
+						if (currentPrice == 0){
+							percentChange = 0
+						} else if (currentPrice > oldPrice){
+							percentChange = (1 + ((currentPrice - oldPrice)/(oldPrice)))
+						} else if (currentPrice < oldPrice){
+							percentChange = 1 - (((currentPrice - oldPrice)/(oldPrice)) * -1)
+						}
+
+						var oldAllocation = choices[count].allocation
+						choices[count].price = currentPrice
+						choices[count].allocation = (oldAllocation * percentChange)
 					}
 					count = count + 1
 				}
-
-				//choices now contains the updated prices and allocations for any choices any trades made
-				//update the coinballance and unallocated balance appropriaey.
-
-				var oldChoices = result[0].currentChoices
-				var noFunds = 0;
-				// var updatedCoinBalance = result[0].coin_balance
-				var updatedALlocatedCoin = result[0].unallocated_capcoin
-				oldChoices.forEach(oldChoice => {
-					newChoices.forEach(newChoice => {
-						if (oldChoice.symbol == newChoice.symbol){
-							//BUY ORDER
-							if (oldChoice.allocation < newChoice.allocation){
-								console.log("new more than old")
-								console.log(oldChoice.allocation)
-								console.log(newChoice.allocation)
-								console.log(oldChoice.symbol)
-								var diffCC = newChoice.allocation - oldChoice.allocation
-								if (diffCC > updatedALlocatedCoin) {
-									console.log('insufficient funds, not enough unallocated CC left')
-									res.status(422).send('insufficient funds, not enough unallocated CC left');
-									noFunds = 1
-								} else{
-									// var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
-									// updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
-									newChoice.allocation = (oldChoice.allocation) + diffCC
-									updatedALlocatedCoin = updatedALlocatedCoin - diffCC
-								}
-							}
-							//SELL ORDER
-							else if (oldChoice.allocation > newChoice.allocation){
-								console.log("new less than old")
-								var diffCC = oldChoice.allocation - newChoice.allocation
-
-								if (diffCC < 0){
-									console.log('insufficient funds, not enough unallocated CC left')
-									res.status(422).send('insufficient funds, not enough unallocated CC left to sell' );
-									noFunds = 1
-								}
-								// var percentChange = 1 - (((currentPrice - oldPrice)/(oldPrice)) * -1)
-								// updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
-								newChoice.allocation = (oldChoice.allocation) - diffCC
-								updatedALlocatedCoin = updatedALlocatedCoin + (diffCC)
-							}
-						}
-					});
+				// //update coinBalance
+				var newCoinBalance = result.unallocated_capcoin
+				choices.forEach(choice => {
+					newCoinBalance = newCoinBalance + choice.allocation
 				});
 
-				//only update entry if we had the funds
-				if (noFunds == 0){
-					GameEntry.findOneAndUpdate({
+				// update entry
+				GameEntry.findOneAndUpdate({
+					gameId: req.params.gameId,
+					userId: req.params.userId
+				}, {
+					$set: {
 						gameId: req.params.gameId,
-						userId: req.params.userId
-					}, {
-						$set: {
-							gameId: req.params.gameId,
-							userId: req.params.userId,
-							currentChoices: newChoices,
-							unallocated_capcoin: updatedALlocatedCoin,
-							last_updated: Date.now()
+						userId: req.params.userId,
+						coin_balance: newCoinBalance,
+						currentChoices: choices,
+						last_updated: Date.now()
+					}
+				}, {
+					upsert: true,
+					new: true,
+					setDefaultsOnInsert: true
+				}, (newError, newResult) => {
+					if (newError || !newResult) {
+						res.status(500).send('unable to create game entry');
+						return;
+					} else {
+						// res.json(result);
+						var newChoices = req.body.choices
+						var unallocatedCapCoinLeft = result[0].unallocated_capcoin
+						// ensure below 10 capcoin limit
+						var totalCapcoin = 0;
+						newChoices.forEach(choice => totalCapcoin += parseFloat(choice.allocation));
+
+						var tickerString = "";
+						for (var i = 0; i < newChoices.length; i++) {
+							if (i != newChoices.length - 1) {
+								tickerString = tickerString.concat(newChoices[i].symbol, ",");
+							} else {
+								tickerString = tickerString.concat(newChoices[i].symbol);
+							}
 						}
-					}, {
-						upsert: true,
-						new: true,
-						setDefaultsOnInsert: true
-					}, (upError, upResult) => {
-						if (upError || !upResult) {
-							console.log("here")
-							res.status(500).send('unable to update game entry');
-							return;
+						// console.log(tickerString);
 
-						// update initial trade for user
-						} else {
-							Trade.findOneAndUpdate({
-								gameId: req.params.gameId,
-								userId: req.params.userId
-							}, {
-								$set: {
-									choices: newChoices
-								}
-							}, (tradeError, tradeResult) => {
-								if (tradeError || !tradeResult) {
-									console.log("asdfasdf")
-									res.status(500).send('unable to update initial trade');
-									return;
-								}
-
-								// we made it
-								res.status(200).send(upResult);
+						if (totalCapcoin > result.unallocated_capcoin) {
+							res.status(200).json({
+								'error': 'over capcoin limit for game, i.e. exceeds available unallocated capcoin limit'
 							});
+							return;
 						}
-					});
-				}
+
+						getJSON('https://min-api.cryptocompare.com/data/pricemulti?fsyms=' + tickerString + '&tsyms=USD', (subErr, prices) => {
+							if (subErr || !prices) {
+								res.status(422).send('Unable to retrieve price - please check https://min-api.cryptocompare.com. Error: ' + subErr);
+								return;
+							}
+							var count = 0
+							// console.log(prices)
+							for (var coin in prices) {
+								if (newChoices[count].allocation > 0){
+									// console.log('allocation > 0');
+									newChoices[count].price = prices[coin]['USD']
+								}
+								count = count + 1
+							}
+
+							//choices now contains the updated prices and allocations for any choices any trades made
+							//update the coinballance and unallocated balance appropriaey.
+
+							var oldChoices = result[0].currentChoices
+							var noFunds = 0;
+							// var updatedCoinBalance = result[0].coin_balance
+							var updatedALlocatedCoin = result[0].unallocated_capcoin
+							oldChoices.forEach(oldChoice => {
+								newChoices.forEach(newChoice => {
+									if (oldChoice.symbol == newChoice.symbol){
+										//BUY ORDER
+										if (oldChoice.allocation < newChoice.allocation){
+											console.log("new more than old")
+											console.log(oldChoice.allocation)
+											console.log(newChoice.allocation)
+											console.log(oldChoice.symbol)
+											var diffCC = newChoice.allocation - oldChoice.allocation
+											if (diffCC > updatedALlocatedCoin) {
+												console.log('insufficient funds, not enough unallocated CC left')
+												res.status(422).send('insufficient funds, not enough unallocated CC left');
+												noFunds = 1
+											} else{
+												// var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
+												// updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
+												newChoice.allocation = (oldChoice.allocation) + diffCC
+												updatedALlocatedCoin = updatedALlocatedCoin - diffCC
+											}
+										}
+										//SELL ORDER
+										else if (oldChoice.allocation > newChoice.allocation){
+											console.log("new less than old")
+											var diffCC = oldChoice.allocation - newChoice.allocation
+
+											if (diffCC < 0){
+												console.log('insufficient funds, not enough unallocated CC left')
+												res.status(422).send('insufficient funds, not enough unallocated CC left to sell' );
+												noFunds = 1
+											}
+											// var percentChange = 1 - (((currentPrice - oldPrice)/(oldPrice)) * -1)
+											// updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
+											newChoice.allocation = (oldChoice.allocation) - diffCC
+											updatedALlocatedCoin = updatedALlocatedCoin + (diffCC)
+										}
+									}
+								});
+							});
+
+							//only update entry if we had the funds
+							if (noFunds == 0){
+								GameEntry.findOneAndUpdate({
+									gameId: req.params.gameId,
+									userId: req.params.userId
+								}, {
+									$set: {
+										gameId: req.params.gameId,
+										userId: req.params.userId,
+										currentChoices: newChoices,
+										unallocated_capcoin: updatedALlocatedCoin,
+										last_updated: Date.now()
+									}
+								}, {
+									upsert: true,
+									new: true,
+									setDefaultsOnInsert: true
+								}, (upError, upResult) => {
+									if (upError || !upResult) {
+										console.log("here")
+										res.status(500).send('unable to update game entry');
+										return;
+
+									// update initial trade for user
+									} else {
+										Trade.findOneAndUpdate({
+											gameId: req.params.gameId,
+											userId: req.params.userId
+										}, {
+											$set: {
+												choices: newChoices
+											}
+										}, (tradeError, tradeResult) => {
+											if (tradeError || !tradeResult) {
+												console.log("asdfasdf")
+												res.status(500).send('unable to update initial trade');
+												return;
+											}
+
+											// we made it
+											res.status(200).send(upResult);
+										});
+									}
+								});
+							}
+						});
+					}
+				});
 			});
 		}
 	});
