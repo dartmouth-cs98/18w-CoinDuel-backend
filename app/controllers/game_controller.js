@@ -395,13 +395,13 @@ export const createAndUpdateEntry = (req, res) => {
 
 
 			//get a ticketstring to get current prices for all coins.
-			var choices = result.currentChoices
+			var entryChoices = result.currentChoices
 			var tickerString = "";
-			for (var i = 0; i < choices.length; i++) {
-				if (i != choices.length - 1) {
-					tickerString = tickerString.concat(choices[i].symbol, ",");
+			for (var i = 0; i < entryChoices.length; i++) {
+				if (i != entryChoices.length - 1) {
+					tickerString = tickerString.concat(entryChoices[i].symbol, ",");
 				} else {
-					tickerString = tickerString.concat(choices[i].symbol);
+					tickerString = tickerString.concat(entryChoices[i].symbol);
 				}
 			}
 			// console.log(tickerString);
@@ -416,9 +416,9 @@ export const createAndUpdateEntry = (req, res) => {
 				var count = 0
 				// console.log(prices)
 				for (var coin in prices) {
-					if (choices[count].allocation > 0){
+					if (entryChoices[count].allocation > 0){
 
-						var oldPrice = choices[count].price
+						var oldPrice = entryChoices[count].price
 						var currentPrice = prices[coin]['USD']
 
 
@@ -431,15 +431,15 @@ export const createAndUpdateEntry = (req, res) => {
 							percentChange = 1 - (((currentPrice - oldPrice)/(oldPrice)) * -1)
 						}
 
-						var oldAllocation = choices[count].allocation
-						choices[count].price = currentPrice
-						choices[count].allocation = (oldAllocation * percentChange)
+						var oldAllocation = entryChoices[count].allocation
+						entryChoices[count].price = currentPrice
+						entryChoices[count].allocation = (oldAllocation * percentChange)
 					}
 					count = count + 1
 				}
 				// //update coinBalance
 				var newCoinBalance = result.unallocated_capcoin
-				choices.forEach(choice => {
+				entryChoices.forEach(choice => {
 					newCoinBalance = newCoinBalance + choice.allocation
 				});
 
@@ -452,7 +452,7 @@ export const createAndUpdateEntry = (req, res) => {
 						gameId: req.params.gameId,
 						userId: req.params.userId,
 						coin_balance: newCoinBalance,
-						currentChoices: choices,
+						currentChoices: entryChoices,
 						last_updated: Date.now()
 					}
 				}, {
@@ -466,7 +466,7 @@ export const createAndUpdateEntry = (req, res) => {
 					} else {
 						// res.json(result);
 						var newChoices = req.body.choices
-						var unallocatedCapCoinLeft = result[0].unallocated_capcoin
+						var unallocatedCapCoinLeft = newResult.unallocated_capcoin
 						// ensure below 10 capcoin limit
 						var totalCapcoin = 0;
 						newChoices.forEach(choice => totalCapcoin += parseFloat(choice.allocation));
@@ -481,7 +481,7 @@ export const createAndUpdateEntry = (req, res) => {
 						}
 						// console.log(tickerString);
 
-						if (totalCapcoin > result.unallocated_capcoin) {
+						if (totalCapcoin > newResult.unallocated_capcoin) {
 							res.status(200).json({
 								'error': 'over capcoin limit for game, i.e. exceeds available unallocated capcoin limit'
 							});
@@ -506,7 +506,7 @@ export const createAndUpdateEntry = (req, res) => {
 							//choices now contains the updated prices and allocations for any choices any trades made
 							//update the coinballance and unallocated balance appropriaey.
 
-							var oldChoices = result[0].currentChoices
+							var oldChoices = newResult.currentChoices
 							var noFunds = 0;
 							// var updatedCoinBalance = result[0].coin_balance
 							var updatedALlocatedCoin = result[0].unallocated_capcoin
