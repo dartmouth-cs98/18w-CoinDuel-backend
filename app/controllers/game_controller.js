@@ -267,6 +267,12 @@ export const getEntry = (req, res) => {
 		});
 };
 
+function calc(theform) {
+    var num = theform.original.value, rounded = theform.rounded
+    var with2Decimals = num.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0]
+    rounded.value = with2Decimals
+}
+
 // updates entry specified by game and user ids (creates a new entry if one doesn't already exist)
 export const createAndUpdateEntry = (req, res) => {
 
@@ -435,11 +441,40 @@ export const createAndUpdateEntry = (req, res) => {
 
 				var oldChoices = result[0].currentChoices
 				var noFunds = 0;
-				// var updatedCoinBalance = result[0].coin_balance
-				var updatedALlocatedCoin = result[0].unallocated_capcoin
+
+				// cancel out any super small amounts of a coin a user might be in and add it back to their unallocated balance
+				var residualFundsToAdd = 0
 				oldChoices.forEach(oldChoice => {
 					newChoices.forEach(newChoice => {
 						if (oldChoice.symbol == newChoice.symbol){
+							if (oldChoice.allocation < 0.05 && newChoice.allocation < 0.05){
+								oldChoice.allocation = 0
+								residualFundsToAdd = residualFundsToAdd + parseFloat(newChoice.allocation)
+								newChoice.allocation = 0
+							}
+						}
+					});
+				});
+
+				console.log("residuals")
+				console.log(residualFundsToAdd)
+
+				// var updatedCoinBalance = result[0].coin_balance
+				var updatedALlocatedCoin = result[0].unallocated_capcoin + residualFundsToAdd
+				oldChoices.forEach(oldChoice => {
+					newChoices.forEach(newChoice => {
+
+						if (oldChoice.symbol == newChoice.symbol){
+							console.log("old alc and price, new alc and price, symbol")
+							console.log(oldChoice.allocation)
+							console.log(oldChoice.price)
+							console.log(newChoice.allocation)
+							console.log(newChoice.price)
+							console.log(oldChoice.symbol)
+
+
+
+
 							//BUY ORDER
 							if (oldChoice.allocation < newChoice.allocation){
 								var diffCC = newChoice.allocation - oldChoice.allocation
@@ -447,7 +482,6 @@ export const createAndUpdateEntry = (req, res) => {
 									console.log('insufficient funds, not enough unallocated CC left')
 									res.status(422).send('insufficient funds, not enough unallocated CC left');
 									noFunds = 1
-									return;
 								} else{
 									// var percentChange = ((newChoice.price - oldChoice.price)/oldChoice.price) * 100
 									// updatedCoinBalance = updatedCoinBalance + (percentChange * oldChoice.allocation)
@@ -456,9 +490,10 @@ export const createAndUpdateEntry = (req, res) => {
 								}
 							}
 							//SELL ORDER
-							if (oldChoice.allocation > newChoice.allocation){
+							else if (oldChoice.allocation > newChoice.allocation){
 								var diffCC = oldChoice.allocation - newChoice.allocation
-
+								console.log("Sell order")
+								console.log(diffCC)
 								if (diffCC < 0){
 									console.log('insufficient funds, not enough unallocated CC left')
 									res.status(422).send('insufficient funds, not enough unallocated CC left to sell' );
