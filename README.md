@@ -64,7 +64,42 @@ Heroku, using an automatic scheduler for certain jobs
 
 ## Blockchain
 
-ADD HERE JOSH
+After each game, users' Capcoin winnings are stored on a blockchain. A user mines their balance on the blockchain to receive their winnings. Our blockchain is built with Python and is loosely modeled after Bitcoin's blockchain. It is based on the tutorial found here: https://medium.com/crypto-currently/lets-make-the-tiniest-blockchain-bigger-ac360a328f4d.
+
+##### What is a blockchain?
+
+"[A blockchain is] a public database where new data are stored in a container called a block and are added to an immutable chain (hence blockchain) with data added in the past" - Gerald Nash, https://medium.com/crypto-currently/lets-build-the-tiniest-blockchain-e70965a248b.
+In short, a blockchain is a public ledger of transactions that rely on the trust of the public to execute. For our blockchain, all transactions are from the game and to the user, and rely on the user's participation in the game to execute, i.e. a user will only be able to mine their Capcoin winnings if they log time in the app after a game.
+
+##### Our Capcoin Block Schema
+A Capcoin block is instantiated using the following Python snippet...
+```
+def __init__(self, index, timestamp, data, previous_hash):
+    self.index = index
+    self.timestamp = timestamp
+    self.data = data
+    self.previous_hash = previous_hash
+    self.hash = self.hashBlock()
+```
+As seen above, a single Capcoin Block stores:
+1. index of the block (number of games a user has played)
+2. timestamp of the creation of the block
+3. any form of data (in our case, always a Capcoin balance)
+4. hash of the previous block for proof of work (explained below)
+5. hash of the block, formed by hashing all of its own data
+
+##### Mining & Our Proof of Work Algorithm
+In popular cryptocurrencies like Bitcoin, a proof-of-work is a datapoint (usually a number) that verifies "mining" work has been done to verify the transactions of a block of the blockchain. For our blockchain, we use an extremely simple proof-of-work algorithm:
+```
+def proofOfWork(lastProof):
+    """proof of work algorithm"""
+    # generate proof of work by incrementing variable
+    incrementor = lastProof + 1
+    while not (incrementor % POW_CONST == 0 and incrementor % lastProof == 0):
+        incrementor += 1
+    return incrementor
+```
+Our proof of work for a block will simply be the next multiple of an arbitrary constant (POW_CONST) that is also divisible by the previous proof of work on the chain. When a user opens our app after they participate in a game, the app will mine their winnings on the blockchain by accessing the proof of work generated from the previous game. Capcoin's POW_CONST is currently initialized to 5 to ensure extremely quick transaction verification. To put this in perspective, it would take several thoundand years to mine a single Bitcoin on a MacBookPro. Capcoin mining takes seconds.
 
 ## Authors
 
