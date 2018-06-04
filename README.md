@@ -62,6 +62,10 @@ The backend is comprised of Node.js and Express for the server, and MongoDB for 
 
 Heroku, using an automatic scheduler for certain jobs
 
+## Blockchain
+
+ADD HERE JOSH
+
 ## Authors
 
 Kooshul Jhaveri, Josh Kerber, Anish Chadalavada, Mitchell Revers, Rajiv Ramaiah, Henry Wilson
