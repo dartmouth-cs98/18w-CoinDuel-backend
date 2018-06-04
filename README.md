@@ -11,14 +11,19 @@ Look at the router.js file to view all the different endpoints created. They inc
 ```
 User: {
     email: { type: String, unique: true, lowercase: true },
-    username: String,
-    password: String,
+    username: { type: String },
+    password: { type: String },
+    verified: { type: Boolean, default: false },
+    verificationId: { type: String },
     profile_url: { type: String, default: 'profile' },
-    coinBalance: { type: Number, default: 0 }
+    coinBalance: { type: Number, default: 0 },
+    oneSignalId: { type: String },
+    lastGameId : {type: String, default: ' '}
 },
 Game: {
     start_date: { type: Date, default: Date.now },
     finish_date: { type: Date },
+    has_ended: { type: Boolean, default: false },
     coins: [{ name: { type: String }, startPrice: { type: Number }, endPrice: { type: Number }}],
 },
 GameEntry: {
@@ -63,4 +68,4 @@ Kooshul Jhaveri, Josh Kerber, Anish Chadalavada, Mitchell Revers, Rajiv Ramaiah,
 
 ## Acknowledgments
 
-N/A
+Tim Tregubov, for helping us make CoinDuel a reality!!!
