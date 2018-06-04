@@ -99,7 +99,7 @@ def proofOfWork(lastProof):
         incrementor += 1
     return incrementor
 ```
-Our proof-of-work for a block will simply be the next multiple of an arbitrary constant (POW_CONST) that is also divisible by the previous proof-of-work on the chain. When a user opens our app after they participate in a game, the app will mine their winnings on the blockchain by accessing the proof-of-work generated from the previous game. Capcoin's POW_CONST is currently initialized to 5 to ensure extremely quick transaction verification. To put this in perspective, it would take several thoundand years to mine a single Bitcoin on a MacBookPro. Capcoin mining takes seconds.
+Our proof-of-work for a block will simply be the next multiple of an arbitrary constant (POW_CONST) that is also divisible by the previous proof-of-work on the chain. When a user opens our app after they participate in a game, the app will mine their winnings on the blockchain by accessing the proof-of-work generated from the previous game they played. Capcoin's POW_CONST is currently initialized to 5 to ensure extremely quick transaction verification. To put this in perspective, it would take several thousand years to mine a single Bitcoin on a MacBookPro. Capcoin mining takes seconds.
 
 ## Authors
 
