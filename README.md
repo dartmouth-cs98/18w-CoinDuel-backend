@@ -89,7 +89,7 @@ As seen above, a single Capcoin Block stores:
 5. hash of the block, formed by hashing all of its own data
 
 ##### Mining & Our Proof of Work Algorithm
-In popular cryptocurrencies like Bitcoin, a proof-of-work is a datapoint (usually a number) that verifies "mining" work has been done to verify the transactions of a block of the blockchain. For our blockchain, we use an extremely simple proof-of-work algorithm:
+In popular cryptocurrencies like Bitcoin, a proof-of-work is a datapoint (usually a number) that verifies "mining" work has been done on the transactions of a block on the blockchain. Mining is required to verify and execute a transaction. For our blockchain, we use an extremely simple proof-of-work algorithm:
 ```
 def proofOfWork(lastProof):
     """proof of work algorithm"""
